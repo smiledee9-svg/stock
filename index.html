@@ -13,7 +13,7 @@
 <body>
   <div class="app-container">
     
-    <!-- Top Global Header -->
+    <!-- Top Global Header (รวมสองแถวแรกเป็นแถวเดียว Compact & Clean) -->
     <header class="app-header">
       <div class="header-content">
         <div class="brand" id="brandHomeTrigger" style="cursor: pointer;" title="กลับหน้ารวมร้านค้า">
@@ -26,11 +26,18 @@
           </div>
           <div>
             <h1 class="brand-title">SmartStock Hub</h1>
-            <p class="brand-subtitle" id="headerSubtitle">ระบบจัดการสต็อกหลายสาขา</p>
+            <p class="brand-subtitle" id="headerSubtitle">เลือกร้านค้าเพื่อเริ่มต้น</p>
           </div>
         </div>
 
         <div class="header-actions">
+          <button id="openAddStoreBtn" class="btn btn-primary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ เพิ่มร้านใหม่</span>
+          </button>
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
             <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -49,58 +56,7 @@
 
     <!-- ================= VIEW 1: STORES DIRECTORY (หน้าแรก: รวมร้านค้า) ================= -->
     <section id="storesHubView" class="view-section active">
-      <div class="hub-header-card">
-        <div class="hub-title-area">
-          <div class="hub-badge-pill">🏪 ศูนย์ควบคุมร้านค้า</div>
-          <h2 class="hub-title">เลือกร้านค้าเพื่อจัดการสต็อก</h2>
-          <p class="hub-subtitle">คุณสามารถเพิ่มสาขาใหม่ แยกสต็อกแต่ละร้าน และสลับร้านทำงานได้อย่างอิสระ</p>
-        </div>
-        <button id="openAddStoreBtn" class="btn btn-primary btn-large">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>+ เพิ่มร้านค้าใหม่</span>
-        </button>
-      </div>
-
-      <!-- Overview Stats Across All Stores -->
-      <div class="metrics-grid hub-metrics">
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">จำนวนร้านค้า</span>
-            <span class="metric-icon blue">🏪</span>
-          </div>
-          <div class="metric-value" id="hubTotalStores">0</div>
-          <div class="metric-foot">สาขาที่เปิดใช้งาน</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">จำนวนชิ้นรวมทุกร้าน</span>
-            <span class="metric-icon green">📦</span>
-          </div>
-          <div class="metric-value" id="hubTotalItems">0</div>
-          <div class="metric-foot">สินค้าในระบบทั้งหมด</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">มูลค่าสินค้าทุกร้าน</span>
-            <span class="metric-icon purple">💰</span>
-          </div>
-          <div class="metric-value" id="hubTotalValue">฿0</div>
-          <div class="metric-foot">ประเมินรวมทุกสาขา</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">สินค้าใกล้หมดรวม</span>
-            <span class="metric-icon amber">⚠️</span>
-          </div>
-          <div class="metric-value alert-text" id="hubTotalAlerts">0</div>
-          <div class="metric-foot">รายการที่ต้องสั่งเพิ่ม</div>
-        </div>
-      </div>
-
-      <!-- Stores Cards Grid -->
+      <!-- Stores Cards Grid (แสดงรายการร้านค้าทันที พื้นที่กว้างขึ้นเต็มตา) -->
       <div class="stores-section">
         <div class="section-title-row">
           <h3 class="section-title">รายชื่อร้านค้าของคุณ</h3>
@@ -114,7 +70,7 @@
         <div id="emptyStoresState" class="empty-state" style="display: none;">
           <div class="empty-icon">🏪</div>
           <h3>ยังไม่มีร้านค้าในระบบ</h3>
-          <p>กดปุ่ม "+ เพิ่มร้านค้าใหม่" เพื่อเริ่มต้นสร้างร้านค้าแรกของคุณ</p>
+          <p>กดปุ่ม "+ เพิ่มร้านใหม่" ด้านบนเพื่อเริ่มต้นสร้างร้านค้าแรกของคุณ</p>
         </div>
       </div>
     </section>

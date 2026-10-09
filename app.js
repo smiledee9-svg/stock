@@ -794,15 +794,8 @@ class MultiStoreStockApp {
     badge.textContent = `${this.stores.length} สาขา`;
 
     // Overview Stats
-    const totalStores = this.stores.length;
-    const totalItems = this.products.reduce((sum, p) => sum + (p.quantity || 0), 0);
-    const totalValue = this.products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
-    const totalAlerts = this.products.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
-
-    document.getElementById('hubTotalStores').textContent = totalStores;
-    document.getElementById('hubTotalItems').textContent = totalItems.toLocaleString();
-    document.getElementById('hubTotalValue').textContent = '฿' + totalValue.toLocaleString();
-    document.getElementById('hubTotalAlerts').textContent = totalAlerts;
+    // Product mapping (fallback unassigned products to first store)
+    const firstStoreId = this.stores[0]?.id;
 
     if (this.stores.length === 0) {
       grid.innerHTML = '';
@@ -813,7 +806,7 @@ class MultiStoreStockApp {
     emptyState.style.display = 'none';
 
     grid.innerHTML = this.stores.map(store => {
-      const storeProducts = this.products.filter(p => p.storeId === store.id);
+      const storeProducts = this.products.filter(p => p.storeId === store.id || (!p.storeId && store.id === firstStoreId));
       const skuCount = storeProducts.length;
       const piecesCount = storeProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
       const lowCount = storeProducts.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
