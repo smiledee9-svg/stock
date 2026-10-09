@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ระบบจัดการสต็อกสินค้า (Smart Stock Manager)</title>
+  <meta name="description" content="ระบบจัดการสต็อกสินค้าออนไลน์ บันทึกรับเข้า-ตัดออก เช็กประวัติ แจ้งเตือนสินค้าใกล้หมด ใช้งานง่ายบนมือถือ">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-title">SmartStock</h1>
+            <p class="brand-subtitle">ระบบสต็อกออนไลน์ 24 ชม.</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
+            <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <button id="backupBtn" class="icon-btn" title="สำรอง / กู้คืนข้อมูล" aria-label="Backup and Restore">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Navigation Bar (Mobile-friendly tabs) -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="inventory" id="tabInventoryBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <span>สต็อกสินค้า</span>
+      </button>
+      <button class="nav-tab" data-tab="history" id="tabHistoryBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>ประวัติเข้า-ออก</span>
+      </button>
+      <button class="nav-tab" data-tab="alerts" id="tabAlertsBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>เตือนของหมด</span>
+        <span class="badge-alert-count" id="alertCountBadge">0</span>
+      </button>
+    </nav>
+
+    <!-- Metrics Summary Cards -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">รายการสินค้า</span>
+          <span class="metric-icon blue">📦</span>
+        </div>
+        <div class="metric-value" id="metricTotalSKUs">0</div>
+        <div class="metric-foot">รวมทุกหมวดหมู่</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">จำนวนของรวม</span>
+          <span class="metric-icon green">🔢</span>
+        </div>
+        <div class="metric-value" id="metricTotalQuantity">0</div>
+        <div class="metric-foot">ชิ้นในคลัง</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">มูลค่าสินค้า</span>
+          <span class="metric-icon purple">💰</span>
+        </div>
+        <div class="metric-value" id="metricTotalValue">฿0</div>
+        <div class="metric-foot">ประเมินตามราคาขาย</div>
+      </div>
+      <div class="metric-card highlight-warning" id="cardLowStockTrigger">
+        <div class="metric-header">
+          <span class="metric-label">ใกล้หมดสต็อก</span>
+          <span class="metric-icon amber">⚠️</span>
+        </div>
+        <div class="metric-value alert-text" id="metricLowStockCount">0</div>
+        <div class="metric-foot" id="metricLowStockHint">ต้องสั่งเพิ่มด่วน</div>
+      </div>
+    </section>
+
+    <!-- TAB 1: INVENTORY SECTION -->
+    <main class="tab-content active" id="inventoryTab">
+      <!-- Controls Bar -->
+      <section class="controls-card">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="ค้นหาชื่อสินค้า, รหัส SKU..." autocomplete="off">
+          <button id="clearSearchBtn" class="clear-btn" hidden>&times;</button>
+        </div>
+
+        <div class="filter-actions">
+          <select id="categoryFilter" class="custom-select">
+            <option value="ALL">📁 ทุกหมวดหมู่</option>
+          </select>
+          <button id="openAddModalBtn" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>เพิ่มสินค้าใหม่</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Inventory Product List -->
+      <section class="products-section">
+        <div class="section-title-row">
+          <h2 class="section-title">คลังสินค้าปัจจุบัน</h2>
+          <span class="item-count-badge" id="productCountBadge">0 รายการ</span>
+        </div>
+
+        <div class="product-cards-grid" id="productGrid">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <div id="emptyInventoryState" class="empty-state" style="display: none;">
+          <div class="empty-icon">📦</div>
+          <h3>ยังไม่มีสินค้าในระบบ</h3>
+          <p>กดปุ่ม "เพิ่มสินค้าใหม่" ด้านบนเพื่อเริ่มต้นบันทึกสต็อกแรกของคุณ</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- TAB 2: TRANSACTION HISTORY SECTION -->
+    <section class="tab-content" id="historyTab">
+      <div class="history-card">
+        <div class="history-header">
+          <div>
+            <h2 class="section-title">ประวัติการเคลื่อนไหว (เข้า-ออก)</h2>
+            <p class="section-subtitle">บันทึกทุกรายการเพิ่ม/ตัดสต็อกพร้อมเวลาแบบเรียลไทม์</p>
+          </div>
+          <div class="history-filters">
+            <select id="historyFilterType" class="custom-select">
+              <option value="ALL">ทุกการทำรายการ</option>
+              <option value="IN">📥 รับเข้าอย่างเดียว</option>
+              <option value="OUT">📤 ตัดออกอย่างเดียว</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="history-list" id="historyList">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <div id="emptyHistoryState" class="empty-state" style="display: none;">
+          <div class="empty-icon">🕒</div>
+          <h3>ยังไม่มีประวัติการทำรายการ</h3>
+          <p>เมื่อมีการเพิ่มสต็อกหรือตัดของออก ประวัติจะบันทึกที่นี่โดยอัตโนมัติ</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: LOW STOCK ALERTS SECTION -->
+    <section class="tab-content" id="alertsTab">
+      <div class="alerts-card">
+        <div class="alerts-header">
+          <div class="warning-badge-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span>รายการสินค้าที่ต้องเติมด่วน</span>
+          </div>
+          <p class="section-subtitle">สินค้าที่จำนวนคงเหลือต่ำกว่าหรือเท่ากับจุดเตือนสต็อก</p>
+        </div>
+
+        <div class="low-stock-grid" id="lowStockGrid">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <div id="allGoodState" class="empty-state safe-state" style="display: none;">
+          <div class="empty-icon">🎉</div>
+          <h3>สต็อกเพียงพอทุกรายการ!</h3>
+          <p>ไม่มีสินค้าที่ต่ำกว่าจุดสั่งซื้อในขณะนี้ ระบบพร้อมใช้งานอย่างราบรื่น</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL: ADD / EDIT PRODUCT -->
+  <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">เพิ่มสินค้าใหม่</h3>
+        <button class="close-btn" id="closeProductModalBtn" aria-label="ปิด">&times;</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="editProductId">
+        
+        <div class="form-group">
+          <label for="prodName">ชื่อสินค้า <span class="required">*</span></label>
+          <input type="text" id="prodName" required placeholder="เช่น เสื้อยืดสีดำ ไซส์ L">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prodSku">รหัสสินค้า / SKU</label>
+            <input type="text" id="prodSku" placeholder="เช่น TS-BLK-L">
+          </div>
+          <div class="form-group">
+            <label for="prodCategory">หมวดหมู่</label>
+            <input type="text" id="prodCategory" placeholder="เช่น เสื้อผ้า, เครื่องดื่ม">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prodQuantity">จำนวนเริ่มต้น <span class="required">*</span></label>
+            <input type="number" id="prodQuantity" required min="0" step="1" value="10">
+          </div>
+          <div class="form-group">
+            <label for="prodMinAlert">เตือนเมื่อเหลือน้อยกว่า <span class="required">*</span></label>
+            <input type="number" id="prodMinAlert" required min="0" step="1" value="5">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prodPrice">ราคาต่อหน่วย (บาท)</label>
+            <input type="number" id="prodPrice" min="0" step="0.5" value="100">
+          </div>
+          <div class="form-group">
+            <label for="prodUnit">หน่วยนับ</label>
+            <input type="text" id="prodUnit" placeholder="ชิ้น, กล่อง, แพ็ก" value="ชิ้น">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelProductBtn">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="saveProductBtn">บันทึกสินค้า</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: QUICK STOCK ADJUST (IN/OUT) -->
+  <div class="modal-overlay" id="stockActionModal" role="dialog" aria-modal="true">
+    <div class="modal-card action-modal-card">
+      <div class="modal-header">
+        <h3 id="actionModalTitle">ปรับสต็อกสินค้า</h3>
+        <button class="close-btn" id="closeActionModalBtn" aria-label="ปิด">&times;</button>
+      </div>
+      <form id="stockActionForm">
+        <input type="hidden" id="actionProductId">
+        <input type="hidden" id="actionType" value="IN"> <!-- IN or OUT -->
+
+        <div class="action-product-summary">
+          <div class="action-prod-name" id="actionProdName">ชื่อสินค้า</div>
+          <div class="action-prod-stock">
+            คงเหลือปัจจุบัน: <strong id="actionCurrentStock">0</strong> <span id="actionProdUnit">ชิ้น</span>
+          </div>
+        </div>
+
+        <!-- Mode Toggle Tabs -->
+        <div class="action-type-tabs">
+          <button type="button" class="type-tab-btn active" id="btnTypeIn">
+            📥 รับของเข้า (+เพิ่ม)
+          </button>
+          <button type="button" class="type-tab-btn" id="btnTypeOut">
+            📤 ตัดของออก (-ลด)
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label for="actionAmount">จำนวน <span class="required">*</span></label>
+          <input type="number" id="actionAmount" required min="1" step="1" placeholder="ระบุจำนวนที่ต้องการปรับ" autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="actionReason">หมายเหตุ / เหตุผล</label>
+          <input type="text" id="actionReason" placeholder="เช่น สั่งของเข้าเพิ่ม, ขายหน้าร้าน, สินค้าชำรุด">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelActionBtn">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="confirmActionBtn">ยืนยันบันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: BACKUP & DATA MANAGEMENT -->
+  <div class="modal-overlay" id="backupModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>จัดการข้อมูลและสำรองไฟล์</h3>
+        <button class="close-btn" id="closeBackupModalBtn">&times;</button>
+      </div>
+      <div class="modal-body-content">
+        <p class="backup-desc">ข้อมูลทั้งหมดจะถูกบันทึกไว้อย่างปลอดภัย และสามารถส่งออกเพื่อย้ายเครื่องหรือนำไปเปิดบนอุปกรณ์อื่นได้ทันที</p>
+        
+        <div class="backup-actions-grid">
+          <div class="backup-action-box">
+            <h4>💾 ดาวน์โหลดข้อมูลสำรอง (Export)</h4>
+            <p>บันทึกข้อมูลสต็อกและประวัติทั้งหมดออกมาเป็นไฟล์ JSON</p>
+            <button id="exportJsonBtn" class="btn btn-secondary full-width">ดาวน์โหลดไฟล์ Backup (.json)</button>
+          </div>
+
+          <div class="backup-action-box">
+            <h4>📥 นำเข้าข้อมูล (Import)</h4>
+            <p>กู้คืนข้อมูลจากไฟล์สำรองที่เคยดาวน์โหลดไว้</p>
+            <input type="file" id="importFileInput" accept=".json" style="display:none">
+            <button id="importJsonBtn" class="btn btn-secondary full-width">เลือกไฟล์เพื่อนำเข้า</button>
+          </div>
+
+          <div class="backup-action-box">
+            <h4>✨ โหลดตัวอย่างสินค้าเริ่มต้น</h4>
+            <p>เพิ่มชุดข้อมูลตัวอย่างสำหรับทดสอบการใช้งาน</p>
+            <button id="loadSampleDataBtn" class="btn btn-secondary full-width">โหลดข้อมูลตัวอย่าง</button>
+          </div>
+
+          <div class="backup-action-box danger-box">
+            <h4>⚠️ ล้างข้อมูลทั้งหมด</h4>
+            <p>ล้างสต็อกและประวัติการทำรายการทั้งหมด</p>
+            <button id="resetAllDataBtn" class="btn btn-danger full-width">ล้างข้อมูลทั้งหมด</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeBackupFooterBtn">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
