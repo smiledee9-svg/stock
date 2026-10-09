@@ -91,7 +91,7 @@
           <div class="current-store-info">
             <span class="store-status-dot"></span>
             <div class="current-store-title" id="currentStoreName">ชื่อร้านค้า</div>
-            <span class="store-tag-badge" id="currentStoreTag">สาขาหลัก</span>
+            <span class="store-code-pill" id="currentStoreCode">01</span>
           </div>
         </div>
 
@@ -287,15 +287,9 @@
           <input type="text" id="storeNameInput" required placeholder="เช่น ร้านสาขา 1 (หน้าร้านสยาม), สต็อกออนไลน์">
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="storeTagInput">ป้ายกำกับ / หมวดหมู่ร้าน</label>
-            <input type="text" id="storeTagInput" placeholder="เช่น หน้าร้าน, ออนไลน์, คลังหลัก">
-          </div>
-          <div class="form-group">
-            <label for="storeIconInput">ไอคอนร้าน (อีโมจิ)</label>
-            <input type="text" id="storeIconInput" value="🏪" maxlength="4">
-          </div>
+        <div class="form-group">
+          <label for="storeCodeInput">ลำดับร้านค้า / รหัสสาขา <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400;">(ระบบจัดลำดับให้อัตโนมัติ)</span></label>
+          <input type="text" id="storeCodeInput" readonly style="background: var(--bg-tertiary); font-weight: 700; font-family: var(--font-code); color: var(--primary); cursor: default;">
         </div>
 
         <div class="form-group">

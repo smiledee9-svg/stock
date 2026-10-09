@@ -5,17 +5,15 @@
 const DEFAULT_STORES = [
   {
     id: "store_1",
+    code: "01",
     name: "สาขา 1 (หน้าร้านสยาม)",
-    tag: "หน้าร้าน",
-    icon: "🏪",
     desc: "สต็อกสินค้าขายหน้าร้านสยามสแควร์ ชั้น 1",
     createdAt: new Date().toISOString()
   },
   {
     id: "store_2",
+    code: "02",
     name: "สาขา 2 (คลังสินค้าออนไลน์)",
-    tag: "ออนไลน์",
-    icon: "🛒",
     desc: "สต็อกสำหรับส่งออเดอร์ Shopee, TikTok, Lazada",
     createdAt: new Date().toISOString()
   }
@@ -146,6 +144,12 @@ class MultiStoreStockApp {
       this.stores = [...DEFAULT_STORES];
       this.saveStores();
     }
+
+    // Ensure all stores have sequential code (01, 02, ...)
+    this.stores = this.stores.map((s, idx) => ({
+      ...s,
+      code: s.code || String(idx + 1).padStart(2, '0')
+    }));
 
     if (savedProducts) {
       try {
@@ -386,6 +390,8 @@ class MultiStoreStockApp {
     const form = document.getElementById('storeForm');
     const title = document.getElementById('storeModalTitle');
     const editIdInput = document.getElementById('editStoreId');
+    const codeInput = document.getElementById('storeCodeInput');
+    const descInput = document.getElementById('storeDescInput');
 
     form.reset();
 
@@ -393,13 +399,14 @@ class MultiStoreStockApp {
       title.textContent = 'แก้ไขข้อมูลร้านค้า';
       editIdInput.value = store.id;
       document.getElementById('storeNameInput').value = store.name;
-      document.getElementById('storeTagInput').value = store.tag || '';
-      document.getElementById('storeIconInput').value = store.icon || '🏪';
-      document.getElementById('storeDescInput').value = store.desc || '';
+      if (codeInput) codeInput.value = store.code || '01';
+      descInput.value = store.desc || '';
     } else {
-      title.textContent = 'เพิ่มร้านค้า / สาขาใหม่';
+      title.textContent = 'เพิ่มร้านค้าใหม่';
       editIdInput.value = '';
-      document.getElementById('storeIconInput').value = '🏪';
+      const nextNum = this.stores.length + 1;
+      if (codeInput) codeInput.value = String(nextNum).padStart(2, '0');
+      descInput.value = '';
     }
 
     this.openModal(modal);
@@ -409,8 +416,8 @@ class MultiStoreStockApp {
     e.preventDefault();
     const editId = document.getElementById('editStoreId').value;
     const name = document.getElementById('storeNameInput').value.trim();
-    const tag = document.getElementById('storeTagInput').value.trim() || 'สาขา';
-    const icon = document.getElementById('storeIconInput').value.trim() || '🏪';
+    const codeInput = document.getElementById('storeCodeInput');
+    const code = codeInput ? codeInput.value.trim() : '';
     const desc = document.getElementById('storeDescInput').value.trim();
 
     if (editId) {
@@ -419,23 +426,22 @@ class MultiStoreStockApp {
         this.stores[index] = {
           ...this.stores[index],
           name,
-          tag,
-          icon,
           desc
         };
         this.showToast(`แก้ไขร้าน "${name}" เรียบร้อย`, 'success');
       }
     } else {
+      const nextNum = this.stores.length + 1;
+      const storeCode = code || String(nextNum).padStart(2, '0');
       const newStore = {
         id: 'store_' + Date.now(),
+        code: storeCode,
         name,
-        tag,
-        icon,
         desc,
         createdAt: new Date().toISOString()
       };
       this.stores.push(newStore);
-      this.showToast(`เพิ่มร้าน "${name}" เรียบร้อย 🎉`, 'success');
+      this.showToast(`เพิ่มร้าน "${name}" (#${newStore.code}) เรียบร้อย 🎉`, 'success');
     }
 
     this.saveStores();
@@ -779,7 +785,8 @@ class MultiStoreStockApp {
       subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
 
       document.getElementById('currentStoreName').textContent = currentStore.name;
-      document.getElementById('currentStoreTag').textContent = currentStore.tag || 'สาขา';
+      const codeBadge = document.getElementById('currentStoreCode');
+      if (codeBadge) codeBadge.textContent = currentStore.code ? `#${currentStore.code}` : '#01';
 
       this.renderStoreDetail();
     }
@@ -805,7 +812,8 @@ class MultiStoreStockApp {
 
     emptyState.style.display = 'none';
 
-    grid.innerHTML = this.stores.map(store => {
+    grid.innerHTML = this.stores.map((store, idx) => {
+      const storeCode = store.code || String(idx + 1).padStart(2, '0');
       const storeProducts = this.products.filter(p => p.storeId === store.id || (!p.storeId && store.id === firstStoreId));
       const skuCount = storeProducts.length;
       const piecesCount = storeProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
@@ -816,10 +824,9 @@ class MultiStoreStockApp {
           <div>
             <div class="store-card-header">
               <div class="store-header-left">
-                <div class="store-avatar">${store.icon || '🏪'}</div>
+                <div class="store-avatar">${storeCode}</div>
                 <div>
                   <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
-                  <span class="store-tag-badge">${this.escapeHtml(store.tag || 'สาขา')}</span>
                 </div>
               </div>
               <div>
