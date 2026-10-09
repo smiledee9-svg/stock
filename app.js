@@ -1,11 +1,30 @@
 /**
- * SmartStock - Complete Stock Management Application Logic
+ * SmartStock - Multi-Store Architecture Application Logic
  */
 
-// Initial Sample Data if empty
-const SAMPLE_PRODUCTS = [
+const DEFAULT_STORES = [
+  {
+    id: "store_1",
+    name: "สาขา 1 (หน้าร้านสยาม)",
+    tag: "หน้าร้าน",
+    icon: "🏪",
+    desc: "สต็อกสินค้าขายหน้าร้านสยามสแควร์ ชั้น 1",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "store_2",
+    name: "สาขา 2 (คลังสินค้าออนไลน์)",
+    tag: "ออนไลน์",
+    icon: "🛒",
+    desc: "สต็อกสำหรับส่งออเดอร์ Shopee, TikTok, Lazada",
+    createdAt: new Date().toISOString()
+  }
+];
+
+const DEFAULT_PRODUCTS = [
   {
     id: "prod_1",
+    storeId: "store_1",
     name: "เสื้อยืดคอตตอน สีดำ (Oversized)",
     sku: "TS-BLK-OS",
     category: "เสื้อผ้า",
@@ -17,6 +36,7 @@ const SAMPLE_PRODUCTS = [
   },
   {
     id: "prod_2",
+    storeId: "store_1",
     name: "กางเกงคาร์โก้ ขากระบอก สีเขียวโอลีฟ",
     sku: "CG-GRN-32",
     category: "เสื้อผ้า",
@@ -28,10 +48,11 @@ const SAMPLE_PRODUCTS = [
   },
   {
     id: "prod_3",
+    storeId: "store_2",
     name: "หมวกแก๊ปเบสบอล มินิมอล",
     sku: "CAP-MINI-01",
     category: "เครื่องประดับ",
-    quantity: 15,
+    quantity: 18,
     minAlert: 5,
     price: 250,
     unit: "ใบ",
@@ -39,10 +60,11 @@ const SAMPLE_PRODUCTS = [
   },
   {
     id: "prod_4",
+    storeId: "store_2",
     name: "กระเป๋าผ้าแคนวาส รักษ์โลก",
     sku: "BAG-ECO-WHT",
     category: "เครื่องประดับ",
-    quantity: 1,
+    quantity: 2,
     minAlert: 6,
     price: 190,
     unit: "ใบ",
@@ -50,45 +72,50 @@ const SAMPLE_PRODUCTS = [
   }
 ];
 
-const SAMPLE_HISTORY = [
+const DEFAULT_HISTORY = [
   {
     id: "hist_1",
+    storeId: "store_1",
     productId: "prod_1",
     productName: "เสื้อยืดคอตตอน สีดำ (Oversized)",
     type: "IN",
     amount: 24,
     balanceAfter: 24,
-    reason: "สต็อกล็อตใหม่จากโรงงาน",
+    reason: "สต็อกล็อตแรกหน้าร้าน",
     timestamp: new Date(Date.now() - 3600000 * 24).toISOString()
   },
   {
     id: "hist_2",
+    storeId: "store_1",
     productId: "prod_2",
     productName: "กางเกงคาร์โก้ ขากระบอก สีเขียวโอลีฟ",
     type: "OUT",
     amount: 2,
     balanceAfter: 3,
-    reason: "ลูกค้าสั่งผ่านหน้าร้าน",
-    timestamp: new Date(Date.now() - 3600000 * 4).toISOString()
+    reason: "ลูกค้าหน้าร้านซื้อ",
+    timestamp: new Date(Date.now() - 3600000 * 5).toISOString()
   },
   {
     id: "hist_3",
+    storeId: "store_2",
     productId: "prod_4",
     productName: "กระเป๋าผ้าแคนวาส รักษ์โลก",
     type: "OUT",
-    amount: 5,
-    balanceAfter: 1,
-    reason: "ขายทางออนไลน์ (Shopee/TikTok)",
+    amount: 4,
+    balanceAfter: 2,
+    reason: "ออเดอร์ TikTok Shop",
     timestamp: new Date(Date.now() - 3600000 * 2).toISOString()
   }
 ];
 
-// State Manager
-class StockApp {
+class MultiStoreStockApp {
   constructor() {
+    this.stores = [];
     this.products = [];
     this.history = [];
-    this.activeTab = 'inventory';
+
+    this.currentStoreId = null; // null = Hub view
+    this.activeTab = 'inventory'; // within store view
     this.searchQuery = '';
     this.categoryFilter = 'ALL';
     this.historyFilter = 'ALL';
@@ -102,20 +129,32 @@ class StockApp {
     this.render();
   }
 
-  // Load from LocalStorage
   loadState() {
+    const savedStores = localStorage.getItem('smartstock_stores');
     const savedProducts = localStorage.getItem('smartstock_products');
     const savedHistory = localStorage.getItem('smartstock_history');
     const savedTheme = localStorage.getItem('smartstock_theme');
+    const savedCurrentStore = localStorage.getItem('smartstock_current_store');
+
+    if (savedStores) {
+      try {
+        this.stores = JSON.parse(savedStores);
+      } catch (e) {
+        this.stores = [...DEFAULT_STORES];
+      }
+    } else {
+      this.stores = [...DEFAULT_STORES];
+      this.saveStores();
+    }
 
     if (savedProducts) {
       try {
         this.products = JSON.parse(savedProducts);
       } catch (e) {
-        this.products = [...SAMPLE_PRODUCTS];
+        this.products = [...DEFAULT_PRODUCTS];
       }
     } else {
-      this.products = [...SAMPLE_PRODUCTS];
+      this.products = [...DEFAULT_PRODUCTS];
       this.saveProducts();
     }
 
@@ -123,16 +162,26 @@ class StockApp {
       try {
         this.history = JSON.parse(savedHistory);
       } catch (e) {
-        this.history = [...SAMPLE_HISTORY];
+        this.history = [...DEFAULT_HISTORY];
       }
     } else {
-      this.history = [...SAMPLE_HISTORY];
+      this.history = [...DEFAULT_HISTORY];
       this.saveHistory();
     }
 
     if (savedTheme === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
     }
+
+    if (savedCurrentStore && this.stores.some(s => s.id === savedCurrentStore)) {
+      this.currentStoreId = savedCurrentStore;
+    } else {
+      this.currentStoreId = null;
+    }
+  }
+
+  saveStores() {
+    localStorage.setItem('smartstock_stores', JSON.stringify(this.stores));
   }
 
   saveProducts() {
@@ -143,11 +192,9 @@ class StockApp {
     localStorage.setItem('smartstock_history', JSON.stringify(this.history));
   }
 
-  // Bind UI Events
   bindEvents() {
     // Theme Switcher
-    const themeBtn = document.getElementById('themeToggleBtn');
-    themeBtn.addEventListener('click', () => {
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
       if (isDark) {
         document.body.removeAttribute('data-theme');
@@ -160,12 +207,38 @@ class StockApp {
       }
     });
 
-    // Navigation Tabs
-    const tabs = document.querySelectorAll('.nav-tab');
-    tabs.forEach(tab => {
+    // Brand click = return to Hub
+    document.getElementById('brandHomeTrigger').addEventListener('click', () => {
+      this.goToHubView();
+    });
+
+    // Back to Hub button
+    document.getElementById('backToHubBtn').addEventListener('click', () => {
+      this.goToHubView();
+    });
+
+    // Store Modal
+    const storeModal = document.getElementById('storeModal');
+    const openAddStoreBtn = document.getElementById('openAddStoreBtn');
+    const closeStoreModalBtn = document.getElementById('closeStoreModalBtn');
+    const cancelStoreBtn = document.getElementById('cancelStoreBtn');
+    const storeForm = document.getElementById('storeForm');
+
+    openAddStoreBtn.addEventListener('click', () => this.openStoreModal());
+    closeStoreModalBtn.addEventListener('click', () => this.closeModal(storeModal));
+    cancelStoreBtn.addEventListener('click', () => this.closeModal(storeModal));
+    storeForm.addEventListener('submit', (e) => this.handleSaveStore(e));
+
+    // Edit Current Store button
+    document.getElementById('editCurrentStoreBtn').addEventListener('click', () => {
+      const store = this.stores.find(s => s.id === this.currentStoreId);
+      if (store) this.openStoreModal(store);
+    });
+
+    // Navigation Tabs in Store
+    document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        const tabTarget = tab.dataset.tab;
-        this.switchTab(tabTarget);
+        this.switchTab(tab.dataset.tab);
       });
     });
 
@@ -174,7 +247,7 @@ class StockApp {
       this.switchTab('alerts');
     });
 
-    // Search input
+    // Search and Filters
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearchBtn');
 
@@ -191,97 +264,96 @@ class StockApp {
       this.renderProducts();
     });
 
-    // Category Filter
-    const catFilter = document.getElementById('categoryFilter');
-    catFilter.addEventListener('change', (e) => {
+    document.getElementById('categoryFilter').addEventListener('change', (e) => {
       this.categoryFilter = e.target.value;
       this.renderProducts();
     });
 
-    // History Type Filter
-    const histFilter = document.getElementById('historyFilterType');
-    histFilter.addEventListener('change', (e) => {
+    document.getElementById('historyFilterType').addEventListener('change', (e) => {
       this.historyFilter = e.target.value;
       this.renderHistory();
     });
 
-    // Modals: Product Add/Edit
-    const openAddBtn = document.getElementById('openAddModalBtn');
+    // Product Modal
     const productModal = document.getElementById('productModal');
-    const closeProductModal = document.getElementById('closeProductModalBtn');
-    const cancelProductBtn = document.getElementById('cancelProductBtn');
-    const productForm = document.getElementById('productForm');
+    document.getElementById('openAddModalBtn').addEventListener('click', () => this.openProductModal());
+    document.getElementById('closeProductModalBtn').addEventListener('click', () => this.closeModal(productModal));
+    document.getElementById('cancelProductBtn').addEventListener('click', () => this.closeModal(productModal));
+    document.getElementById('productForm').addEventListener('submit', (e) => this.handleSaveProduct(e));
 
-    openAddBtn.addEventListener('click', () => this.openProductModal());
-    closeProductModal.addEventListener('click', () => this.closeModal(productModal));
-    cancelProductBtn.addEventListener('click', () => this.closeModal(productModal));
-    productForm.addEventListener('submit', (e) => this.handleSaveProduct(e));
-
-    // Modals: Quick Stock Adjust
+    // Stock Adjust Modal
     const actionModal = document.getElementById('stockActionModal');
-    const closeActionModal = document.getElementById('closeActionModalBtn');
-    const cancelActionBtn = document.getElementById('cancelActionBtn');
-    const stockActionForm = document.getElementById('stockActionForm');
-    const btnTypeIn = document.getElementById('btnTypeIn');
-    const btnTypeOut = document.getElementById('btnTypeOut');
+    document.getElementById('btnTypeIn').addEventListener('click', () => this.setActionType('IN'));
+    document.getElementById('btnTypeOut').addEventListener('click', () => this.setActionType('OUT'));
+    document.getElementById('closeActionModalBtn').addEventListener('click', () => this.closeModal(actionModal));
+    document.getElementById('cancelActionBtn').addEventListener('click', () => this.closeModal(actionModal));
+    document.getElementById('stockActionForm').addEventListener('submit', (e) => this.handleSaveStockAction(e));
 
-    btnTypeIn.addEventListener('click', () => this.setActionType('IN'));
-    btnTypeOut.addEventListener('click', () => this.setActionType('OUT'));
-
-    closeActionModal.addEventListener('click', () => this.closeModal(actionModal));
-    cancelActionBtn.addEventListener('click', () => this.closeModal(actionModal));
-    stockActionForm.addEventListener('submit', (e) => this.handleSaveStockAction(e));
-
-    // Modals: Backup & Restore
-    const backupBtn = document.getElementById('backupBtn');
+    // Backup & Restore
     const backupModal = document.getElementById('backupModal');
-    const closeBackupBtn = document.getElementById('closeBackupModalBtn');
-    const closeBackupFooterBtn = document.getElementById('closeBackupFooterBtn');
-
-    backupBtn.addEventListener('click', () => this.openModal(backupModal));
-    closeBackupBtn.addEventListener('click', () => this.closeModal(backupModal));
-    closeBackupFooterBtn.addEventListener('click', () => this.closeModal(backupModal));
-
-    // Export JSON
+    document.getElementById('backupBtn').addEventListener('click', () => this.openModal(backupModal));
+    document.getElementById('closeBackupModalBtn').addEventListener('click', () => this.closeModal(backupModal));
+    document.getElementById('closeBackupFooterBtn').addEventListener('click', () => this.closeModal(backupModal));
     document.getElementById('exportJsonBtn').addEventListener('click', () => this.exportBackup());
 
-    // Import JSON
     const importFileInput = document.getElementById('importFileInput');
     document.getElementById('importJsonBtn').addEventListener('click', () => importFileInput.click());
     importFileInput.addEventListener('change', (e) => this.importBackup(e));
 
     // Load Sample Data
     document.getElementById('loadSampleDataBtn').addEventListener('click', () => {
-      if (confirm('ต้องการโหลดข้อมูลตัวอย่างสินค้าหรือไม่? ข้อมูลปัจจุบันจะถูกแทนที่')) {
-        this.products = JSON.parse(JSON.stringify(SAMPLE_PRODUCTS));
-        this.history = JSON.parse(JSON.stringify(SAMPLE_HISTORY));
+      if (confirm('ต้องการโหลดข้อมูลตัวอย่างร้านค้าและสินค้าหรือไม่? ข้อมูลปัจจุบันจะถูกแทนที่')) {
+        this.stores = JSON.parse(JSON.stringify(DEFAULT_STORES));
+        this.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+        this.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+        this.saveStores();
         this.saveProducts();
         this.saveHistory();
+        this.currentStoreId = null;
         this.render();
         this.closeModal(backupModal);
-        this.showToast('โหลดข้อมูลตัวอย่างเรียบร้อย', 'success');
+        this.showToast('โหลดข้อมูลตัวอย่าง 2 สาขาเรียบร้อย 🎉', 'success');
       }
     });
 
     // Reset All Data
     document.getElementById('resetAllDataBtn').addEventListener('click', () => {
-      if (confirm('คำเตือน: คุณแน่ใจหรือไม่ว่าต้องการล้างสต็อกและประวัติทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้')) {
+      if (confirm('คำเตือน: คุณแน่ใจหรือไม่ว่าต้องการล้างร้านค้าและสต็อกทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้')) {
+        this.stores = [];
         this.products = [];
         this.history = [];
+        this.saveStores();
         this.saveProducts();
         this.saveHistory();
+        this.currentStoreId = null;
         this.render();
         this.closeModal(backupModal);
         this.showToast('ล้างข้อมูลเรียบร้อยแล้ว', 'warning');
       }
     });
 
-    // Close modal on click outside
+    // Close on outside modal click
     window.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal-overlay')) {
         this.closeModal(e.target);
       }
     });
+  }
+
+  // View Navigation
+  goToHubView() {
+    this.currentStoreId = null;
+    localStorage.removeItem('smartstock_current_store');
+    this.render();
+  }
+
+  selectStore(storeId) {
+    this.currentStoreId = storeId;
+    localStorage.setItem('smartstock_current_store', storeId);
+    this.activeTab = 'inventory';
+    this.searchQuery = '';
+    this.categoryFilter = 'ALL';
+    this.render();
   }
 
   switchTab(tabName) {
@@ -300,14 +372,105 @@ class StockApp {
     }
   }
 
-  openModal(modalElem) {
-    modalElem.classList.add('active');
+  openModal(elem) {
+    elem.classList.add('active');
   }
 
-  closeModal(modalElem) {
-    modalElem.classList.remove('active');
+  closeModal(elem) {
+    elem.classList.remove('active');
   }
 
+  // Store Management
+  openStoreModal(store = null) {
+    const modal = document.getElementById('storeModal');
+    const form = document.getElementById('storeForm');
+    const title = document.getElementById('storeModalTitle');
+    const editIdInput = document.getElementById('editStoreId');
+
+    form.reset();
+
+    if (store) {
+      title.textContent = 'แก้ไขข้อมูลร้านค้า';
+      editIdInput.value = store.id;
+      document.getElementById('storeNameInput').value = store.name;
+      document.getElementById('storeTagInput').value = store.tag || '';
+      document.getElementById('storeIconInput').value = store.icon || '🏪';
+      document.getElementById('storeDescInput').value = store.desc || '';
+    } else {
+      title.textContent = 'เพิ่มร้านค้า / สาขาใหม่';
+      editIdInput.value = '';
+      document.getElementById('storeIconInput').value = '🏪';
+    }
+
+    this.openModal(modal);
+  }
+
+  handleSaveStore(e) {
+    e.preventDefault();
+    const editId = document.getElementById('editStoreId').value;
+    const name = document.getElementById('storeNameInput').value.trim();
+    const tag = document.getElementById('storeTagInput').value.trim() || 'สาขา';
+    const icon = document.getElementById('storeIconInput').value.trim() || '🏪';
+    const desc = document.getElementById('storeDescInput').value.trim();
+
+    if (editId) {
+      const index = this.stores.findIndex(s => s.id === editId);
+      if (index !== -1) {
+        this.stores[index] = {
+          ...this.stores[index],
+          name,
+          tag,
+          icon,
+          desc
+        };
+        this.showToast(`แก้ไขร้าน "${name}" เรียบร้อย`, 'success');
+      }
+    } else {
+      const newStore = {
+        id: 'store_' + Date.now(),
+        name,
+        tag,
+        icon,
+        desc,
+        createdAt: new Date().toISOString()
+      };
+      this.stores.push(newStore);
+      this.showToast(`เพิ่มร้าน "${name}" เรียบร้อย 🎉`, 'success');
+    }
+
+    this.saveStores();
+    this.closeModal(document.getElementById('storeModal'));
+    this.render();
+  }
+
+  deleteStore(storeId) {
+    const store = this.stores.find(s => s.id === storeId);
+    if (!store) return;
+
+    const itemCount = this.products.filter(p => p.storeId === storeId).length;
+    const msg = itemCount > 0 
+      ? `คุณต้องการลบร้าน "${store.name}" พร้อมสินค้าทั้ง ${itemCount} รายการในร้านนี้หรือไม่?`
+      : `คุณต้องการลบร้าน "${store.name}" หรือไม่?`;
+
+    if (confirm(msg)) {
+      this.stores = this.stores.filter(s => s.id !== storeId);
+      this.products = this.products.filter(p => p.storeId !== storeId);
+      this.history = this.history.filter(h => h.storeId !== storeId);
+      this.saveStores();
+      this.saveProducts();
+      this.saveHistory();
+
+      if (this.currentStoreId === storeId) {
+        this.currentStoreId = null;
+        localStorage.removeItem('smartstock_current_store');
+      }
+
+      this.render();
+      this.showToast(`ลบร้าน "${store.name}" เรียบร้อยแล้ว`, 'warning');
+    }
+  }
+
+  // Product Management
   openProductModal(product = null) {
     const modal = document.getElementById('productModal');
     const form = document.getElementById('productForm');
@@ -327,7 +490,7 @@ class StockApp {
       document.getElementById('prodPrice').value = product.price || 0;
       document.getElementById('prodUnit').value = product.unit || 'ชิ้น';
     } else {
-      title.textContent = 'เพิ่มสินค้าใหม่';
+      title.textContent = 'เพิ่มสินค้าในร้านนี้';
       editIdInput.value = '';
       document.getElementById('prodQuantity').value = 10;
       document.getElementById('prodMinAlert').value = 5;
@@ -340,6 +503,8 @@ class StockApp {
 
   handleSaveProduct(e) {
     e.preventDefault();
+    if (!this.currentStoreId) return;
+
     const editId = document.getElementById('editProductId').value;
     const name = document.getElementById('prodName').value.trim();
     const sku = document.getElementById('prodSku').value.trim();
@@ -350,7 +515,6 @@ class StockApp {
     const unit = document.getElementById('prodUnit').value.trim() || 'ชิ้น';
 
     if (editId) {
-      // Edit existing product
       const index = this.products.findIndex(p => p.id === editId);
       if (index !== -1) {
         const oldQty = this.products[index].quantity;
@@ -366,10 +530,10 @@ class StockApp {
           updatedAt: new Date().toISOString()
         };
 
-        // If quantity changed directly in edit, log it
         if (oldQty !== quantity) {
           const diff = quantity - oldQty;
           this.logHistory({
+            storeId: this.currentStoreId,
             productId: editId,
             productName: name,
             type: diff > 0 ? 'IN' : 'OUT',
@@ -381,9 +545,9 @@ class StockApp {
         this.showToast(`แก้ไขข้อมูล "${name}" สำเร็จ`, 'success');
       }
     } else {
-      // Create new product
       const newProduct = {
         id: 'prod_' + Date.now(),
+        storeId: this.currentStoreId,
         name,
         sku: sku || ('SKU-' + Math.floor(1000 + Math.random() * 9000)),
         category,
@@ -395,19 +559,19 @@ class StockApp {
       };
       this.products.unshift(newProduct);
 
-      // Log initial stock
       if (quantity > 0) {
         this.logHistory({
+          storeId: this.currentStoreId,
           productId: newProduct.id,
           productName: name,
           type: 'IN',
           amount: quantity,
           balanceAfter: quantity,
-          reason: 'เพิ่มสินค้าใหม่เข้าระบบ'
+          reason: 'เพิ่มสินค้าใหม่เข้าร้าน'
         });
       }
 
-      this.showToast(`เพิ่ม "${name}" เข้าระบบแล้ว`, 'success');
+      this.showToast(`เพิ่ม "${name}" เข้าร้านสำเร็จ`, 'success');
     }
 
     this.saveProducts();
@@ -415,7 +579,7 @@ class StockApp {
     this.render();
   }
 
-  // Stock Adjust Modal Trigger
+  // Stock Adjustment (IN/OUT)
   openStockAction(productId, type = 'IN') {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
@@ -469,7 +633,7 @@ class StockApp {
     if (!product) return;
 
     if (type === 'OUT' && amount > product.quantity) {
-      alert(`ไม่สามารถตัดของออกได้! จำนวนในสต็อกมีเพียง ${product.quantity} ${product.unit}`);
+      alert(`ไม่สามารถตัดของออกได้! จำนวนคงเหลือมีเพียง ${product.quantity} ${product.unit}`);
       return;
     }
 
@@ -483,8 +647,8 @@ class StockApp {
     }
     product.updatedAt = new Date().toISOString();
 
-    // Log History
     this.logHistory({
+      storeId: product.storeId,
       productId: product.id,
       productName: product.name,
       type: type,
@@ -505,7 +669,7 @@ class StockApp {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
 
-    if (confirm(`คุณต้องการลบ "${product.name}" ออกจากระบบหรือไม่?`)) {
+    if (confirm(`คุณต้องการลบ "${product.name}" ออกจากร้านนี้หรือไม่?`)) {
       this.products = this.products.filter(p => p.id !== productId);
       this.saveProducts();
       this.render();
@@ -523,11 +687,12 @@ class StockApp {
     this.saveHistory();
   }
 
-  // Backup Export
+  // Backup & Restore
   exportBackup() {
     const backupData = {
-      app: 'SmartStock',
+      app: 'MultiStoreSmartStock',
       exportedAt: new Date().toISOString(),
+      stores: this.stores,
       products: this.products,
       history: this.history
     };
@@ -536,15 +701,14 @@ class StockApp {
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
     const dateFormatted = new Date().toISOString().slice(0, 10);
-    downloadAnchor.setAttribute("download", `smartstock-backup-${dateFormatted}.json`);
+    downloadAnchor.setAttribute("download", `multistock-backup-${dateFormatted}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
 
-    this.showToast('ดาวน์โหลดไฟล์สำรองเรียบร้อยแล้ว 💾', 'success');
+    this.showToast('ดาวน์โหลดไฟล์สำรองทุกร้านเรียบร้อย 💾', 'success');
   }
 
-  // Backup Import
   importBackup(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -553,14 +717,17 @@ class StockApp {
     reader.onload = (event) => {
       try {
         const parsed = JSON.parse(event.target.result);
-        if (Array.isArray(parsed.products)) {
+        if (Array.isArray(parsed.stores) && Array.isArray(parsed.products)) {
+          this.stores = parsed.stores;
           this.products = parsed.products;
           this.history = Array.isArray(parsed.history) ? parsed.history : [];
+          this.saveStores();
           this.saveProducts();
           this.saveHistory();
+          this.currentStoreId = null;
           this.render();
           this.closeModal(document.getElementById('backupModal'));
-          this.showToast('กู้คืนข้อมูลสต็อกสำเร็จเรียบร้อย! 🎉', 'success');
+          this.showToast('กู้คืนข้อมูลทุกสาขาสำเร็จเรียบร้อย! 🎉', 'success');
         } else {
           alert('รูปแบบไฟล์ JSON ไม่ถูกต้องสำหรับระบบ SmartStock');
         }
@@ -572,7 +739,6 @@ class StockApp {
     e.target.value = '';
   }
 
-  // Toast System
   showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -588,20 +754,131 @@ class StockApp {
     }, 3200);
   }
 
-  // Render Pipeline
+  // Master Render Loop
   render() {
-    this.renderMetrics();
-    this.renderCategoryFilterOptions();
-    this.renderProducts();
-    this.renderHistory();
-    this.renderAlerts();
+    const hubView = document.getElementById('storesHubView');
+    const detailView = document.getElementById('storeDetailView');
+    const subtitle = document.getElementById('headerSubtitle');
+
+    if (!this.currentStoreId) {
+      // Show Hub View
+      hubView.style.display = 'block';
+      detailView.style.display = 'none';
+      subtitle.textContent = 'เลือกร้านค้าเพื่อเริ่มต้น';
+      this.renderHub();
+    } else {
+      // Show Store Detail View
+      const currentStore = this.stores.find(s => s.id === this.currentStoreId);
+      if (!currentStore) {
+        this.goToHubView();
+        return;
+      }
+
+      hubView.style.display = 'none';
+      detailView.style.display = 'block';
+      subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
+
+      document.getElementById('currentStoreName').textContent = currentStore.name;
+      document.getElementById('currentStoreTag').textContent = currentStore.tag || 'สาขา';
+
+      this.renderStoreDetail();
+    }
   }
 
-  renderMetrics() {
-    const totalSKUs = this.products.length;
-    const totalQuantity = this.products.reduce((sum, p) => sum + (p.quantity || 0), 0);
+  // Render Hub
+  renderHub() {
+    const grid = document.getElementById('storesGrid');
+    const emptyState = document.getElementById('emptyStoresState');
+    const badge = document.getElementById('storesCountBadge');
+
+    badge.textContent = `${this.stores.length} สาขา`;
+
+    // Overview Stats
+    const totalStores = this.stores.length;
+    const totalItems = this.products.reduce((sum, p) => sum + (p.quantity || 0), 0);
     const totalValue = this.products.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
-    const lowStockCount = this.products.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
+    const totalAlerts = this.products.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
+
+    document.getElementById('hubTotalStores').textContent = totalStores;
+    document.getElementById('hubTotalItems').textContent = totalItems.toLocaleString();
+    document.getElementById('hubTotalValue').textContent = '฿' + totalValue.toLocaleString();
+    document.getElementById('hubTotalAlerts').textContent = totalAlerts;
+
+    if (this.stores.length === 0) {
+      grid.innerHTML = '';
+      emptyState.style.display = 'block';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+
+    grid.innerHTML = this.stores.map(store => {
+      const storeProducts = this.products.filter(p => p.storeId === store.id);
+      const skuCount = storeProducts.length;
+      const piecesCount = storeProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
+      const lowCount = storeProducts.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
+
+      return `
+        <article class="store-card">
+          <div>
+            <div class="store-card-header">
+              <div class="store-header-left">
+                <div class="store-avatar">${store.icon || '🏪'}</div>
+                <div>
+                  <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
+                  <span class="store-tag-badge">${this.escapeHtml(store.tag || 'สาขา')}</span>
+                </div>
+              </div>
+              <div>
+                ${lowCount > 0 ? `<span class="stock-status-pill status-warning">⚠️ ใกล้หมด ${lowCount}</span>` : `<span class="stock-status-pill status-normal">ปกติ</span>`}
+              </div>
+            </div>
+
+            <p class="store-desc-text">${this.escapeHtml(store.desc || 'ไม่มีรายละเอียด')}</p>
+
+            <div class="store-stats-row">
+              <div class="store-stat-item">
+                <span class="store-stat-val">${skuCount}</span>
+                <span class="store-stat-lbl">รายการสินค้า</span>
+              </div>
+              <div class="store-stat-item">
+                <span class="store-stat-val">${piecesCount.toLocaleString()}</span>
+                <span class="store-stat-lbl">จำนวนชิ้นรวม</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="store-card-actions">
+            <button class="btn-open-store" onclick="window.app.selectStore('${store.id}')">
+              <span>เปิดจัดการสต็อก</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+            <button class="btn-card-more" title="แก้ไขชื่อร้าน" onclick="window.app.openEditStoreModal('${store.id}')">
+              ✏️
+            </button>
+            <button class="btn-card-more" title="ลบร้านนี้" onclick="window.app.deleteStore('${store.id}')">
+              🗑️
+            </button>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  openEditStoreModal(storeId) {
+    const store = this.stores.find(s => s.id === storeId);
+    if (store) this.openStoreModal(store);
+  }
+
+  // Render Store Detail
+  renderStoreDetail() {
+    const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
+    const totalSKUs = storeProducts.length;
+    const totalQuantity = storeProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
+    const totalValue = storeProducts.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
+    const lowStockCount = storeProducts.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
 
     document.getElementById('metricTotalSKUs').textContent = totalSKUs.toLocaleString();
     document.getElementById('metricTotalQuantity').textContent = totalQuantity.toLocaleString();
@@ -617,16 +894,21 @@ class StockApp {
       hint.textContent = 'สต็อกอยู่ในเกณฑ์ปลอดภัย';
       hint.style.color = 'var(--success)';
     }
+
+    this.renderCategoryFilterOptions(storeProducts);
+    this.renderProducts();
+    this.renderHistory();
+    this.renderAlerts();
   }
 
-  renderCategoryFilterOptions() {
+  renderCategoryFilterOptions(storeProducts) {
     const select = document.getElementById('categoryFilter');
     const currentVal = select.value;
-    const categories = Array.from(new Set(this.products.map(p => p.category).filter(Boolean)));
+    const categories = Array.from(new Set(storeProducts.map(p => p.category).filter(Boolean)));
 
-    let html = `<option value="ALL">📁 ทุกหมวดหมู่ (${this.products.length})</option>`;
+    let html = `<option value="ALL">📁 ทุกหมวดหมู่ (${storeProducts.length})</option>`;
     categories.forEach(cat => {
-      const count = this.products.filter(p => p.category === cat).length;
+      const count = storeProducts.filter(p => p.category === cat).length;
       html += `<option value="${cat}">${cat} (${count})</option>`;
     });
 
@@ -641,7 +923,9 @@ class StockApp {
     const emptyState = document.getElementById('emptyInventoryState');
     const countBadge = document.getElementById('productCountBadge');
 
-    let filtered = this.products.filter(p => {
+    const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
+
+    let filtered = storeProducts.filter(p => {
       const matchesSearch = !this.searchQuery || 
         p.name.toLowerCase().includes(this.searchQuery) ||
         (p.sku && p.sku.toLowerCase().includes(this.searchQuery)) ||
@@ -725,12 +1009,13 @@ class StockApp {
     const list = document.getElementById('historyList');
     const emptyState = document.getElementById('emptyHistoryState');
 
-    let filtered = this.history;
+    let storeHistory = this.history.filter(h => h.storeId === this.currentStoreId);
+
     if (this.historyFilter !== 'ALL') {
-      filtered = filtered.filter(h => h.type === this.historyFilter);
+      storeHistory = storeHistory.filter(h => h.type === this.historyFilter);
     }
 
-    if (filtered.length === 0) {
+    if (storeHistory.length === 0) {
       list.innerHTML = '';
       emptyState.style.display = 'block';
       return;
@@ -738,7 +1023,7 @@ class StockApp {
 
     emptyState.style.display = 'none';
 
-    list.innerHTML = filtered.map(item => {
+    list.innerHTML = storeHistory.map(item => {
       const isIn = item.type === 'IN';
       const timeStr = this.formatDate(item.timestamp);
       const sign = isIn ? '+' : '-';
@@ -769,7 +1054,8 @@ class StockApp {
     const grid = document.getElementById('lowStockGrid');
     const safeState = document.getElementById('allGoodState');
 
-    const lowStockItems = this.products.filter(p => (p.quantity || 0) <= (p.minAlert || 0));
+    const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
+    const lowStockItems = storeProducts.filter(p => (p.quantity || 0) <= (p.minAlert || 0));
 
     if (lowStockItems.length === 0) {
       grid.innerHTML = '';
@@ -824,7 +1110,7 @@ class StockApp {
   }
 }
 
-// Instantiate globally
+// Global Instantiate
 window.addEventListener('DOMContentLoaded', () => {
-  window.app = new StockApp();
+  window.app = new MultiStoreStockApp();
 });

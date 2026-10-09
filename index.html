@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ระบบจัดการสต็อกสินค้า (Smart Stock Manager)</title>
-  <meta name="description" content="ระบบจัดการสต็อกสินค้าออนไลน์ บันทึกรับเข้า-ตัดออก เช็กประวัติ แจ้งเตือนสินค้าใกล้หมด ใช้งานง่ายบนมือถือ">
+  <title>ระบบจัดการสต็อกหลายสาขา (Multi-Store SmartStock)</title>
+  <meta name="description" content="ระบบจัดการสต็อกสินค้าออนไลน์ รองรับหลายร้านค้า/หลายสาขา บันทึกรับเข้า-ตัดออก แจ้งเตือนของหมด ใช้งานง่ายบนมือถือ">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -12,10 +12,11 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Top Header -->
+    
+    <!-- Top Global Header -->
     <header class="app-header">
       <div class="header-content">
-        <div class="brand">
+        <div class="brand" id="brandHomeTrigger" style="cursor: pointer;" title="กลับหน้ารวมร้านค้า">
           <div class="brand-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -24,17 +25,18 @@
             </svg>
           </div>
           <div>
-            <h1 class="brand-title">SmartStock</h1>
-            <p class="brand-subtitle">ระบบสต็อกออนไลน์ 24 ชม.</p>
+            <h1 class="brand-title">SmartStock Hub</h1>
+            <p class="brand-subtitle" id="headerSubtitle">ระบบจัดการสต็อกหลายสาขา</p>
           </div>
         </div>
+
         <div class="header-actions">
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
             <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
-          <button id="backupBtn" class="icon-btn" title="สำรอง / กู้คืนข้อมูล" aria-label="Backup and Restore">
+          <button id="backupBtn" class="icon-btn" title="สำรอง / กู้คืนข้อมูลทั้งหมด" aria-label="Backup and Restore">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
               <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -45,174 +47,316 @@
       </div>
     </header>
 
-    <!-- Main Navigation Bar (Mobile-friendly tabs) -->
-    <nav class="nav-tabs">
-      <button class="nav-tab active" data-tab="inventory" id="tabInventoryBtn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-        </svg>
-        <span>สต็อกสินค้า</span>
-      </button>
-      <button class="nav-tab" data-tab="history" id="tabHistoryBtn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span>ประวัติเข้า-ออก</span>
-      </button>
-      <button class="nav-tab" data-tab="alerts" id="tabAlertsBtn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-          <line x1="12" y1="9" x2="12" y2="13"></line>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <span>เตือนของหมด</span>
-        <span class="badge-alert-count" id="alertCountBadge">0</span>
-      </button>
-    </nav>
+    <!-- ================= VIEW 1: STORES DIRECTORY (หน้าแรก: รวมร้านค้า) ================= -->
+    <section id="storesHubView" class="view-section active">
+      <div class="hub-header-card">
+        <div class="hub-title-area">
+          <div class="hub-badge-pill">🏪 ศูนย์ควบคุมร้านค้า</div>
+          <h2 class="hub-title">เลือกร้านค้าเพื่อจัดการสต็อก</h2>
+          <p class="hub-subtitle">คุณสามารถเพิ่มสาขาใหม่ แยกสต็อกแต่ละร้าน และสลับร้านทำงานได้อย่างอิสระ</p>
+        </div>
+        <button id="openAddStoreBtn" class="btn btn-primary btn-large">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>+ เพิ่มร้านค้าใหม่</span>
+        </button>
+      </div>
 
-    <!-- Metrics Summary Cards -->
-    <section class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-header">
-          <span class="metric-label">รายการสินค้า</span>
-          <span class="metric-icon blue">📦</span>
+      <!-- Overview Stats Across All Stores -->
+      <div class="metrics-grid hub-metrics">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">จำนวนร้านค้า</span>
+            <span class="metric-icon blue">🏪</span>
+          </div>
+          <div class="metric-value" id="hubTotalStores">0</div>
+          <div class="metric-foot">สาขาที่เปิดใช้งาน</div>
         </div>
-        <div class="metric-value" id="metricTotalSKUs">0</div>
-        <div class="metric-foot">รวมทุกหมวดหมู่</div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">จำนวนชิ้นรวมทุกร้าน</span>
+            <span class="metric-icon green">📦</span>
+          </div>
+          <div class="metric-value" id="hubTotalItems">0</div>
+          <div class="metric-foot">สินค้าในระบบทั้งหมด</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">มูลค่าสินค้าทุกร้าน</span>
+            <span class="metric-icon purple">💰</span>
+          </div>
+          <div class="metric-value" id="hubTotalValue">฿0</div>
+          <div class="metric-foot">ประเมินรวมทุกสาขา</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">สินค้าใกล้หมดรวม</span>
+            <span class="metric-icon amber">⚠️</span>
+          </div>
+          <div class="metric-value alert-text" id="hubTotalAlerts">0</div>
+          <div class="metric-foot">รายการที่ต้องสั่งเพิ่ม</div>
+        </div>
       </div>
-      <div class="metric-card">
-        <div class="metric-header">
-          <span class="metric-label">จำนวนของรวม</span>
-          <span class="metric-icon green">🔢</span>
+
+      <!-- Stores Cards Grid -->
+      <div class="stores-section">
+        <div class="section-title-row">
+          <h3 class="section-title">รายชื่อร้านค้าของคุณ</h3>
+          <span class="item-count-badge" id="storesCountBadge">0 สาขา</span>
         </div>
-        <div class="metric-value" id="metricTotalQuantity">0</div>
-        <div class="metric-foot">ชิ้นในคลัง</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-header">
-          <span class="metric-label">มูลค่าสินค้า</span>
-          <span class="metric-icon purple">💰</span>
+
+        <div class="stores-grid" id="storesGrid">
+          <!-- Dynamically generated via JS -->
         </div>
-        <div class="metric-value" id="metricTotalValue">฿0</div>
-        <div class="metric-foot">ประเมินตามราคาขาย</div>
-      </div>
-      <div class="metric-card highlight-warning" id="cardLowStockTrigger">
-        <div class="metric-header">
-          <span class="metric-label">ใกล้หมดสต็อก</span>
-          <span class="metric-icon amber">⚠️</span>
+
+        <div id="emptyStoresState" class="empty-state" style="display: none;">
+          <div class="empty-icon">🏪</div>
+          <h3>ยังไม่มีร้านค้าในระบบ</h3>
+          <p>กดปุ่ม "+ เพิ่มร้านค้าใหม่" เพื่อเริ่มต้นสร้างร้านค้าแรกของคุณ</p>
         </div>
-        <div class="metric-value alert-text" id="metricLowStockCount">0</div>
-        <div class="metric-foot" id="metricLowStockHint">ต้องสั่งเพิ่มด่วน</div>
       </div>
     </section>
 
-    <!-- TAB 1: INVENTORY SECTION -->
-    <main class="tab-content active" id="inventoryTab">
-      <!-- Controls Bar -->
-      <section class="controls-card">
-        <div class="search-box">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="searchInput" placeholder="ค้นหาชื่อสินค้า, รหัส SKU..." autocomplete="off">
-          <button id="clearSearchBtn" class="clear-btn" hidden>&times;</button>
+    <!-- ================= VIEW 2: STORE INVENTORY & OPERATIONS (หน้าจัดการสต็อกในร้าน) ================= -->
+    <section id="storeDetailView" class="view-section" style="display: none;">
+      
+      <!-- Store Active Bar with Back & Switcher -->
+      <div class="active-store-banner">
+        <div class="store-banner-left">
+          <button id="backToHubBtn" class="btn btn-secondary btn-sm" title="กลับหน้ารวมร้านค้า">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>เลือกร้านอื่น</span>
+          </button>
+          <div class="current-store-info">
+            <span class="store-status-dot"></span>
+            <div class="current-store-title" id="currentStoreName">ชื่อร้านค้า</div>
+            <span class="store-tag-badge" id="currentStoreTag">สาขาหลัก</span>
+          </div>
         </div>
 
-        <div class="filter-actions">
-          <select id="categoryFilter" class="custom-select">
-            <option value="ALL">📁 ทุกหมวดหมู่</option>
-          </select>
-          <button id="openAddModalBtn" class="btn btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span>เพิ่มสินค้าใหม่</span>
+        <div class="store-banner-right">
+          <button id="editCurrentStoreBtn" class="btn btn-secondary btn-sm" title="แก้ไขข้อมูลร้านนี้">
+            ✏️ แก้ไขร้านนี้
           </button>
         </div>
-      </section>
-
-      <!-- Inventory Product List -->
-      <section class="products-section">
-        <div class="section-title-row">
-          <h2 class="section-title">คลังสินค้าปัจจุบัน</h2>
-          <span class="item-count-badge" id="productCountBadge">0 รายการ</span>
-        </div>
-
-        <div class="product-cards-grid" id="productGrid">
-          <!-- Dynamically populated via JS -->
-        </div>
-
-        <div id="emptyInventoryState" class="empty-state" style="display: none;">
-          <div class="empty-icon">📦</div>
-          <h3>ยังไม่มีสินค้าในระบบ</h3>
-          <p>กดปุ่ม "เพิ่มสินค้าใหม่" ด้านบนเพื่อเริ่มต้นบันทึกสต็อกแรกของคุณ</p>
-        </div>
-      </section>
-    </main>
-
-    <!-- TAB 2: TRANSACTION HISTORY SECTION -->
-    <section class="tab-content" id="historyTab">
-      <div class="history-card">
-        <div class="history-header">
-          <div>
-            <h2 class="section-title">ประวัติการเคลื่อนไหว (เข้า-ออก)</h2>
-            <p class="section-subtitle">บันทึกทุกรายการเพิ่ม/ตัดสต็อกพร้อมเวลาแบบเรียลไทม์</p>
-          </div>
-          <div class="history-filters">
-            <select id="historyFilterType" class="custom-select">
-              <option value="ALL">ทุกการทำรายการ</option>
-              <option value="IN">📥 รับเข้าอย่างเดียว</option>
-              <option value="OUT">📤 ตัดออกอย่างเดียว</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="history-list" id="historyList">
-          <!-- Dynamically populated via JS -->
-        </div>
-
-        <div id="emptyHistoryState" class="empty-state" style="display: none;">
-          <div class="empty-icon">🕒</div>
-          <h3>ยังไม่มีประวัติการทำรายการ</h3>
-          <p>เมื่อมีการเพิ่มสต็อกหรือตัดของออก ประวัติจะบันทึกที่นี่โดยอัตโนมัติ</p>
-        </div>
       </div>
-    </section>
 
-    <!-- TAB 3: LOW STOCK ALERTS SECTION -->
-    <section class="tab-content" id="alertsTab">
-      <div class="alerts-card">
-        <div class="alerts-header">
-          <div class="warning-badge-pill">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      <!-- Main Navigation Tabs for this store -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="inventory" id="tabInventoryBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span>สต็อกสินค้า</span>
+        </button>
+        <button class="nav-tab" data-tab="history" id="tabHistoryBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>ประวัติเข้า-ออก</span>
+        </button>
+        <button class="nav-tab" data-tab="alerts" id="tabAlertsBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>เตือนของหมด</span>
+          <span class="badge-alert-count" id="alertCountBadge">0</span>
+        </button>
+      </nav>
+
+      <!-- Metrics Summary Cards for Current Store -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">รายการสินค้า</span>
+            <span class="metric-icon blue">📦</span>
+          </div>
+          <div class="metric-value" id="metricTotalSKUs">0</div>
+          <div class="metric-foot">ในร้านนี้</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">จำนวนของรวม</span>
+            <span class="metric-icon green">🔢</span>
+          </div>
+          <div class="metric-value" id="metricTotalQuantity">0</div>
+          <div class="metric-foot">ชิ้นในคลังร้านนี้</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-label">มูลค่าสินค้า</span>
+            <span class="metric-icon purple">💰</span>
+          </div>
+          <div class="metric-value" id="metricTotalValue">฿0</div>
+          <div class="metric-foot">มูลค่ารวมในร้านนี้</div>
+        </div>
+        <div class="metric-card highlight-warning" id="cardLowStockTrigger">
+          <div class="metric-header">
+            <span class="metric-label">ใกล้หมดสต็อก</span>
+            <span class="metric-icon amber">⚠️</span>
+          </div>
+          <div class="metric-value alert-text" id="metricLowStockCount">0</div>
+          <div class="metric-foot" id="metricLowStockHint">ต้องสั่งเพิ่มด่วน</div>
+        </div>
+      </section>
+
+      <!-- TAB 1: INVENTORY SECTION -->
+      <main class="tab-content active" id="inventoryTab">
+        <section class="controls-card">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span>รายการสินค้าที่ต้องเติมด่วน</span>
+            <input type="text" id="searchInput" placeholder="ค้นหาชื่อสินค้า, รหัส SKU..." autocomplete="off">
+            <button id="clearSearchBtn" class="clear-btn" hidden>&times;</button>
           </div>
-          <p class="section-subtitle">สินค้าที่จำนวนคงเหลือต่ำกว่าหรือเท่ากับจุดเตือนสต็อก</p>
-        </div>
 
-        <div class="low-stock-grid" id="lowStockGrid">
-          <!-- Dynamically populated via JS -->
-        </div>
+          <div class="filter-actions">
+            <select id="categoryFilter" class="custom-select">
+              <option value="ALL">📁 ทุกหมวดหมู่</option>
+            </select>
+            <button id="openAddModalBtn" class="btn btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>เพิ่มสินค้าในร้านนี้</span>
+            </button>
+          </div>
+        </section>
 
-        <div id="allGoodState" class="empty-state safe-state" style="display: none;">
-          <div class="empty-icon">🎉</div>
-          <h3>สต็อกเพียงพอทุกรายการ!</h3>
-          <p>ไม่มีสินค้าที่ต่ำกว่าจุดสั่งซื้อในขณะนี้ ระบบพร้อมใช้งานอย่างราบรื่น</p>
+        <!-- Product Cards Grid -->
+        <section class="products-section">
+          <div class="section-title-row">
+            <h3 class="section-title">คลังสินค้าของร้านนี้</h3>
+            <span class="item-count-badge" id="productCountBadge">0 รายการ</span>
+          </div>
+
+          <div class="product-cards-grid" id="productGrid">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <div id="emptyInventoryState" class="empty-state" style="display: none;">
+            <div class="empty-icon">📦</div>
+            <h3>ร้านนี้ยังไม่มีสินค้า</h3>
+            <p>กดปุ่ม "เพิ่มสินค้าในร้านนี้" ด้านบนเพื่อเริ่มบันทึกสต็อกแรก</p>
+          </div>
+        </section>
+      </main>
+
+      <!-- TAB 2: TRANSACTION HISTORY SECTION -->
+      <section class="tab-content" id="historyTab">
+        <div class="history-card">
+          <div class="history-header">
+            <div>
+              <h3 class="section-title">ประวัติการเคลื่อนไหวในร้านนี้</h3>
+              <p class="section-subtitle">บันทึกทุกรายการรับเข้าและตัดออกพร้อมเวลาแบบเรียลไทม์</p>
+            </div>
+            <div class="history-filters">
+              <select id="historyFilterType" class="custom-select">
+                <option value="ALL">ทุกการทำรายการ</option>
+                <option value="IN">📥 รับเข้าอย่างเดียว</option>
+                <option value="OUT">📤 ตัดออกอย่างเดียว</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="history-list" id="historyList">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <div id="emptyHistoryState" class="empty-state" style="display: none;">
+            <div class="empty-icon">🕒</div>
+            <h3>ยังไม่มีประวัติในร้านนี้</h3>
+            <p>เมื่อมีการเพิ่มสต็อกหรือตัดของออก ประวัติจะบันทึกที่นี่โดยอัตโนมัติ</p>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- TAB 3: LOW STOCK ALERTS SECTION -->
+      <section class="tab-content" id="alertsTab">
+        <div class="alerts-card">
+          <div class="alerts-header">
+            <div class="warning-badge-pill">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <span>สินค้าที่ต้องเติมด่วนในร้านนี้</span>
+            </div>
+            <p class="section-subtitle">สินค้าที่ยอดคงเหลือต่ำกว่าหรือเท่ากับจุดเตือนสต็อก</p>
+          </div>
+
+          <div class="low-stock-grid" id="lowStockGrid">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <div id="allGoodState" class="empty-state safe-state" style="display: none;">
+            <div class="empty-icon">🎉</div>
+            <h3>สต็อกร้านนี้ปลอดภัยทุกรายการ!</h3>
+            <p>ไม่มีสินค้าที่ต่ำกว่าจุดสั่งซื้อในขณะนี้</p>
+          </div>
+        </div>
+      </section>
+
     </section>
+
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- MODAL: ADD / EDIT STORE -->
+  <div class="modal-overlay" id="storeModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="storeModalTitle">เพิ่มร้านค้าใหม่</h3>
+        <button class="close-btn" id="closeStoreModalBtn" aria-label="ปิด">&times;</button>
+      </div>
+      <form id="storeForm">
+        <input type="hidden" id="editStoreId">
+
+        <div class="form-group">
+          <label for="storeNameInput">ชื่อร้านค้า / สาขา <span class="required">*</span></label>
+          <input type="text" id="storeNameInput" required placeholder="เช่น ร้านสาขา 1 (หน้าร้านสยาม), สต็อกออนไลน์">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="storeTagInput">ป้ายกำกับ / หมวดหมู่ร้าน</label>
+            <input type="text" id="storeTagInput" placeholder="เช่น หน้าร้าน, ออนไลน์, คลังหลัก">
+          </div>
+          <div class="form-group">
+            <label for="storeIconInput">ไอคอนร้าน (อีโมจิ)</label>
+            <input type="text" id="storeIconInput" value="🏪" maxlength="4">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="storeDescInput">รายละเอียด / ที่ตั้ง / เบอร์โทร</label>
+          <input type="text" id="storeDescInput" placeholder="เช่น ชั้น 1 โซน B หรือ โกดังเก็บของบ้าน">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelStoreBtn">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="saveStoreBtn">บันทึกร้านค้า</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- MODAL: ADD / EDIT PRODUCT -->
-  <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true">
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modalTitle">เพิ่มสินค้าใหม่</h3>
@@ -276,7 +420,7 @@
       </div>
       <form id="stockActionForm">
         <input type="hidden" id="actionProductId">
-        <input type="hidden" id="actionType" value="IN"> <!-- IN or OUT -->
+        <input type="hidden" id="actionType" value="IN">
 
         <div class="action-product-summary">
           <div class="action-prod-name" id="actionProdName">ชื่อสินค้า</div>
@@ -321,12 +465,12 @@
         <button class="close-btn" id="closeBackupModalBtn">&times;</button>
       </div>
       <div class="modal-body-content">
-        <p class="backup-desc">ข้อมูลทั้งหมดจะถูกบันทึกไว้อย่างปลอดภัย และสามารถส่งออกเพื่อย้ายเครื่องหรือนำไปเปิดบนอุปกรณ์อื่นได้ทันที</p>
+        <p class="backup-desc">ข้อมูลร้านค้า สต็อกสินค้า และประวัติทั้งหมด สามารถดาวน์โหลดเก็บไว้และนำไปเปิดบนเครื่องอื่นได้ทันที</p>
         
         <div class="backup-actions-grid">
           <div class="backup-action-box">
-            <h4>💾 ดาวน์โหลดข้อมูลสำรอง (Export)</h4>
-            <p>บันทึกข้อมูลสต็อกและประวัติทั้งหมดออกมาเป็นไฟล์ JSON</p>
+            <h4>💾 ดาวน์โหลดข้อมูลสำรองทุกร้าน (Export)</h4>
+            <p>บันทึกข้อมูลทุกสาขา สต็อก และประวัติทั้งหมดเป็นไฟล์ JSON</p>
             <button id="exportJsonBtn" class="btn btn-secondary full-width">ดาวน์โหลดไฟล์ Backup (.json)</button>
           </div>
 
@@ -338,14 +482,14 @@
           </div>
 
           <div class="backup-action-box">
-            <h4>✨ โหลดตัวอย่างสินค้าเริ่มต้น</h4>
-            <p>เพิ่มชุดข้อมูลตัวอย่างสำหรับทดสอบการใช้งาน</p>
+            <h4>✨ โหลดตัวอย่างร้านค้า & สินค้า</h4>
+            <p>โหลดชุดข้อมูลตัวอย่าง 2 สาขา สำหรับทดลองระบบ</p>
             <button id="loadSampleDataBtn" class="btn btn-secondary full-width">โหลดข้อมูลตัวอย่าง</button>
           </div>
 
           <div class="backup-action-box danger-box">
             <h4>⚠️ ล้างข้อมูลทั้งหมด</h4>
-            <p>ล้างสต็อกและประวัติการทำรายการทั้งหมด</p>
+            <p>ล้างร้านค้า สต็อก และประวัติทั้งหมด</p>
             <button id="resetAllDataBtn" class="btn btn-danger full-width">ล้างข้อมูลทั้งหมด</button>
           </div>
         </div>

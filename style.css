@@ -1,5 +1,6 @@
 /* ===================================================
    SmartStock - Modern Responsive CSS Design System
+   Multi-Store Architecture Version
    =================================================== */
 
 :root {
@@ -97,14 +98,13 @@ body {
   padding-bottom: 60px;
 }
 
-/* Container */
 .app-container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 16px 20px;
 }
 
-/* ================= Header ================= */
+/* ================= Global Header ================= */
 .app-header {
   margin-bottom: 20px;
 }
@@ -177,6 +177,221 @@ body {
   background: var(--primary-light);
   color: var(--primary);
   transform: translateY(-1px);
+}
+
+/* ================= VIEW 1: STORES HUB (หน้าแรก) ================= */
+.hub-header-card {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.hub-badge-pill {
+  display: inline-block;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+}
+
+.hub-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.hub-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.btn-large {
+  padding: 13px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Stores Cards Grid */
+.stores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.store-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition);
+  position: relative;
+}
+
+.store-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.store-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.store-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.store-avatar {
+  font-size: 2rem;
+  width: 48px;
+  height: 48px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.store-name-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.store-tag-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-top: 3px;
+}
+
+.store-desc-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.store-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: var(--bg-primary);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+}
+
+.store-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.store-stat-val {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-code);
+  color: var(--text-main);
+}
+
+.store-stat-lbl {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.store-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-open-store {
+  flex: 1;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-open-store:hover {
+  background: var(--primary-hover);
+}
+
+/* ================= VIEW 2: ACTIVE STORE BANNER ================= */
+.active-store-banner {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.store-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.current-store-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.store-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.current-store-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 /* ================= Navigation Tabs ================= */
@@ -470,7 +685,6 @@ body {
   justify-content: space-between;
   transition: var(--transition);
   position: relative;
-  overflow: hidden;
 }
 
 .product-card:hover {
@@ -806,7 +1020,7 @@ body {
   font-weight: 500;
 }
 
-/* Empty States */
+/* ================= Empty States ================= */
 .empty-state {
   text-align: center;
   padding: 48px 20px;
@@ -833,7 +1047,7 @@ body {
   margin: 0 auto;
 }
 
-/* ================= Tab Display ================= */
+/* ================= Tab & View Display ================= */
 .tab-content {
   display: none;
 }
@@ -1109,6 +1323,14 @@ body {
     font-size: 1.15rem;
   }
 
+  .hub-header-card {
+    padding: 18px;
+  }
+
+  .hub-title {
+    font-size: 1.25rem;
+  }
+
   .metrics-grid {
     grid-template-columns: 1fr 1fr;
     gap: 10px;
@@ -1123,7 +1345,13 @@ body {
     gap: 0;
   }
 
+  .stores-grid,
   .product-cards-grid {
     grid-template-columns: 1fr;
+  }
+
+  .active-store-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
