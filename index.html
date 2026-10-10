@@ -271,37 +271,37 @@
         <input type="hidden" id="prodSku" value="">
         <input type="hidden" id="prodCategory" value="">
         
-        <!-- 1. รายการ (ตรงกับคอลัมน์ "รายการ") -->
+        <!-- 1. รายการ -->
         <div class="form-group">
           <label for="prodName" id="prodNameLabel">รายการ <span class="required">*</span></label>
           <input type="text" id="prodName" required placeholder="ชื่อสินค้า เช่น หมวกแก๊ป, กระเป๋าผ้า, GS 46B24L..." autocomplete="off">
         </div>
 
-        <!-- 2. ราคาทุน / ราคาขาย (ตรงกับคอลัมน์ "ราคาทุน/หน่วย" และ "ราคาขาย/หน่วย") -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="prodCostPrice">ราคาทุน/หน่วย (บาท)</label>
-            <input type="number" id="prodCostPrice" min="0" step="any" value="180" placeholder="0">
-          </div>
-          <div class="form-group">
-            <label for="prodPrice">ราคาขาย/หน่วย (บาท)</label>
-            <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
-          </div>
+        <!-- 2. ราคาทุน/หน่วย -->
+        <div class="form-group">
+          <label for="prodCostPrice">ราคาทุน/หน่วย (บาท)</label>
+          <input type="number" id="prodCostPrice" min="0" step="any" value="180" placeholder="0">
         </div>
 
-        <!-- 3. สต็อกเป้าหมาย / นับได้จริง (ตรงกับคอลัมน์ "สต็อกเป้าหมาย" และ "นับได้จริง") -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="prodMinAlert">สต็อกเป้าหมาย</label>
-            <input type="number" id="prodMinAlert" required min="0" step="1" value="5" placeholder="5">
-          </div>
-          <div class="form-group">
-            <label for="prodQuantity">นับได้จริง</label>
-            <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
-          </div>
+        <!-- 3. ราคาขาย/หน่วย -->
+        <div class="form-group">
+          <label for="prodPrice">ราคาขาย/หน่วย (บาท)</label>
+          <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
         </div>
 
-        <!-- 4. หน่วยนับ (ตรงกับหน่วยท้ายราคา เช่น /ลูก, /ใบ, /ชิ้น) -->
+        <!-- 4. สต็อกเป้าหมาย -->
+        <div class="form-group">
+          <label for="prodMinAlert">สต็อกเป้าหมาย</label>
+          <input type="number" id="prodMinAlert" required min="0" step="1" value="5" placeholder="5">
+        </div>
+
+        <!-- 5. นับได้จริง -->
+        <div class="form-group">
+          <label for="prodQuantity">นับได้จริง</label>
+          <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
+        </div>
+
+        <!-- 6. หน่วยนับ -->
         <div class="form-group">
           <div class="unit-label-row">
             <label for="prodUnit">หน่วยนับ</label>
