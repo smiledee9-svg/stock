@@ -823,6 +823,7 @@ class MultiStoreStockApp {
     const brandHome = document.getElementById('brandHomeTrigger');
     const headerStoreInfo = document.getElementById('headerStoreInfo');
     const editBtn = document.getElementById('editCurrentStoreBtn');
+    const openAddStoreBtn = document.getElementById('openAddStoreBtn');
 
     if (!this.currentStoreId) {
       // Show Hub View
@@ -831,6 +832,7 @@ class MultiStoreStockApp {
       if (brandHome) brandHome.style.display = 'flex';
       if (headerStoreInfo) headerStoreInfo.style.display = 'none';
       if (editBtn) editBtn.style.display = 'none';
+      if (openAddStoreBtn) openAddStoreBtn.style.display = 'inline-flex';
       if (subtitle) subtitle.textContent = 'เลือกร้านค้าเพื่อเริ่มต้น';
       this.renderHub();
     } else {
@@ -845,7 +847,8 @@ class MultiStoreStockApp {
       detailView.style.display = 'block';
       if (brandHome) brandHome.style.display = 'none';
       if (headerStoreInfo) headerStoreInfo.style.display = 'flex';
-      if (editBtn) editBtn.style.display = 'inline-flex';
+      if (editBtn) editBtn.style.display = 'none'; // หน้านี้ไม่ได้ใช้ ซ่อนตามคำขอ
+      if (openAddStoreBtn) openAddStoreBtn.style.display = 'none'; // หน้านี้ไม่ได้ใช้ ซ่อนตามคำขอ
       if (subtitle) subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
 
       const nameEl = document.getElementById('currentStoreName');
