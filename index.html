@@ -136,7 +136,9 @@
             <table class="compact-stock-table" id="stockTable">
               <thead>
                 <tr>
-                  <th class="col-name">ยี่ห้อ / รุ่น</th>
+                  <th class="col-name">รายการ</th>
+                  <th class="col-cost text-center">ราคาทุน/หน่วย</th>
+                  <th class="col-price text-center">ราคาขาย/หน่วย</th>
                   <th class="col-target text-center">สต็อกเป้าหมาย</th>
                   <th class="col-actual text-center">นับได้จริง</th>
                   <th class="col-order text-center">ต้องสั่งเพิ่ม</th>
@@ -295,13 +297,18 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="prodPrice">ราคาขาย (บาท)</label>
-            <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
+            <label for="prodCostPrice">ราคาทุนต่อหน่วย (บาท)</label>
+            <input type="number" id="prodCostPrice" min="0" step="any" value="180" placeholder="0">
           </div>
           <div class="form-group">
-            <label for="prodUnit">หน่วยนับ</label>
-            <input type="text" id="prodUnit" placeholder="เช่น ชิ้น, ลูก, ใบ, ตัว" value="ชิ้น">
+            <label for="prodPrice">ราคาขายต่อหน่วย (บาท)</label>
+            <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prodUnit">หน่วยนับ</label>
+          <input type="text" id="prodUnit" placeholder="เช่น ชิ้น, ลูก, ใบ, ตัว" value="ชิ้น">
         </div>
 
         <div class="modal-footer">

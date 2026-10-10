@@ -895,6 +895,48 @@ body {
   font-size: 0.75rem;
 }
 
+/* Cost and Selling Price Columns (ราคาทุน/หน่วย และ ราคาขาย/หน่วย) */
+.col-cost, .col-price {
+  white-space: nowrap;
+}
+
+.price-val-wrapper {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.cost-price-val {
+  font-family: var(--font-code);
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="light"] .cost-price-val {
+  color: #64748b;
+}
+
+.sell-price-val {
+  font-family: var(--font-code);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #10b981;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .sell-price-val {
+  color: #34d399;
+}
+
+.table-unit-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 /* Target Column */
 .target-val {
   font-family: var(--font-code);

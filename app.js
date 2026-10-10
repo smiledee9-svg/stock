@@ -28,7 +28,8 @@ const DEFAULT_PRODUCTS = [
     category: "แบตเตอรี่ (ขั้ว L)",
     quantity: 2,       // นับได้จริง (ช่อง C2)
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B2)
-    price: 1850,
+    costPrice: 1400,   // ราคาทุน/หน่วย
+    price: 1850,       // ราคาขาย/หน่วย
     unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
@@ -40,7 +41,8 @@ const DEFAULT_PRODUCTS = [
     category: "แบตเตอรี่ (ขั้ว L)",
     quantity: 5,       // นับได้จริง (ช่อง C3)
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B3)
-    price: 2100,
+    costPrice: 1600,   // ราคาทุน/หน่วย
+    price: 2100,       // ราคาขาย/หน่วย
     unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
@@ -52,7 +54,8 @@ const DEFAULT_PRODUCTS = [
     category: "แบตเตอรี่ (กะบะ/ดีเซล)",
     quantity: 1,       // นับได้จริง (ช่อง C4)
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B4)
-    price: 2850,
+    costPrice: 2200,   // ราคาทุน/หน่วย
+    price: 2850,       // ราคาขาย/หน่วย
     unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
@@ -64,7 +67,8 @@ const DEFAULT_PRODUCTS = [
     category: "แบตเตอรี่ (DIN ยุโรป)",
     quantity: 6,       // นับได้จริง (ช่อง C5 เกินเป้าหมาย)
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B5)
-    price: 3200,
+    costPrice: 2500,   // ราคาทุน/หน่วย
+    price: 3200,       // ราคาขาย/หน่วย
     unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
@@ -76,7 +80,8 @@ const DEFAULT_PRODUCTS = [
     category: "แบตเตอรี่ (ขั้ว L)",
     quantity: 3,
     minAlert: 5,
-    price: 1950,
+    costPrice: 1500,   // ราคาทุน/หน่วย
+    price: 1950,       // ราคาขาย/หน่วย
     unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
@@ -88,7 +93,8 @@ const DEFAULT_PRODUCTS = [
     category: "แบตเตอรี่ (ขั้ว L)",
     quantity: 0,
     minAlert: 4,
-    price: 2250,
+    costPrice: 1750,   // ราคาทุน/หน่วย
+    price: 2250,       // ราคาขาย/หน่วย
     unit: "ลูก",
     updatedAt: new Date().toISOString()
   }
@@ -184,6 +190,28 @@ class MultiStoreStockApp {
       }
     } else {
       this.products = [...DEFAULT_PRODUCTS];
+      this.saveProducts();
+    }
+
+    // Auto-migrate costPrice if missing
+    const defaultCosts = {
+      'GS-46B24L': 1400,
+      '3K-55D23L': 1600,
+      'FB-105D31L': 2200,
+      'AMR-LN3': 2500,
+      'PANA-50B24L': 1500,
+      'YUA-75D23L': 1750
+    };
+    let costUpdated = false;
+    this.products = this.products.map(p => {
+      if (p.costPrice === undefined || p.costPrice === null) {
+        costUpdated = true;
+        const fallback = defaultCosts[p.sku] || Math.round((p.price || 0) * 0.75);
+        return { ...p, costPrice: fallback };
+      }
+      return p;
+    });
+    if (costUpdated) {
       this.saveProducts();
     }
 
@@ -550,6 +578,7 @@ class MultiStoreStockApp {
       document.getElementById('prodCategory').value = product.category || '';
       document.getElementById('prodQuantity').value = product.quantity;
       document.getElementById('prodMinAlert').value = product.minAlert;
+      document.getElementById('prodCostPrice').value = product.costPrice !== undefined ? product.costPrice : Math.round((product.price || 0) * 0.75);
       document.getElementById('prodPrice').value = product.price || 0;
       document.getElementById('prodUnit').value = product.unit || (isBattery ? 'ลูก' : 'ชิ้น');
     } else {
@@ -557,7 +586,8 @@ class MultiStoreStockApp {
       editIdInput.value = '';
       document.getElementById('prodQuantity').value = 5;
       document.getElementById('prodMinAlert').value = 5;
-      document.getElementById('prodPrice').value = isBattery ? 1800 : 250;
+      document.getElementById('prodCostPrice').value = isBattery ? 1400 : 180;
+      document.getElementById('prodPrice').value = isBattery ? 1850 : 250;
       document.getElementById('prodUnit').value = isBattery ? 'ลูก' : 'ชิ้น';
     }
 
@@ -587,6 +617,7 @@ class MultiStoreStockApp {
     const category = document.getElementById('prodCategory').value.trim() || defaultCat;
     const quantity = parseInt(document.getElementById('prodQuantity').value, 10) || 0;
     const minAlert = parseInt(document.getElementById('prodMinAlert').value, 10) || 0;
+    const costPrice = parseFloat(document.getElementById('prodCostPrice').value) || 0;
     const price = parseFloat(document.getElementById('prodPrice').value) || 0;
     const unit = document.getElementById('prodUnit').value.trim() || defaultUnit;
 
@@ -601,6 +632,7 @@ class MultiStoreStockApp {
           category,
           quantity,
           minAlert,
+          costPrice,
           price,
           unit,
           updatedAt: new Date().toISOString()
@@ -629,6 +661,7 @@ class MultiStoreStockApp {
         category,
         quantity,
         minAlert,
+        costPrice,
         price,
         unit,
         updatedAt: new Date().toISOString()
@@ -1080,24 +1113,37 @@ class MultiStoreStockApp {
 
         return `
           <tr class="${needOrder > 0 ? 'row-needs-order' : ''}">
-            <!-- 1. ยี่ห้อ / รุ่น -->
+            <!-- 1. รายการ (ชื่อสินค้า / ยี่ห้อ / รุ่น) -->
             <td>
               <div class="col-name-wrapper">
                 <span class="battery-name">${this.escapeHtml(item.name)}</span>
                 <div class="battery-meta">
                   <span class="battery-badge-cat">${this.escapeHtml(item.category || 'สินค้า')}</span>
                   ${item.sku ? `<span>${this.escapeHtml(item.sku)}</span>` : ''}
-                  <span>• ฿${(item.price || 0).toLocaleString()}${unit ? ` /${unit}` : ''}</span>
                 </div>
               </div>
             </td>
 
-            <!-- 2. สต็อกเป้าหมาย -->
+            <!-- 2. ราคาทุน/หน่วย -->
+            <td class="text-center">
+              <div class="price-val-wrapper">
+                <span class="cost-price-val">฿${(item.costPrice || 0).toLocaleString()}</span><span class="table-unit-sub">/${item.unit || 'ลูก'}</span>
+              </div>
+            </td>
+
+            <!-- 3. ราคาขาย/หน่วย -->
+            <td class="text-center">
+              <div class="price-val-wrapper">
+                <span class="sell-price-val">฿${(item.price || 0).toLocaleString()}</span><span class="table-unit-sub">/${item.unit || 'ลูก'}</span>
+              </div>
+            </td>
+
+            <!-- 4. สต็อกเป้าหมาย -->
             <td class="text-center">
               <span class="target-val">${target}</span>
             </td>
 
-            <!-- 3. นับได้จริง (นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
+            <!-- 5. นับได้จริง (นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
             <td class="text-center">
               <div class="actual-count-stepper">
                 <button class="stepper-btn" type="button" title="ลด 1" onclick="window.app.quickAdjustCount('${item.id}', -1)">−</button>
@@ -1106,7 +1152,7 @@ class MultiStoreStockApp {
               </div>
             </td>
 
-            <!-- 4. ต้องสั่งเพิ่ม (สรุปสั้นๆ: เพิ่มเท่าไร สีแดง / ไม่ต้องเพิ่ม สีเขียว) -->
+            <!-- 6. ต้องสั่งเพิ่ม (สรุปสั้นๆ: เพิ่มเท่าไร สีแดง / ไม่ต้องเพิ่ม สีเขียว) -->
             <td class="text-center">
               ${needOrder > 0 
                 ? `<span class="order-badge-simple need-order">เพิ่ม ${needOrder}${unit}</span>` 
