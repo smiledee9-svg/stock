@@ -650,7 +650,16 @@ body {
 .filter-actions {
   display: flex;
   gap: 10px;
+  align-items: center;
   flex-wrap: wrap;
+}
+
+.filter-actions .btn {
+  min-height: 52px;
+  padding: 0 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .custom-select {
@@ -1926,8 +1935,8 @@ body {
   }
 
   .current-store-title {
-    font-size: 1rem;
-    max-width: 140px;
+    font-size: 1.05rem;
+    max-width: 240px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1958,9 +1967,18 @@ body {
     height: 36px;
   }
 
-  .inventory-top-tools {
+  .filter-actions {
     width: 100%;
-    justify-content: space-between;
+    display: flex;
+    gap: 8px;
+  }
+
+  .filter-actions .btn {
+    flex: 1 1 calc(50% - 4px);
+    min-height: 48px;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    justify-content: center;
   }
 
   .compact-stock-table th,

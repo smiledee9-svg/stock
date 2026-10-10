@@ -31,15 +31,8 @@
           </div>
         </div>
 
-        <!-- Store Active Info (แสดงในแถวเดียวกันเมื่อเปิดจัดการสต็อก รวมสองส่วนเป็นแถวเดียว Compact) -->
+        <!-- Store Active Info (แสดงชื่อร้านที่กำลังจัดการ) -->
         <div class="header-store-info" id="headerStoreInfo" style="display: none;">
-          <button id="backToHubBtn" class="btn btn-secondary btn-sm back-hub-btn" title="กลับหน้ารวมร้านค้า">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            <span class="back-btn-text">เลือกร้านอื่น</span>
-          </button>
           <div class="current-store-info">
             <span class="store-status-dot"></span>
             <div class="current-store-title" id="currentStoreName">ชื่อร้านค้า</div>
@@ -116,9 +109,13 @@
           </div>
 
           <div class="filter-actions">
-            <select id="categoryFilter" class="custom-select">
-              <option value="ALL">📁 ทุกหมวดหมู่</option>
-            </select>
+            <button id="backToHubBtn" class="btn btn-secondary" title="กลับไปเลือกร้านอื่น">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              <span>เลือกร้านอื่น</span>
+            </button>
             <button id="openAddModalBtn" class="btn btn-primary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>

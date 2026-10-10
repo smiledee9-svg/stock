@@ -341,10 +341,13 @@ class MultiStoreStockApp {
       this.renderProducts();
     });
 
-    document.getElementById('categoryFilter').addEventListener('change', (e) => {
-      this.categoryFilter = e.target.value;
-      this.renderProducts();
-    });
+    const catFilterEl = document.getElementById('categoryFilter');
+    if (catFilterEl) {
+      catFilterEl.addEventListener('change', (e) => {
+        this.categoryFilter = e.target.value;
+        this.renderProducts();
+      });
+    }
 
     document.getElementById('historyFilterType').addEventListener('change', (e) => {
       this.historyFilter = e.target.value;
@@ -1055,6 +1058,7 @@ class MultiStoreStockApp {
 
   renderCategoryFilterOptions(storeProducts) {
     const select = document.getElementById('categoryFilter');
+    if (!select) return;
     const currentVal = select.value;
     const categories = Array.from(new Set(storeProducts.map(p => p.category).filter(Boolean)));
 
