@@ -154,10 +154,46 @@ body {
   font-weight: 400;
 }
 
+/* ================= Unified Store Header (เมื่อเปิดจัดการสต็อก รวมสองส่วนเป็นหนึ่ง) ================= */
+.header-store-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.back-hub-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  padding: 8px 14px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.back-hub-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.header-actions .btn-sm {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
 }
 
 .icon-btn {
@@ -1367,8 +1403,45 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .active-store-banner {
-    flex-direction: column;
-    align-items: flex-start;
+  .header-content {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .header-store-info {
+    gap: 8px;
+  }
+
+  .current-store-title {
+    font-size: 1rem;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .back-hub-btn {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    height: 36px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .header-actions .btn-sm {
+    height: 36px;
+    padding: 6px 10px;
+  }
+
+  .header-actions .edit-btn-text,
+  .header-actions .add-store-text {
+    display: none;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
   }
 }

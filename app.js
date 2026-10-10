@@ -765,12 +765,18 @@ class MultiStoreStockApp {
     const hubView = document.getElementById('storesHubView');
     const detailView = document.getElementById('storeDetailView');
     const subtitle = document.getElementById('headerSubtitle');
+    const brandHome = document.getElementById('brandHomeTrigger');
+    const headerStoreInfo = document.getElementById('headerStoreInfo');
+    const editBtn = document.getElementById('editCurrentStoreBtn');
 
     if (!this.currentStoreId) {
       // Show Hub View
       hubView.style.display = 'block';
       detailView.style.display = 'none';
-      subtitle.textContent = 'เลือกร้านค้าเพื่อเริ่มต้น';
+      if (brandHome) brandHome.style.display = 'flex';
+      if (headerStoreInfo) headerStoreInfo.style.display = 'none';
+      if (editBtn) editBtn.style.display = 'none';
+      if (subtitle) subtitle.textContent = 'เลือกร้านค้าเพื่อเริ่มต้น';
       this.renderHub();
     } else {
       // Show Store Detail View
@@ -782,9 +788,13 @@ class MultiStoreStockApp {
 
       hubView.style.display = 'none';
       detailView.style.display = 'block';
-      subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
+      if (brandHome) brandHome.style.display = 'none';
+      if (headerStoreInfo) headerStoreInfo.style.display = 'flex';
+      if (editBtn) editBtn.style.display = 'inline-flex';
+      if (subtitle) subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
 
-      document.getElementById('currentStoreName').textContent = currentStore.name;
+      const nameEl = document.getElementById('currentStoreName');
+      if (nameEl) nameEl.textContent = currentStore.name;
       const codeBadge = document.getElementById('currentStoreCode');
       if (codeBadge) codeBadge.textContent = currentStore.code ? `#${currentStore.code}` : '#01';
 

@@ -16,6 +16,7 @@
     <!-- Top Global Header (รวมสองแถวแรกเป็นแถวเดียว Compact & Clean) -->
     <header class="app-header">
       <div class="header-content">
+        <!-- Hub Brand Info (แสดงเมื่ออยู่หน้ารวมร้านค้า) -->
         <div class="brand" id="brandHomeTrigger" style="cursor: pointer;" title="กลับหน้ารวมร้านค้า">
           <div class="brand-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -30,13 +31,33 @@
           </div>
         </div>
 
+        <!-- Store Active Info (แสดงในแถวเดียวกันเมื่อเปิดจัดการสต็อก รวมสองส่วนเป็นแถวเดียว Compact) -->
+        <div class="header-store-info" id="headerStoreInfo" style="display: none;">
+          <button id="backToHubBtn" class="btn btn-secondary btn-sm back-hub-btn" title="กลับหน้ารวมร้านค้า">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span class="back-btn-text">เลือกร้านอื่น</span>
+          </button>
+          <div class="current-store-info">
+            <span class="store-status-dot"></span>
+            <div class="current-store-title" id="currentStoreName">ชื่อร้านค้า</div>
+            <span class="store-code-pill" id="currentStoreCode">01</span>
+          </div>
+        </div>
+
         <div class="header-actions">
+          <button id="editCurrentStoreBtn" class="btn btn-secondary btn-sm" title="แก้ไขข้อมูลร้านนี้" style="display: none;">
+            <span>✏️</span>
+            <span class="edit-btn-text">แก้ไขร้านนี้</span>
+          </button>
           <button id="openAddStoreBtn" class="btn btn-primary btn-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>+ เพิ่มร้านใหม่</span>
+            <span class="add-store-text">+ เพิ่มร้านใหม่</span>
           </button>
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
             <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -77,30 +98,6 @@
 
     <!-- ================= VIEW 2: STORE INVENTORY & OPERATIONS (หน้าจัดการสต็อกในร้าน) ================= -->
     <section id="storeDetailView" class="view-section" style="display: none;">
-      
-      <!-- Store Active Bar with Back & Switcher -->
-      <div class="active-store-banner">
-        <div class="store-banner-left">
-          <button id="backToHubBtn" class="btn btn-secondary btn-sm" title="กลับหน้ารวมร้านค้า">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            <span>เลือกร้านอื่น</span>
-          </button>
-          <div class="current-store-info">
-            <span class="store-status-dot"></span>
-            <div class="current-store-title" id="currentStoreName">ชื่อร้านค้า</div>
-            <span class="store-code-pill" id="currentStoreCode">01</span>
-          </div>
-        </div>
-
-        <div class="store-banner-right">
-          <button id="editCurrentStoreBtn" class="btn btn-secondary btn-sm" title="แก้ไขข้อมูลร้านนี้">
-            ✏️ แก้ไขร้านนี้
-          </button>
-        </div>
-      </div>
 
       <!-- Main Navigation Tabs for this store -->
       <nav class="nav-tabs">
