@@ -288,10 +288,13 @@ class MultiStoreStockApp {
       });
     });
 
-    // Low stock trigger card in metrics
-    document.getElementById('cardLowStockTrigger').addEventListener('click', () => {
-      this.switchTab('alerts');
-    });
+    // Low stock trigger card in metrics (if exists)
+    const lowStockCard = document.getElementById('cardLowStockTrigger');
+    if (lowStockCard) {
+      lowStockCard.addEventListener('click', () => {
+        this.switchTab('alerts');
+      });
+    }
 
     // Search and Filters
     const searchInput = document.getElementById('searchInput');
@@ -942,19 +945,26 @@ class MultiStoreStockApp {
     const totalValue = storeProducts.reduce((sum, p) => sum + ((p.quantity || 0) * (p.price || 0)), 0);
     const lowStockCount = storeProducts.filter(p => (p.quantity || 0) <= (p.minAlert || 0)).length;
 
-    document.getElementById('metricTotalSKUs').textContent = totalSKUs.toLocaleString();
-    document.getElementById('metricTotalQuantity').textContent = totalQuantity.toLocaleString();
-    document.getElementById('metricTotalValue').textContent = '฿' + totalValue.toLocaleString();
-    document.getElementById('metricLowStockCount').textContent = lowStockCount.toLocaleString();
-    document.getElementById('alertCountBadge').textContent = lowStockCount;
+    const elSKU = document.getElementById('metricTotalSKUs');
+    if (elSKU) elSKU.textContent = totalSKUs.toLocaleString();
+    const elQty = document.getElementById('metricTotalQuantity');
+    if (elQty) elQty.textContent = totalQuantity.toLocaleString();
+    const elVal = document.getElementById('metricTotalValue');
+    if (elVal) elVal.textContent = '฿' + totalValue.toLocaleString();
+    const elLow = document.getElementById('metricLowStockCount');
+    if (elLow) elLow.textContent = lowStockCount.toLocaleString();
+    const elBadge = document.getElementById('alertCountBadge');
+    if (elBadge) elBadge.textContent = lowStockCount;
 
     const hint = document.getElementById('metricLowStockHint');
-    if (lowStockCount > 0) {
-      hint.textContent = `มี ${lowStockCount} รายการต้องเติมด่วน`;
-      hint.style.color = 'var(--danger)';
-    } else {
-      hint.textContent = 'สต็อกอยู่ในเกณฑ์ปลอดภัย';
-      hint.style.color = 'var(--success)';
+    if (hint) {
+      if (lowStockCount > 0) {
+        hint.textContent = `มี ${lowStockCount} รายการต้องเติมด่วน`;
+        hint.style.color = 'var(--danger)';
+      } else {
+        hint.textContent = 'สต็อกอยู่ในเกณฑ์ปลอดภัย';
+        hint.style.color = 'var(--success)';
+      }
     }
 
     this.renderCategoryFilterOptions(storeProducts);

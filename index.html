@@ -99,70 +99,7 @@
     <!-- ================= VIEW 2: STORE INVENTORY & OPERATIONS (หน้าจัดการสต็อกในร้าน) ================= -->
     <section id="storeDetailView" class="view-section" style="display: none;">
 
-      <!-- Main Navigation Tabs for this store -->
-      <nav class="nav-tabs">
-        <button class="nav-tab active" data-tab="inventory" id="tabInventoryBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-          </svg>
-          <span>สต็อกสินค้า</span>
-        </button>
-        <button class="nav-tab" data-tab="history" id="tabHistoryBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          <span>ประวัติเข้า-ออก</span>
-        </button>
-        <button class="nav-tab" data-tab="alerts" id="tabAlertsBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          <span>เตือนของหมด</span>
-          <span class="badge-alert-count" id="alertCountBadge">0</span>
-        </button>
-      </nav>
-
-      <!-- Metrics Summary Cards for Current Store -->
-      <section class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">รายการสินค้า</span>
-            <span class="metric-icon blue">📦</span>
-          </div>
-          <div class="metric-value" id="metricTotalSKUs">0</div>
-          <div class="metric-foot">ในร้านนี้</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">จำนวนของรวม</span>
-            <span class="metric-icon green">🔢</span>
-          </div>
-          <div class="metric-value" id="metricTotalQuantity">0</div>
-          <div class="metric-foot">ชิ้นในคลังร้านนี้</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-label">มูลค่าสินค้า</span>
-            <span class="metric-icon purple">💰</span>
-          </div>
-          <div class="metric-value" id="metricTotalValue">฿0</div>
-          <div class="metric-foot">มูลค่ารวมในร้านนี้</div>
-        </div>
-        <div class="metric-card highlight-warning" id="cardLowStockTrigger">
-          <div class="metric-header">
-            <span class="metric-label">ใกล้หมดสต็อก</span>
-            <span class="metric-icon amber">⚠️</span>
-          </div>
-          <div class="metric-value alert-text" id="metricLowStockCount">0</div>
-          <div class="metric-foot" id="metricLowStockHint">ต้องสั่งเพิ่มด่วน</div>
-        </div>
-      </section>
-
-      <!-- TAB 1: INVENTORY SECTION -->
+      <!-- INVENTORY SECTION (เปิดแสดงตารางสต็อกทันที เต็มพื้นที่ ไม่เกะกะ) -->
       <main class="tab-content active" id="inventoryTab">
         <section class="controls-card">
           <div class="search-box">
