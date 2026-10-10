@@ -657,7 +657,7 @@ class MultiStoreStockApp {
         id: 'prod_' + Date.now(),
         storeId: this.currentStoreId,
         name,
-        sku: sku || ('SKU-' + Math.floor(1000 + Math.random() * 9000)),
+        sku: sku || '',
         category,
         quantity,
         minAlert,
@@ -1117,10 +1117,6 @@ class MultiStoreStockApp {
             <td>
               <div class="col-name-wrapper">
                 <span class="battery-name">${this.escapeHtml(item.name)}</span>
-                <div class="battery-meta">
-                  <span class="battery-badge-cat">${this.escapeHtml(item.category || 'สินค้า')}</span>
-                  ${item.sku ? `<span>${this.escapeHtml(item.sku)}</span>` : ''}
-                </div>
               </div>
             </td>
 
