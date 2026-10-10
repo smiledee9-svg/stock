@@ -200,6 +200,24 @@ body {
   padding: 8px 14px;
 }
 
+.line-btn-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.line-setting-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+}
+
+.line-setting-icon-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
 .icon-btn {
   background: var(--bg-tertiary);
   color: var(--text-main);

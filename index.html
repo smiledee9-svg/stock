@@ -52,10 +52,18 @@
             </svg>
             <span class="add-store-text">เพิ่มร้านใหม่</span>
           </button>
-          <!-- ปุ่มคัดลอกรายการสั่งของ รวมไว้ในแถบด้านบนตามคำขอ -->
-          <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="คัดลอกรายการที่ต้องสั่งเพิ่ม" style="display: none;">
-            <span>📋 คัดลอกรายการสั่งของ</span>
-          </button>
+          <!-- ปุ่มสั่งของเข้า LINE และตั้งค่า LINE ผู้รับ -->
+          <div class="line-btn-wrapper" id="lineOrderBtnGroup" style="display: none;">
+            <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="ส่งรายการสั่งของเข้า LINE ตามที่ตั้งค่าไว้">
+              <span>📋 สั่งของเข้า LINE</span>
+            </button>
+            <button id="openLineSettingsBtn" class="icon-btn line-setting-icon-btn" title="⚙️ ตั้งค่า LINE ผู้รับรายการสั่งของ" aria-label="ตั้งค่า LINE ผู้รับ">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+            </button>
+          </div>
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
             <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -393,6 +401,44 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="closeBackupFooterBtn">ปิดหน้าต่าง</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LINE SETTINGS (ตั้งค่า LINE สำหรับสั่งของ) -->
+  <div class="modal-overlay" id="lineSettingsModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>⚙️ ตั้งค่า LINE สำหรับสั่งของ</h3>
+        <button class="close-btn" id="closeLineSettingsModalBtn" aria-label="ปิด">&times;</button>
+      </div>
+      <form id="lineSettingsForm">
+        <div class="modal-body-content">
+          <p class="backup-desc">กำหนด LINE ID ของซัพพลายเออร์หรือผู้รับรายการสั่งของ เมื่อกดปุ่มสั่งของ ระบบจะเปิดห้องแชทของ LINE นี้โดยตรงทันที</p>
+          
+          <div class="form-group">
+            <label for="lineTargetInput">LINE ID หรือ ลิงก์ LINE ของผู้รับ / ซัพพลายเออร์ <span class="required">*</span></label>
+            <input type="text" id="lineTargetInput" placeholder="เช่น @supplier, somchai_line, หรือ https://line.me/ti/p/~xxx" autocomplete="off">
+            <div style="background: var(--bg-tertiary); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; font-size: 0.82rem; line-height: 1.5; color: var(--text-muted);">
+              <span style="font-weight: 700; color: var(--text-main);">💡 รูปแบบที่รองรับ:</span><br>
+              • <strong>LINE Official Account (LINE OA):</strong> ใส่ <code>@ชื่อไอดี</code> (เช่น <code>@battery_shop</code>) ระบบจะเปิดเข้าแชทพร้อมวางข้อความสั่งของให้ทันที<br>
+              • <strong>LINE ส่วนตัว:</strong> ใส่ไอดี เช่น <code>somchai88</code> หรือลิงก์แอดไลน์ เช่น <code>https://line.me/ti/p/~somchai</code><br>
+              • <strong>หากไม่ใส่:</strong> ระบบจะเปิดหน้าต่างแชร์ ให้คุณเลือกเพื่อนหรือกลุ่มใน LINE เอง
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label for="lineCustomHeaderInput">หัวข้อรายการสั่งของ (แสดงบรรทัดแรก)</label>
+            <input type="text" id="lineCustomHeaderInput" placeholder="เช่น รายการสั่งแบตเตอรี่ด่วน" autocomplete="off">
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" class="btn btn-secondary" id="clearLineSettingsBtn" style="color: var(--danger);" title="ล้างค่าการตั้งค่า LINE">ล้างค่า</button>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary" id="cancelLineSettingsBtn">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary" id="saveLineSettingsBtn">บันทึก</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 

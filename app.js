@@ -369,9 +369,23 @@ class MultiStoreStockApp {
     if (viewTableBtn) viewTableBtn.addEventListener('click', () => this.switchInventoryView('table'));
     if (viewCardsBtn) viewCardsBtn.addEventListener('click', () => this.switchInventoryView('cards'));
 
-    // Copy order list button
+    // Send order to LINE button
     const copyOrderBtn = document.getElementById('copyOrderListBtn');
-    if (copyOrderBtn) copyOrderBtn.addEventListener('click', () => this.copyOrderList());
+    if (copyOrderBtn) copyOrderBtn.addEventListener('click', () => this.sendOrderListToLine());
+
+    // LINE Settings
+    const openLineSettingsBtn = document.getElementById('openLineSettingsBtn');
+    const lineSettingsModal = document.getElementById('lineSettingsModal');
+    const closeLineSettingsModalBtn = document.getElementById('closeLineSettingsModalBtn');
+    const cancelLineSettingsBtn = document.getElementById('cancelLineSettingsBtn');
+    const clearLineSettingsBtn = document.getElementById('clearLineSettingsBtn');
+    const lineSettingsForm = document.getElementById('lineSettingsForm');
+
+    if (openLineSettingsBtn) openLineSettingsBtn.addEventListener('click', () => this.openLineSettingsModal());
+    if (closeLineSettingsModalBtn) closeLineSettingsModalBtn.addEventListener('click', () => this.closeModal(lineSettingsModal));
+    if (cancelLineSettingsBtn) cancelLineSettingsBtn.addEventListener('click', () => this.closeModal(lineSettingsModal));
+    if (clearLineSettingsBtn) clearLineSettingsBtn.addEventListener('click', () => this.clearLineSettings());
+    if (lineSettingsForm) lineSettingsForm.addEventListener('submit', (e) => this.handleSaveLineSettings(e));
 
     // Product Modal
     const productModal = document.getElementById('productModal');
@@ -911,6 +925,7 @@ class MultiStoreStockApp {
     const headerStoreInfo = document.getElementById('headerStoreInfo');
     const editBtn = document.getElementById('editCurrentStoreBtn');
     const openAddStoreBtn = document.getElementById('openAddStoreBtn');
+    const lineOrderGroup = document.getElementById('lineOrderBtnGroup');
     const copyOrderBtn = document.getElementById('copyOrderListBtn');
 
     if (!this.currentStoreId) {
@@ -921,6 +936,7 @@ class MultiStoreStockApp {
       if (headerStoreInfo) headerStoreInfo.style.display = 'none';
       if (editBtn) editBtn.style.display = 'none';
       if (openAddStoreBtn) openAddStoreBtn.style.display = 'inline-flex';
+      if (lineOrderGroup) lineOrderGroup.style.display = 'none';
       if (copyOrderBtn) copyOrderBtn.style.display = 'none';
       if (subtitle) subtitle.textContent = 'เลือกร้านค้าเพื่อเริ่มต้น';
       this.renderHub();
@@ -938,7 +954,8 @@ class MultiStoreStockApp {
       if (headerStoreInfo) headerStoreInfo.style.display = 'flex';
       if (editBtn) editBtn.style.display = 'none'; // หน้านี้ไม่ได้ใช้ ซ่อนตามคำขอ
       if (openAddStoreBtn) openAddStoreBtn.style.display = 'none'; // หน้านี้ไม่ได้ใช้ ซ่อนตามคำขอ
-      if (copyOrderBtn) copyOrderBtn.style.display = 'inline-flex'; // รวมไว้ที่แถบด้านบนตามคำขอ
+      if (lineOrderGroup) lineOrderGroup.style.display = 'inline-flex'; // รวมไว้ที่แถบด้านบนตามคำขอ
+      if (copyOrderBtn) copyOrderBtn.style.display = 'inline-flex';
       if (subtitle) subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
 
       const nameEl = document.getElementById('currentStoreName');
@@ -1135,10 +1152,10 @@ class MultiStoreStockApp {
     if (copyOrderBtn) {
       if (needOrderItems.length > 0) {
         copyOrderBtn.className = 'btn btn-primary btn-sm';
-        copyOrderBtn.innerHTML = `<span>📋 คัดลอกรายการสั่งของ (${needOrderItems.length})</span>`;
+        copyOrderBtn.innerHTML = `<span>📋 สั่งของเข้า LINE (${needOrderItems.length})</span>`;
       } else {
         copyOrderBtn.className = 'btn btn-secondary btn-sm';
-        copyOrderBtn.innerHTML = `<span>📋 คัดลอกรายการสั่งของ</span>`;
+        copyOrderBtn.innerHTML = `<span>📋 สั่งของเข้า LINE</span>`;
       }
     }
 
@@ -1385,7 +1402,82 @@ class MultiStoreStockApp {
     this.showToast(`อัปเดต "${product.name}" เป็น ${newQty}${unitStr} เรียบร้อย`, 'success');
   }
 
-  copyOrderList() {
+  openLineSettingsModal() {
+    const modal = document.getElementById('lineSettingsModal');
+    if (!modal) return;
+    const store = this.stores.find(s => s.id === this.currentStoreId);
+    const targetInput = document.getElementById('lineTargetInput');
+    const headerInput = document.getElementById('lineCustomHeaderInput');
+
+    const savedTarget = (store && store.lineTarget) || localStorage.getItem('smartstock_line_target') || '';
+    const savedHeader = (store && store.lineCustomHeader) || localStorage.getItem('smartstock_line_header') || '';
+
+    if (targetInput) targetInput.value = savedTarget;
+    if (headerInput) headerInput.value = savedHeader;
+
+    this.openModal(modal);
+    setTimeout(() => {
+      if (targetInput) targetInput.focus();
+    }, 150);
+  }
+
+  handleSaveLineSettings(e) {
+    e.preventDefault();
+    const modal = document.getElementById('lineSettingsModal');
+    const targetInput = document.getElementById('lineTargetInput');
+    const headerInput = document.getElementById('lineCustomHeaderInput');
+
+    const targetVal = targetInput ? targetInput.value.trim() : '';
+    const headerVal = headerInput ? headerInput.value.trim() : '';
+
+    localStorage.setItem('smartstock_line_target', targetVal);
+    if (headerVal) {
+      localStorage.setItem('smartstock_line_header', headerVal);
+    } else {
+      localStorage.removeItem('smartstock_line_header');
+    }
+
+    if (this.currentStoreId) {
+      const storeIndex = this.stores.findIndex(s => s.id === this.currentStoreId);
+      if (storeIndex !== -1) {
+        this.stores[storeIndex].lineTarget = targetVal;
+        this.stores[storeIndex].lineCustomHeader = headerVal;
+        this.saveStores();
+      }
+    }
+
+    this.closeModal(modal);
+    if (targetVal) {
+      this.showToast(`บันทึก LINE: ${targetVal} เรียบร้อย 💬 พร้อมสั่งของ!`, 'success');
+    } else {
+      this.showToast('บันทึกการตั้งค่าแล้ว (จะเปิดเลือกผู้รับใน LINE ตามปกติ)', 'info');
+    }
+  }
+
+  clearLineSettings() {
+    const targetInput = document.getElementById('lineTargetInput');
+    const headerInput = document.getElementById('lineCustomHeaderInput');
+    if (targetInput) targetInput.value = '';
+    if (headerInput) headerInput.value = '';
+
+    localStorage.removeItem('smartstock_line_target');
+    localStorage.removeItem('smartstock_line_header');
+
+    if (this.currentStoreId) {
+      const storeIndex = this.stores.findIndex(s => s.id === this.currentStoreId);
+      if (storeIndex !== -1) {
+        delete this.stores[storeIndex].lineTarget;
+        delete this.stores[storeIndex].lineCustomHeader;
+        this.saveStores();
+      }
+    }
+
+    const modal = document.getElementById('lineSettingsModal');
+    this.closeModal(modal);
+    this.showToast('ล้างการตั้งค่า LINE เรียบร้อย', 'info');
+  }
+
+  sendOrderListToLine() {
     const store = this.stores.find(s => s.id === this.currentStoreId);
     const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
     const needOrderItems = storeProducts.filter(p => Math.max(0, (p.minAlert || 5) - (p.quantity || 0)) > 0);
@@ -1396,7 +1488,10 @@ class MultiStoreStockApp {
     }
 
     const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
-    let text = `📦 รายการสั่งของเพิ่ม - ${store ? store.name : 'ร้านค้า'}\n`;
+    const lineTarget = (store && store.lineTarget) || localStorage.getItem('smartstock_line_target') || '';
+    const customHeader = (store && store.lineCustomHeader) || localStorage.getItem('smartstock_line_header') || 'รายการสั่งของเพิ่ม';
+
+    let text = `📦 ${customHeader} - ${store ? store.name : 'ร้านค้า'}\n`;
     text += `📅 ประจำวันที่: ${dateStr}\n`;
     text += `====================================\n`;
     needOrderItems.forEach((p, idx) => {
@@ -1411,15 +1506,38 @@ class MultiStoreStockApp {
     text += `📌 รวมต้องสั่งทั้งหมด: ${totalOrder} (${needOrderItems.length} รายการ)\n`;
     text += `(คำนวณจากสูตร: =MAX(0, สต็อกเป้าหมาย - นับได้จริง))`;
 
+    // Copy to clipboard always for safety/instant paste
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => {
-        this.showToast(`คัดลอกรายการสั่งของ ${needOrderItems.length} รุ่นเรียบร้อย 📋 ส่งใน LINE ได้ทันที!`, 'success');
-      }).catch(() => {
-        prompt('คัดลอกข้อความด้านล่างนี้ได้เลยครับ:', text);
-      });
-    } else {
-      prompt('คัดลอกข้อความด้านล่างนี้ได้เลยครับ:', text);
+      navigator.clipboard.writeText(text).catch(() => {});
     }
+
+    // Check if LINE target is configured
+    if (!lineTarget) {
+      this.openLineSettingsModal();
+      this.showToast('กรุณาตั้งค่า LINE ID ของผู้รับก่อนส่ง (ตั้งค่าครั้งเดียว)', 'info');
+      return;
+    }
+
+    let lineUrl = '';
+    const cleanTarget = lineTarget.trim();
+
+    if (cleanTarget.startsWith('http://') || cleanTarget.startsWith('https://')) {
+      lineUrl = cleanTarget;
+    } else if (cleanTarget.startsWith('@')) {
+      // LINE OA: open 1-on-1 chat with prefilled text
+      lineUrl = `https://line.me/R/oaMessage/${encodeURIComponent(cleanTarget)}/?${encodeURIComponent(text)}`;
+    } else {
+      // Personal LINE ID: open line chat or add friend profile
+      lineUrl = `https://line.me/ti/p/~${encodeURIComponent(cleanTarget)}`;
+    }
+
+    window.open(lineUrl, '_blank');
+    this.showToast(`คัดลอกข้อความและเปิด LINE: ${cleanTarget} เรียบร้อย 🚀 พร้อมส่งได้ทันที!`, 'success');
+  }
+
+  // Backward compatibility alias
+  copyOrderList() {
+    this.sendOrderListToLine();
   }
 
   editProductById(id) {
