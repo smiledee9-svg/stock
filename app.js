@@ -1000,11 +1000,21 @@ class MultiStoreStockApp {
 
     const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
 
+    const queryWords = this.searchQuery ? this.searchQuery.toLowerCase().split(/\s+/).filter(Boolean) : [];
+
     let filtered = storeProducts.filter(p => {
-      const matchesSearch = !this.searchQuery || 
-        p.name.toLowerCase().includes(this.searchQuery) ||
-        (p.sku && p.sku.toLowerCase().includes(this.searchQuery)) ||
-        (p.category && p.category.toLowerCase().includes(this.searchQuery));
+      let matchesSearch = true;
+      if (queryWords.length > 0) {
+        // รองรับการค้นหาภาษาไทยและอังกฤษ ทั้งชื่อรุ่น, หมวดหมู่, รหัสสินค้า
+        const textToSearch = `${p.name} ${p.sku || ''} ${p.category || ''}`.toLowerCase();
+        // ตัดช่องว่างและขีด เพื่อให้ค้นหาแบบย่อได้ เช่น "46b24" เจอ "GS 46B24L"
+        const compactText = textToSearch.replace(/[-\s]/g, '');
+
+        matchesSearch = queryWords.every(word => {
+          const compactWord = word.replace(/[-\s]/g, '');
+          return textToSearch.includes(word) || (compactWord && compactText.includes(compactWord));
+        });
+      }
 
       const matchesCategory = this.categoryFilter === 'ALL' || p.category === this.categoryFilter;
 
