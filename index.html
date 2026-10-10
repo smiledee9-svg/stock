@@ -129,27 +129,14 @@
         <section class="products-section">
           <div class="section-title-row">
             <div>
-              <h3 class="section-title" id="inventorySectionTitle">1. ตารางสต็อกแบบย่อ (เหลือ 4 ช่อง)</h3>
-              <p class="section-subtitle" id="inventorySectionSubtitle">สูตรคำนวณสั่งเพิ่ม: <code>=MAX(0, เป้าหมาย - นับได้จริง)</code></p>
+              <h3 class="section-title" id="inventorySectionTitle">ตารางสต็อกสินค้า</h3>
             </div>
             <div class="inventory-top-tools">
-              <button id="copyOrderListBtn" class="btn btn-secondary btn-sm" title="คัดลอกรายการที่ต้องสั่งเพิ่ม">
+              <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="คัดลอกรายการที่ต้องสั่งเพิ่ม">
                 <span>📋 คัดลอกรายการสั่งของ</span>
               </button>
-              <div class="view-mode-toggle">
-                <button class="toggle-btn active" id="viewModeTableBtn" type="button" title="มุมมองตารางย่อ 4 ช่อง">
-                  📊 ตารางย่อ 4 ช่อง
-                </button>
-                <button class="toggle-btn" id="viewModeCardsBtn" type="button" title="มุมมองการ์ด">
-                  🗂️ การ์ดสินค้า
-                </button>
-              </div>
-              <span class="item-count-badge" id="productCountBadge">0 รายการ</span>
             </div>
           </div>
-
-          <!-- Order Summary Alert Banner -->
-          <div id="orderSummaryBanner" class="order-summary-alert" style="display: none;"></div>
 
           <!-- 1. COMPACT 4-COLUMN TABLE VIEW (แบบย่อ สะอาด สรุปชัดเจน) -->
           <div class="table-responsive-wrapper" id="inventoryTableView">

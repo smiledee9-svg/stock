@@ -1039,7 +1039,7 @@ class MultiStoreStockApp {
       return matchesSearch && matchesCategory;
     });
 
-    countBadge.textContent = `${filtered.length} รายการ`;
+    if (countBadge) countBadge.textContent = `${filtered.length} รายการ`;
 
     if (filtered.length === 0) {
       if (tableBody) tableBody.innerHTML = '';
@@ -1047,34 +1047,22 @@ class MultiStoreStockApp {
       if (tableView) tableView.style.display = 'none';
       if (grid) grid.style.display = 'none';
       if (emptyState) emptyState.style.display = 'block';
-      if (summaryBanner) summaryBanner.style.display = 'none';
       return;
     }
 
     if (emptyState) emptyState.style.display = 'none';
 
-    // Summary alert for items needing ordering
+    // Check items needing ordering for copy button badge
     const needOrderItems = filtered.filter(p => Math.max(0, (p.minAlert || 5) - (p.quantity || 0)) > 0);
-    const totalPiecesToOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
 
-    if (summaryBanner) {
+    const copyOrderBtn = document.getElementById('copyOrderListBtn');
+    if (copyOrderBtn) {
       if (needOrderItems.length > 0) {
-        summaryBanner.style.display = 'flex';
-        const unitWord = store && store.name.includes('แบต') ? 'ลูก' : 'ชิ้น';
-        summaryBanner.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.35rem;">🚨</span>
-            <div>
-              <div><strong>มี ${needOrderItems.length} รายการที่ต้องสั่งเพิ่มด่วน</strong> (รวมทั้งหมด <strong>${totalPiecesToOrder} ${unitWord}</strong>)</div>
-              <div style="font-size: 0.82rem; opacity: 0.9; font-weight: 500;">สรุปตามสต็อกที่นับได้จริง พร้อมกดคัดลอกส่งสั่งของได้ทันที</div>
-            </div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="window.app.copyOrderList()">
-            <span>📋 คัดลอกรายการสั่งของ</span>
-          </button>
-        `;
+        copyOrderBtn.className = 'btn btn-primary btn-sm';
+        copyOrderBtn.innerHTML = `<span>📋 คัดลอกรายการสั่งของ (${needOrderItems.length})</span>`;
       } else {
-        summaryBanner.style.display = 'none';
+        copyOrderBtn.className = 'btn btn-secondary btn-sm';
+        copyOrderBtn.innerHTML = `<span>📋 คัดลอกรายการสั่งของ</span>`;
       }
     }
 
