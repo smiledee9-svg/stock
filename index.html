@@ -259,61 +259,69 @@
   </div>
 
   <!-- MODAL: ADD / EDIT PRODUCT -->
+  <!-- MODAL: ADD / EDIT PRODUCT (ออกแบบย้อนกลับจากตารางภาพที่ 1 ให้กรอกง่ายที่สุด) -->
   <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modalTitle">เพิ่มสินค้าใหม่</h3>
+        <h3 id="modalTitle">เพิ่มรายการสินค้า</h3>
         <button class="close-btn" id="closeProductModalBtn" aria-label="ปิด">&times;</button>
       </div>
       <form id="productForm">
         <input type="hidden" id="editProductId">
+        <input type="hidden" id="prodSku" value="">
+        <input type="hidden" id="prodCategory" value="">
         
+        <!-- 1. รายการ (ตรงกับคอลัมน์ "รายการ") -->
         <div class="form-group">
-          <label for="prodName" id="prodNameLabel">ชื่อสินค้า / ยี่ห้อ / รุ่น <span class="required">*</span></label>
-          <input type="text" id="prodName" required placeholder="เช่น GS 46B24L, หมวกแก๊ป, กระเป๋าผ้า, เสื้อยืด...">
+          <label for="prodName" id="prodNameLabel">รายการ <span class="required">*</span></label>
+          <input type="text" id="prodName" required placeholder="ชื่อสินค้า เช่น หมวกแก๊ป, กระเป๋าผ้า, GS 46B24L..." autocomplete="off">
         </div>
 
+        <!-- 2. ราคาทุน / ราคาขาย (ตรงกับคอลัมน์ "ราคาทุน/หน่วย" และ "ราคาขาย/หน่วย") -->
         <div class="form-row">
           <div class="form-group">
-            <label for="prodSku">รหัสสินค้า / รหัสรุ่น</label>
-            <input type="text" id="prodSku" placeholder="เช่น GS-46B24L, CAP-01">
-          </div>
-          <div class="form-group">
-            <label for="prodCategory">หมวดหมู่</label>
-            <input type="text" id="prodCategory" placeholder="เช่น ขั้ว L, หมวก, เสื้อผ้า, เครื่องประดับ">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="prodMinAlert">สต็อกเป้าหมาย <span class="required">*</span></label>
-            <input type="number" id="prodMinAlert" required min="0" step="1" value="5" placeholder="เช่น 5">
-          </div>
-          <div class="form-group">
-            <label for="prodQuantity">นับได้จริงเริ่มต้น <span class="required">*</span></label>
-            <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="เช่น 0, 2 หรือ 5">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="prodCostPrice">ราคาทุนต่อหน่วย (บาท)</label>
+            <label for="prodCostPrice">ราคาทุน/หน่วย (บาท)</label>
             <input type="number" id="prodCostPrice" min="0" step="any" value="180" placeholder="0">
           </div>
           <div class="form-group">
-            <label for="prodPrice">ราคาขายต่อหน่วย (บาท)</label>
+            <label for="prodPrice">ราคาขาย/หน่วย (บาท)</label>
             <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
           </div>
         </div>
 
+        <!-- 3. สต็อกเป้าหมาย / นับได้จริง (ตรงกับคอลัมน์ "สต็อกเป้าหมาย" และ "นับได้จริง") -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prodMinAlert">สต็อกเป้าหมาย</label>
+            <input type="number" id="prodMinAlert" required min="0" step="1" value="5" placeholder="5">
+          </div>
+          <div class="form-group">
+            <label for="prodQuantity">นับได้จริง</label>
+            <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
+          </div>
+        </div>
+
+        <!-- 4. หน่วยนับ (ตรงกับหน่วยท้ายราคา เช่น /ลูก, /ใบ, /ชิ้น) -->
         <div class="form-group">
-          <label for="prodUnit">หน่วยนับ</label>
+          <div class="unit-label-row">
+            <label for="prodUnit">หน่วยนับ</label>
+            <span class="unit-hint-badge">คลิกเลือกด่วน หรือพิมพ์เอง</span>
+          </div>
+          <div class="unit-chips-container">
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ชิ้น')">ชิ้น</button>
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ลูก')">ลูก</button>
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ใบ')">ใบ</button>
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ตัว')">ตัว</button>
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('กล่อง')">กล่อง</button>
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('คู่')">คู่</button>
+            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ชุด')">ชุด</button>
+          </div>
           <input type="text" id="prodUnit" placeholder="เช่น ชิ้น, ลูก, ใบ, ตัว" value="ชิ้น">
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="cancelProductBtn">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary" id="saveProductBtn">บันทึกสินค้า</button>
+          <button type="submit" class="btn btn-primary" id="saveProductBtn">บันทึกรายการ</button>
         </div>
       </form>
     </div>

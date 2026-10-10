@@ -559,6 +559,14 @@ class MultiStoreStockApp {
     }
   }
 
+  setModalUnit(unit) {
+    const input = document.getElementById('prodUnit');
+    if (input) input.value = unit;
+    document.querySelectorAll('.unit-quick-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.textContent.trim() === unit);
+    });
+  }
+
   // Product Management
   openProductModal(product = null) {
     const modal = document.getElementById('productModal');
@@ -571,27 +579,43 @@ class MultiStoreStockApp {
     form.reset();
 
     if (product) {
-      title.textContent = 'แก้ไขรายละเอียดสินค้า';
+      title.textContent = 'แก้ไขรายการสินค้า';
       editIdInput.value = product.id;
       document.getElementById('prodName').value = product.name;
-      document.getElementById('prodSku').value = product.sku || '';
-      document.getElementById('prodCategory').value = product.category || '';
-      document.getElementById('prodQuantity').value = product.quantity;
-      document.getElementById('prodMinAlert').value = product.minAlert;
+      const skuEl = document.getElementById('prodSku');
+      if (skuEl) skuEl.value = product.sku || '';
+      const catEl = document.getElementById('prodCategory');
+      if (catEl) catEl.value = product.category || '';
       document.getElementById('prodCostPrice').value = product.costPrice !== undefined ? product.costPrice : Math.round((product.price || 0) * 0.75);
       document.getElementById('prodPrice').value = product.price || 0;
-      document.getElementById('prodUnit').value = product.unit || (isBattery ? 'ลูก' : 'ชิ้น');
+      document.getElementById('prodMinAlert').value = product.minAlert || 5;
+      document.getElementById('prodQuantity').value = product.quantity !== undefined ? product.quantity : 5;
+      const currentUnit = product.unit || (isBattery ? 'ลูก' : 'ชิ้น');
+      document.getElementById('prodUnit').value = currentUnit;
+      this.setModalUnit(currentUnit);
     } else {
-      title.textContent = `เพิ่มสินค้าใหม่ใน "${store ? store.name : 'ร้านนี้'}"`;
+      title.textContent = `เพิ่มรายการใน "${store ? store.name : 'ร้านนี้'}"`;
       editIdInput.value = '';
-      document.getElementById('prodQuantity').value = 5;
-      document.getElementById('prodMinAlert').value = 5;
+      const skuEl = document.getElementById('prodSku');
+      if (skuEl) skuEl.value = '';
+      const catEl = document.getElementById('prodCategory');
+      if (catEl) catEl.value = isBattery ? 'แบตเตอรี่' : 'ทั่วไป';
+
+      // Smart Defaults for easiest and fastest input
+      const defaultUnit = isBattery ? 'ลูก' : 'ชิ้น';
       document.getElementById('prodCostPrice').value = isBattery ? 1400 : 180;
       document.getElementById('prodPrice').value = isBattery ? 1850 : 250;
-      document.getElementById('prodUnit').value = isBattery ? 'ลูก' : 'ชิ้น';
+      document.getElementById('prodMinAlert').value = 5;
+      document.getElementById('prodQuantity').value = 5;
+      document.getElementById('prodUnit').value = defaultUnit;
+      this.setModalUnit(defaultUnit);
     }
 
     this.openModal(modal);
+    setTimeout(() => {
+      const nameInput = document.getElementById('prodName');
+      if (nameInput) nameInput.focus();
+    }, 150);
   }
 
   handleSaveProduct(e) {
@@ -609,16 +633,19 @@ class MultiStoreStockApp {
     const editId = document.getElementById('editProductId').value;
     const name = document.getElementById('prodName').value.trim();
     if (!name) {
-      this.showToast('กรุณากรอกชื่อสินค้า', 'warning');
+      this.showToast('กรุณากรอกชื่อรายการสินค้า', 'warning');
       return;
     }
 
-    const sku = document.getElementById('prodSku').value.trim();
-    const category = document.getElementById('prodCategory').value.trim() || defaultCat;
-    const quantity = parseInt(document.getElementById('prodQuantity').value, 10) || 0;
-    const minAlert = parseInt(document.getElementById('prodMinAlert').value, 10) || 0;
+    const skuEl = document.getElementById('prodSku');
+    const sku = skuEl ? skuEl.value.trim() : '';
+    const catEl = document.getElementById('prodCategory');
+    const category = catEl ? (catEl.value.trim() || defaultCat) : defaultCat;
+
     const costPrice = parseFloat(document.getElementById('prodCostPrice').value) || 0;
     const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+    const minAlert = parseInt(document.getElementById('prodMinAlert').value, 10) || 0;
+    const quantity = parseInt(document.getElementById('prodQuantity').value, 10) || 0;
     const unit = document.getElementById('prodUnit').value.trim() || defaultUnit;
 
     if (editId) {

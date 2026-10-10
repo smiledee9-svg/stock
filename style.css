@@ -1609,6 +1609,56 @@ body {
   gap: 12px;
 }
 
+/* Quick Unit Chips in Modal */
+.unit-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.unit-label-row label {
+  margin-bottom: 0;
+}
+
+.unit-hint-badge {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.unit-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.unit-quick-chip {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-family: var(--font-main);
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.unit-quick-chip:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.unit-quick-chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  font-weight: 600;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
