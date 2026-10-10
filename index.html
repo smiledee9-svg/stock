@@ -270,6 +270,7 @@
         <input type="hidden" id="editProductId">
         <input type="hidden" id="prodSku" value="">
         <input type="hidden" id="prodCategory" value="">
+        <input type="hidden" id="prodUnit" value="ชิ้น">
         
         <!-- 1. รายการ -->
         <div class="form-group">
@@ -299,24 +300,6 @@
         <div class="form-group">
           <label for="prodQuantity">นับได้จริง</label>
           <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
-        </div>
-
-        <!-- 6. หน่วยนับ -->
-        <div class="form-group">
-          <div class="unit-label-row">
-            <label for="prodUnit">หน่วยนับ</label>
-            <span class="unit-hint-badge">คลิกเลือกด่วน หรือพิมพ์เอง</span>
-          </div>
-          <div class="unit-chips-container">
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ชิ้น')">ชิ้น</button>
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ลูก')">ลูก</button>
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ใบ')">ใบ</button>
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ตัว')">ตัว</button>
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('กล่อง')">กล่อง</button>
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('คู่')">คู่</button>
-            <button type="button" class="unit-quick-chip" onclick="window.app.setModalUnit('ชุด')">ชุด</button>
-          </div>
-          <input type="text" id="prodUnit" placeholder="เช่น ชิ้น, ลูก, ใบ, ตัว" value="ชิ้น">
         </div>
 
         <div class="modal-footer">

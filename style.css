@@ -1609,53 +1609,47 @@ body {
   gap: 12px;
 }
 
-/* Quick Unit Chips in Modal */
-.unit-label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
+/* Product Modal - Large typography matching largest app font (1.35rem) */
+#productModal .modal-card {
+  max-width: 500px;
+  padding: 26px 28px;
 }
 
-.unit-label-row label {
-  margin-bottom: 0;
+#productModal .modal-header h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.unit-hint-badge {
-  font-size: 0.76rem;
-  color: var(--text-muted);
+#productModal .form-group {
+  margin-bottom: 18px;
 }
 
-.unit-chips-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+#productModal .form-group label {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
   margin-bottom: 8px;
 }
 
-.unit-quick-chip {
-  background: var(--bg-tertiary);
-  color: var(--text-muted);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-full);
-  padding: 4px 12px;
+#productModal .form-group input {
+  font-size: 1.35rem;
+  font-weight: 600;
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
   font-family: var(--font-main);
-  font-size: 0.84rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
+  color: var(--text-main);
 }
 
-.unit-quick-chip:hover {
-  background: var(--primary-light);
-  color: var(--primary);
-  border-color: var(--primary);
+#productModal .form-group input::placeholder {
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text-light);
 }
 
-.unit-quick-chip.active {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
+#productModal .modal-footer .btn {
+  font-size: 1.15rem;
+  padding: 13px 26px;
   font-weight: 600;
 }
 
