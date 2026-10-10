@@ -6,8 +6,8 @@ const DEFAULT_STORES = [
   {
     id: "store_1",
     code: "01",
-    name: "สาขา 1 (หน้าร้านสยาม)",
-    desc: "สต็อกสินค้าขายหน้าร้านสยามสแควร์ ชั้น 1",
+    name: "สาขา 1 (ร้านขายแบตเตอรี่)",
+    desc: "สต็อกแบตเตอรี่รถยนต์หน้าร้าน พร้อมตรวจนับและคำนวณสั่งเพิ่มอัตโนมัติ",
     createdAt: new Date().toISOString()
   },
   {
@@ -23,49 +23,73 @@ const DEFAULT_PRODUCTS = [
   {
     id: "prod_1",
     storeId: "store_1",
-    name: "เสื้อยืดคอตตอน สีดำ (Oversized)",
-    sku: "TS-BLK-OS",
-    category: "เสื้อผ้า",
-    quantity: 24,
-    minAlert: 8,
-    price: 350,
-    unit: "ตัว",
+    name: "GS 46B24L",
+    sku: "GS-46B24L",
+    category: "แบตเตอรี่ (ขั้ว L)",
+    quantity: 2,       // นับได้จริง (ช่อง C2)
+    minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B2)
+    price: 1850,
+    unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
   {
     id: "prod_2",
     storeId: "store_1",
-    name: "กางเกงคาร์โก้ ขากระบอก สีเขียวโอลีฟ",
-    sku: "CG-GRN-32",
-    category: "เสื้อผ้า",
-    quantity: 3,
-    minAlert: 5,
-    price: 690,
-    unit: "ตัว",
+    name: "3K 55D23L",
+    sku: "3K-55D23L",
+    category: "แบตเตอรี่ (ขั้ว L)",
+    quantity: 5,       // นับได้จริง (ช่อง C3)
+    minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B3)
+    price: 2100,
+    unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
   {
     id: "prod_3",
-    storeId: "store_2",
-    name: "หมวกแก๊ปเบสบอล มินิมอล",
-    sku: "CAP-MINI-01",
-    category: "เครื่องประดับ",
-    quantity: 18,
-    minAlert: 5,
-    price: 250,
-    unit: "ใบ",
+    storeId: "store_1",
+    name: "FB 105D31L",
+    sku: "FB-105D31L",
+    category: "แบตเตอรี่ (กะบะ/ดีเซล)",
+    quantity: 1,       // นับได้จริง (ช่อง C4)
+    minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B4)
+    price: 2850,
+    unit: "ลูก",
     updatedAt: new Date().toISOString()
   },
   {
     id: "prod_4",
-    storeId: "store_2",
-    name: "กระเป๋าผ้าแคนวาส รักษ์โลก",
-    sku: "BAG-ECO-WHT",
-    category: "เครื่องประดับ",
-    quantity: 2,
-    minAlert: 6,
-    price: 190,
-    unit: "ใบ",
+    storeId: "store_1",
+    name: "Amaron LN3",
+    sku: "AMR-LN3",
+    category: "แบตเตอรี่ (DIN ยุโรป)",
+    quantity: 6,       // นับได้จริง (ช่อง C5 เกินเป้าหมาย)
+    minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B5)
+    price: 3200,
+    unit: "ลูก",
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "prod_5",
+    storeId: "store_1",
+    name: "Panasonic 50B24L",
+    sku: "PANA-50B24L",
+    category: "แบตเตอรี่ (ขั้ว L)",
+    quantity: 3,
+    minAlert: 5,
+    price: 1950,
+    unit: "ลูก",
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "prod_6",
+    storeId: "store_1",
+    name: "Yuasa 75D23L",
+    sku: "YUA-75D23L",
+    category: "แบตเตอรี่ (ขั้ว L)",
+    quantity: 0,
+    minAlert: 4,
+    price: 2250,
+    unit: "ลูก",
     updatedAt: new Date().toISOString()
   }
 ];
@@ -75,34 +99,34 @@ const DEFAULT_HISTORY = [
     id: "hist_1",
     storeId: "store_1",
     productId: "prod_1",
-    productName: "เสื้อยืดคอตตอน สีดำ (Oversized)",
+    productName: "GS 46B24L",
     type: "IN",
-    amount: 24,
-    balanceAfter: 24,
-    reason: "สต็อกล็อตแรกหน้าร้าน",
-    timestamp: new Date(Date.now() - 3600000 * 24).toISOString()
+    amount: 5,
+    balanceAfter: 5,
+    reason: "รับเข้าสต็อกแบตเตอรี่ล็อตใหม่",
+    timestamp: new Date(Date.now() - 3600000 * 48).toISOString()
   },
   {
     id: "hist_2",
     storeId: "store_1",
-    productId: "prod_2",
-    productName: "กางเกงคาร์โก้ ขากระบอก สีเขียวโอลีฟ",
+    productId: "prod_1",
+    productName: "GS 46B24L",
     type: "OUT",
-    amount: 2,
-    balanceAfter: 3,
-    reason: "ลูกค้าหน้าร้านซื้อ",
-    timestamp: new Date(Date.now() - 3600000 * 5).toISOString()
+    amount: 3,
+    balanceAfter: 2,
+    reason: "ลูกค้าเปลี่ยนแบตหน้าร้าน",
+    timestamp: new Date(Date.now() - 3600000 * 8).toISOString()
   },
   {
     id: "hist_3",
-    storeId: "store_2",
-    productId: "prod_4",
-    productName: "กระเป๋าผ้าแคนวาส รักษ์โลก",
+    storeId: "store_1",
+    productId: "prod_3",
+    productName: "FB 105D31L",
     type: "OUT",
     amount: 4,
-    balanceAfter: 2,
-    reason: "ออเดอร์ TikTok Shop",
-    timestamp: new Date(Date.now() - 3600000 * 2).toISOString()
+    balanceAfter: 1,
+    reason: "รถกระบะเปลี่ยนแบตเตอรี่",
+    timestamp: new Date(Date.now() - 3600000 * 3).toISOString()
   }
 ];
 
@@ -114,6 +138,7 @@ class MultiStoreStockApp {
 
     this.currentStoreId = null; // null = Hub view
     this.activeTab = 'inventory'; // within store view
+    this.inventoryViewMode = 'table'; // 'table' (ตารางย่อ 4 ช่อง) or 'cards'
     this.searchQuery = '';
     this.categoryFilter = 'ALL';
     this.historyFilter = 'ALL';
@@ -160,6 +185,23 @@ class MultiStoreStockApp {
     } else {
       this.products = [...DEFAULT_PRODUCTS];
       this.saveProducts();
+    }
+
+    // Auto-migrate default clothing store to Battery Shop if detected
+    const firstStore = this.stores[0];
+    const hasClothing = this.products.some(p => p.name && (p.name.includes("เสื้อยืด") || p.name.includes("กางเกง")));
+    if (firstStore && (firstStore.name.includes("หน้าร้านสยาม") || hasClothing)) {
+      this.stores[0] = {
+        ...this.stores[0],
+        name: "สาขา 1 (ร้านขายแบตเตอรี่)",
+        desc: "สต็อกแบตเตอรี่รถยนต์หน้าร้าน พร้อมตรวจนับและคำนวณสั่งเพิ่มอัตโนมัติ"
+      };
+      const otherProducts = this.products.filter(p => p.storeId !== this.stores[0].id && !p.name.includes("เสื้อยืด") && !p.name.includes("กางเกง"));
+      this.products = [...DEFAULT_PRODUCTS, ...otherProducts];
+      this.history = [...DEFAULT_HISTORY];
+      this.saveStores();
+      this.saveProducts();
+      this.saveHistory();
     }
 
     if (savedHistory) {
@@ -277,6 +319,16 @@ class MultiStoreStockApp {
       this.historyFilter = e.target.value;
       this.renderHistory();
     });
+
+    // View mode toggles (ตารางย่อ 4 ช่อง / การ์ด)
+    const viewTableBtn = document.getElementById('viewModeTableBtn');
+    const viewCardsBtn = document.getElementById('viewModeCardsBtn');
+    if (viewTableBtn) viewTableBtn.addEventListener('click', () => this.switchInventoryView('table'));
+    if (viewCardsBtn) viewCardsBtn.addEventListener('click', () => this.switchInventoryView('cards'));
+
+    // Copy order list button
+    const copyOrderBtn = document.getElementById('copyOrderListBtn');
+    if (copyOrderBtn) copyOrderBtn.addEventListener('click', () => this.copyOrderList());
 
     // Product Modal
     const productModal = document.getElementById('productModal');
@@ -498,10 +550,10 @@ class MultiStoreStockApp {
     } else {
       title.textContent = 'เพิ่มสินค้าในร้านนี้';
       editIdInput.value = '';
-      document.getElementById('prodQuantity').value = 10;
+      document.getElementById('prodQuantity').value = 5;
       document.getElementById('prodMinAlert').value = 5;
-      document.getElementById('prodPrice').value = 100;
-      document.getElementById('prodUnit').value = 'ชิ้น';
+      document.getElementById('prodPrice').value = 1800;
+      document.getElementById('prodUnit').value = 'ลูก';
     }
 
     this.openModal(modal);
@@ -514,11 +566,11 @@ class MultiStoreStockApp {
     const editId = document.getElementById('editProductId').value;
     const name = document.getElementById('prodName').value.trim();
     const sku = document.getElementById('prodSku').value.trim();
-    const category = document.getElementById('prodCategory').value.trim() || 'ทั่วไป';
+    const category = document.getElementById('prodCategory').value.trim() || 'แบตเตอรี่';
     const quantity = parseInt(document.getElementById('prodQuantity').value, 10) || 0;
     const minAlert = parseInt(document.getElementById('prodMinAlert').value, 10) || 0;
     const price = parseFloat(document.getElementById('prodPrice').value) || 0;
-    const unit = document.getElementById('prodUnit').value.trim() || 'ชิ้น';
+    const unit = document.getElementById('prodUnit').value.trim() || 'ลูก';
 
     if (editId) {
       const index = this.products.findIndex(p => p.id === editId);
@@ -929,9 +981,12 @@ class MultiStoreStockApp {
   }
 
   renderProducts() {
+    const tableBody = document.getElementById('stockTableBody');
+    const tableView = document.getElementById('inventoryTableView');
     const grid = document.getElementById('productGrid');
     const emptyState = document.getElementById('emptyInventoryState');
     const countBadge = document.getElementById('productCountBadge');
+    const summaryBanner = document.getElementById('orderSummaryBanner');
 
     const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
 
@@ -949,65 +1004,284 @@ class MultiStoreStockApp {
     countBadge.textContent = `${filtered.length} รายการ`;
 
     if (filtered.length === 0) {
-      grid.innerHTML = '';
-      emptyState.style.display = 'block';
+      if (tableBody) tableBody.innerHTML = '';
+      if (grid) grid.innerHTML = '';
+      if (tableView) tableView.style.display = 'none';
+      if (grid) grid.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'block';
+      if (summaryBanner) summaryBanner.style.display = 'none';
       return;
     }
 
-    emptyState.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'none';
 
-    grid.innerHTML = filtered.map(item => {
-      const isLow = (item.quantity || 0) <= (item.minAlert || 0);
-      const isOut = (item.quantity || 0) === 0;
+    // Summary alert for items needing ordering
+    const needOrderItems = filtered.filter(p => Math.max(0, (p.minAlert || 5) - (p.quantity || 0)) > 0);
+    const totalPiecesToOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
 
-      let statusPill = '';
-      if (isOut) {
-        statusPill = `<span class="stock-status-pill status-danger">สินค้าหมด</span>`;
-      } else if (isLow) {
-        statusPill = `<span class="stock-status-pill status-warning">ใกล้หมดสต็อก</span>`;
-      } else {
-        statusPill = `<span class="stock-status-pill status-normal">ปกติ</span>`;
-      }
-
-      return `
-        <article class="product-card ${isLow ? 'is-low-stock' : ''}">
-          <div class="product-card-top">
+    if (summaryBanner) {
+      if (needOrderItems.length > 0) {
+        summaryBanner.style.display = 'flex';
+        summaryBanner.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.35rem;">🚨</span>
             <div>
-              <span class="product-sku">${this.escapeHtml(item.sku || 'SKU-NONE')}</span>
-              <h3 class="product-name">${this.escapeHtml(item.name)}</h3>
-              <div class="product-cat">หมวดหมู่: ${this.escapeHtml(item.category || 'ทั่วไป')}</div>
+              <div><strong>มี ${needOrderItems.length} รุ่นที่ต้องสั่งเพิ่มด่วน</strong> (รวมทั้งหมด <strong>${totalPiecesToOrder} ลูก</strong>)</div>
+              <div style="font-size: 0.8rem; opacity: 0.85; font-weight: 400;">คำนวณจากสูตร: =MAX(0, สต็อกเป้าหมาย - นับได้จริง) ปัดเป็น 0 ไม่ติดลบ</div>
             </div>
-            <div>${statusPill}</div>
           </div>
+          <button class="btn btn-primary btn-sm" onclick="window.app.copyOrderList()">
+            <span>📋 คัดลอกรายการสั่งของ</span>
+          </button>
+        `;
+      } else {
+        summaryBanner.style.display = 'none';
+      }
+    }
 
-          <div class="product-stats-row">
-            <div class="product-qty-block">
-              <span class="product-qty-number ${isLow ? 'alert-text' : ''}">${item.quantity}</span>
-              <span class="product-unit">${this.escapeHtml(item.unit || 'ชิ้น')}</span>
-            </div>
-            <div class="product-price-block">
-              <div class="product-unit-price">฿${(item.price || 0).toLocaleString()}</div>
-              <div class="product-min-threshold">เตือนเมื่อต่ำกว่า: ${item.minAlert}</div>
-            </div>
-          </div>
+    // 1. Render Compact 4-Column Table View (แบบย่อ ง่าย เบา เร็ว ตามรูป)
+    if (tableBody) {
+      tableBody.innerHTML = filtered.map((item, idx) => {
+        const rowNum = idx + 2; // Rows start from 2 (like Excel B2, C2, D2)
+        const target = item.minAlert || 5;
+        const actual = item.quantity || 0;
+        const needOrder = Math.max(0, target - actual);
 
-          <div class="product-card-actions">
-            <button class="btn-stock-in" onclick="window.app.openStockAction('${item.id}', 'IN')">
-              + รับเข้า
-            </button>
-            <button class="btn-stock-out" onclick="window.app.openStockAction('${item.id}', 'OUT')">
-              - ตัดออก
-            </button>
-            <button class="btn-card-more" title="แก้ไขสินค้า" onclick="window.app.editProductById('${item.id}')">
-              ✏️
-            </button>
-            <button class="btn-card-more" title="ลบสินค้า" onclick="window.app.deleteProduct('${item.id}')">
-              🗑️
-            </button>
-          </div>
-        </article>
-      `;
-    }).join('');
+        return `
+          <tr class="${needOrder > 0 ? 'row-needs-order' : ''}">
+            <!-- 1. ยี่ห้อ / รุ่น -->
+            <td>
+              <div class="col-name-wrapper">
+                <span class="battery-name">${this.escapeHtml(item.name)}</span>
+                <div class="battery-meta">
+                  <span class="battery-badge-cat">${this.escapeHtml(item.category || 'แบตเตอรี่')}</span>
+                  ${item.sku ? `<span>${this.escapeHtml(item.sku)}</span>` : ''}
+                  <span>• ฿${(item.price || 0).toLocaleString()} / ${this.escapeHtml(item.unit || 'ลูก')}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. สต็อกเป้าหมาย (ช่อง B) -->
+            <td class="text-center">
+              <span class="target-val">${target}</span>
+            </td>
+
+            <!-- 3. นับได้จริง (ช่อง C - นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
+            <td class="text-center">
+              <div class="actual-count-stepper">
+                <button class="stepper-btn" type="button" title="ลด 1 ลูก" onclick="window.app.quickAdjustCount('${item.id}', -1)">−</button>
+                <span class="actual-val" title="คลิกเพื่อพิมพ์จำนวนที่นับได้ตรงๆ" onclick="window.app.quickSetCount('${item.id}')">${actual}</span>
+                <button class="stepper-btn" type="button" title="เพิ่ม 1 ลูก" onclick="window.app.quickAdjustCount('${item.id}', 1)">+</button>
+              </div>
+            </td>
+
+            <!-- 4. ต้องสั่งเพิ่ม (ช่อง D - สูตร =MAX(0, B2-C2) ตามรูปเป๊ะ) -->
+            <td class="text-center">
+              <div class="formula-order-box">
+                <span class="formula-code-pill">=MAX(0, B${rowNum}-C${rowNum})</span>
+                <span class="order-badge-result ${needOrder > 0 ? 'need-order' : 'stock-ok'}">
+                  (ได้ ${needOrder}) ${needOrder > 0 ? `🚨 สั่งเพิ่ม ${needOrder} ${this.escapeHtml(item.unit || 'ลูก')}` : `✅ สต็อกพอดี`}
+                </span>
+              </div>
+            </td>
+
+            <!-- จัดการด่วน -->
+            <td class="text-center">
+              <div class="table-row-actions">
+                <button class="btn-table-action" type="button" title="รับของเข้าสต็อก" onclick="window.app.openStockAction('${item.id}', 'IN')">
+                  📥 รับ
+                </button>
+                <button class="btn-table-action" type="button" title="ตัดของออกจากสต็อก" onclick="window.app.openStockAction('${item.id}', 'OUT')">
+                  📤 ตัด
+                </button>
+                <button class="btn-table-action" type="button" title="แก้ไขรุ่นนี้" onclick="window.app.editProductById('${item.id}')">
+                  ✏️
+                </button>
+                <button class="btn-table-action" type="button" title="ลบรุ่นนี้" onclick="window.app.deleteProduct('${item.id}')">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 2. Render Cards View (ทางเลือก)
+    if (grid) {
+      grid.innerHTML = filtered.map(item => {
+        const isLow = (item.quantity || 0) <= (item.minAlert || 0);
+        const isOut = (item.quantity || 0) === 0;
+
+        let statusPill = '';
+        if (isOut) {
+          statusPill = `<span class="stock-status-pill status-danger">สินค้าหมด</span>`;
+        } else if (isLow) {
+          statusPill = `<span class="stock-status-pill status-warning">ใกล้หมดสต็อก</span>`;
+        } else {
+          statusPill = `<span class="stock-status-pill status-normal">ปกติ</span>`;
+        }
+
+        return `
+          <article class="product-card ${isLow ? 'is-low-stock' : ''}">
+            <div class="product-card-top">
+              <div>
+                <span class="product-sku">${this.escapeHtml(item.sku || 'SKU-NONE')}</span>
+                <h3 class="product-name">${this.escapeHtml(item.name)}</h3>
+                <div class="product-cat">หมวดหมู่: ${this.escapeHtml(item.category || 'ทั่วไป')}</div>
+              </div>
+              <div>${statusPill}</div>
+            </div>
+
+            <div class="product-stats-row">
+              <div class="product-qty-block">
+                <span class="product-qty-number ${isLow ? 'alert-text' : ''}">${item.quantity}</span>
+                <span class="product-unit">${this.escapeHtml(item.unit || 'ลูก')}</span>
+              </div>
+              <div class="product-price-block">
+                <div class="product-unit-price">฿${(item.price || 0).toLocaleString()}</div>
+                <div class="product-min-threshold">เป้าหมาย: ${item.minAlert} ${this.escapeHtml(item.unit || 'ลูก')}</div>
+              </div>
+            </div>
+
+            <div class="product-card-actions">
+              <button class="btn-stock-in" onclick="window.app.openStockAction('${item.id}', 'IN')">
+                + รับเข้า
+              </button>
+              <button class="btn-stock-out" onclick="window.app.openStockAction('${item.id}', 'OUT')">
+                - ตัดออก
+              </button>
+              <button class="btn-card-more" title="แก้ไขสินค้า" onclick="window.app.editProductById('${item.id}')">
+                ✏️
+              </button>
+              <button class="btn-card-more" title="ลบสินค้า" onclick="window.app.deleteProduct('${item.id}')">
+                🗑️
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Apply view mode visibility
+    this.switchInventoryView(this.inventoryViewMode || 'table');
+  }
+
+  switchInventoryView(mode) {
+    this.inventoryViewMode = mode;
+    const tableBtn = document.getElementById('viewModeTableBtn');
+    const cardsBtn = document.getElementById('viewModeCardsBtn');
+    const tableView = document.getElementById('inventoryTableView');
+    const cardsView = document.getElementById('productGrid');
+
+    if (mode === 'table') {
+      if (tableBtn) tableBtn.classList.add('active');
+      if (cardsBtn) cardsBtn.classList.remove('active');
+      if (tableView) tableView.style.display = 'block';
+      if (cardsView) cardsView.style.display = 'none';
+    } else {
+      if (cardsBtn) cardsBtn.classList.add('active');
+      if (tableBtn) tableBtn.classList.remove('active');
+      if (cardsView) cardsView.style.display = 'grid';
+      if (tableView) tableView.style.display = 'none';
+    }
+  }
+
+  quickAdjustCount(productId, delta) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const oldQty = product.quantity || 0;
+    const newQty = Math.max(0, oldQty + delta);
+    if (newQty === oldQty) return;
+
+    product.quantity = newQty;
+    product.updatedAt = new Date().toISOString();
+
+    this.logHistory({
+      storeId: product.storeId,
+      productId: product.id,
+      productName: product.name,
+      type: delta > 0 ? 'IN' : 'OUT',
+      amount: Math.abs(delta),
+      balanceAfter: newQty,
+      reason: 'นับสต็อกด่วนหน้าร้าน'
+    });
+
+    this.saveProducts();
+    this.renderStoreDetail();
+    this.showToast(`${product.name}: นับได้จริง ${newQty} ${product.unit || 'ลูก'}`, 'info');
+  }
+
+  quickSetCount(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const input = prompt(`กรอกจำนวนที่นับได้จริงของ "${product.name}":`, product.quantity || 0);
+    if (input === null) return;
+
+    const newQty = parseInt(input, 10);
+    if (isNaN(newQty) || newQty < 0) {
+      alert('กรุณากรอกตัวเลขจำนวนเต็มที่ถูกต้อง (0 ขึ้นไป)');
+      return;
+    }
+
+    const oldQty = product.quantity || 0;
+    const diff = newQty - oldQty;
+    product.quantity = newQty;
+    product.updatedAt = new Date().toISOString();
+
+    if (diff !== 0) {
+      this.logHistory({
+        storeId: product.storeId,
+        productId: product.id,
+        productName: product.name,
+        type: diff > 0 ? 'IN' : 'OUT',
+        amount: Math.abs(diff),
+        balanceAfter: newQty,
+        reason: 'ปรับยอดจากการนับสต็อก'
+      });
+    }
+
+    this.saveProducts();
+    this.renderStoreDetail();
+    this.showToast(`อัปเดต "${product.name}" เป็น ${newQty} ${product.unit || 'ลูก'} เรียบร้อย`, 'success');
+  }
+
+  copyOrderList() {
+    const store = this.stores.find(s => s.id === this.currentStoreId);
+    const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
+    const needOrderItems = storeProducts.filter(p => Math.max(0, (p.minAlert || 5) - (p.quantity || 0)) > 0);
+
+    if (needOrderItems.length === 0) {
+      this.showToast('ทุกรุ่นมีสต็อกเพียงพอ ไม่มียอดที่ต้องสั่งเพิ่ม 🎉', 'success');
+      return;
+    }
+
+    const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    let text = `🔋 รายการสั่งแบตเตอรี่เพิ่ม - ${store ? store.name : 'ร้านแบตเตอรี่'}\n`;
+    text += `📅 ประจำวันที่: ${dateStr}\n`;
+    text += `====================================\n`;
+    needOrderItems.forEach((p, idx) => {
+      const target = p.minAlert || 5;
+      const actual = p.quantity || 0;
+      const need = Math.max(0, target - actual);
+      text += `${idx + 1}. ${p.name} : สั่งเพิ่ม ${need} ${p.unit || 'ลูก'} (เป้า ${target}, นับได้ ${actual})\n`;
+    });
+    const totalOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
+    text += `====================================\n`;
+    text += `📌 รวมต้องสั่งทั้งหมด: ${totalOrder} ลูก (${needOrderItems.length} รุ่น)\n`;
+    text += `(คำนวณจากสูตร: =MAX(0, สต็อกเป้าหมาย - นับได้จริง))`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.showToast(`คัดลอกรายการสั่งของ ${needOrderItems.length} รุ่นเรียบร้อย 📋 ส่งใน LINE ได้ทันที!`, 'success');
+      }).catch(() => {
+        prompt('คัดลอกข้อความด้านล่างนี้ได้เลยครับ:', text);
+      });
+    } else {
+      prompt('คัดลอกข้อความด้านล่างนี้ได้เลยครับ:', text);
+    }
   }
 
   editProductById(id) {

@@ -188,20 +188,70 @@
           </div>
         </section>
 
-        <!-- Product Cards Grid -->
+        <!-- Product Inventory Section -->
         <section class="products-section">
           <div class="section-title-row">
-            <h3 class="section-title">คลังสินค้าของร้านนี้</h3>
-            <span class="item-count-badge" id="productCountBadge">0 รายการ</span>
+            <div>
+              <h3 class="section-title" id="inventorySectionTitle">1. ตารางสต็อกแบบย่อ (เหลือ 4 ช่อง)</h3>
+              <p class="section-subtitle" id="inventorySectionSubtitle">สูตรคำนวณสั่งเพิ่ม: <code>=MAX(0, เป้าหมาย - นับได้จริง)</code></p>
+            </div>
+            <div class="inventory-top-tools">
+              <button id="copyOrderListBtn" class="btn btn-secondary btn-sm" title="คัดลอกรายการที่ต้องสั่งเพิ่ม">
+                <span>📋 คัดลอกรายการสั่งของ</span>
+              </button>
+              <div class="view-mode-toggle">
+                <button class="toggle-btn active" id="viewModeTableBtn" type="button" title="มุมมองตารางย่อ 4 ช่อง">
+                  📊 ตารางย่อ 4 ช่อง
+                </button>
+                <button class="toggle-btn" id="viewModeCardsBtn" type="button" title="มุมมองการ์ด">
+                  🗂️ การ์ดสินค้า
+                </button>
+              </div>
+              <span class="item-count-badge" id="productCountBadge">0 รายการ</span>
+            </div>
           </div>
 
-          <div class="product-cards-grid" id="productGrid">
+          <!-- Order Summary Alert Banner -->
+          <div id="orderSummaryBanner" class="order-summary-alert" style="display: none;"></div>
+
+          <!-- 1. COMPACT 4-COLUMN TABLE VIEW (แบบย่อ ง่าย เบา เร็ว ตามรูป) -->
+          <div class="table-responsive-wrapper" id="inventoryTableView">
+            <table class="compact-stock-table" id="stockTable">
+              <thead>
+                <tr>
+                  <th class="col-name">ยี่ห้อ / รุ่น</th>
+                  <th class="col-target text-center">สต็อกเป้าหมาย</th>
+                  <th class="col-actual text-center">นับได้จริง</th>
+                  <th class="col-order text-center">ต้องสั่งเพิ่ม</th>
+                  <th class="col-actions text-center">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="stockTableBody">
+                <!-- Dynamically populated via JS -->
+              </tbody>
+            </table>
+
+            <!-- Footnote formula explanation as in screenshot -->
+            <div class="table-formula-footnote">
+              <div class="footnote-item">
+                <span class="footnote-bullet">&#9675;</span>
+                <div class="footnote-content">
+                  <span class="footnote-title">สูตรในช่อง "ต้องสั่งเพิ่ม" (ช่อง D2):</span>
+                  <code class="formula-code">=MAX(0, B2-C2)</code>
+                  <p class="footnote-desc">(เอาสต็อกเป้าหมาย 5 ลบด้วยจำนวนที่นับได้ หากนับได้เกิน 5 ระบบจะปัดเป็น 0 ทันที ไม่ติดลบ)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. PRODUCT CARDS GRID VIEW (ทางเลือกมุมมองการ์ด) -->
+          <div class="product-cards-grid" id="productGrid" style="display: none;">
             <!-- Dynamically populated via JS -->
           </div>
 
           <div id="emptyInventoryState" class="empty-state" style="display: none;">
-            <div class="empty-icon">📦</div>
-            <h3>ร้านนี้ยังไม่มีสินค้า</h3>
+            <div class="empty-icon">🔋</div>
+            <h3>ร้านนี้ยังไม่มีรายการสินค้า</h3>
             <p>กดปุ่ม "เพิ่มสินค้าในร้านนี้" ด้านบนเพื่อเริ่มบันทึกสต็อกแรก</p>
           </div>
         </section>
@@ -313,40 +363,40 @@
         <input type="hidden" id="editProductId">
         
         <div class="form-group">
-          <label for="prodName">ชื่อสินค้า <span class="required">*</span></label>
-          <input type="text" id="prodName" required placeholder="เช่น เสื้อยืดสีดำ ไซส์ L">
+          <label for="prodName">ยี่ห้อ / รุ่น แบตเตอรี่ <span class="required">*</span></label>
+          <input type="text" id="prodName" required placeholder="เช่น GS 46B24L, 3K 55D23L, FB 105D31L, Amaron LN3">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="prodSku">รหัสสินค้า / SKU</label>
-            <input type="text" id="prodSku" placeholder="เช่น TS-BLK-L">
+            <label for="prodSku">รหัสสินค้า / รหัสรุ่น</label>
+            <input type="text" id="prodSku" placeholder="เช่น GS-46B24L">
           </div>
           <div class="form-group">
             <label for="prodCategory">หมวดหมู่</label>
-            <input type="text" id="prodCategory" placeholder="เช่น เสื้อผ้า, เครื่องดื่ม">
+            <input type="text" id="prodCategory" placeholder="เช่น ขั้ว L, ขั้ว R, DIN ยุโรป, กะบะ/ดีเซล">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="prodQuantity">จำนวนเริ่มต้น <span class="required">*</span></label>
-            <input type="number" id="prodQuantity" required min="0" step="1" value="10">
+            <label for="prodMinAlert">สต็อกเป้าหมาย (ช่อง B) <span class="required">*</span></label>
+            <input type="number" id="prodMinAlert" required min="1" step="1" value="5" placeholder="เช่น 5">
           </div>
           <div class="form-group">
-            <label for="prodMinAlert">เตือนเมื่อเหลือน้อยกว่า <span class="required">*</span></label>
-            <input type="number" id="prodMinAlert" required min="0" step="1" value="5">
+            <label for="prodQuantity">นับได้จริงเริ่มต้น (ช่อง C) <span class="required">*</span></label>
+            <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="เช่น 2 หรือ 5">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="prodPrice">ราคาต่อหน่วย (บาท)</label>
-            <input type="number" id="prodPrice" min="0" step="0.5" value="100">
+            <label for="prodPrice">ราคาขายต่อลูก (บาท)</label>
+            <input type="number" id="prodPrice" min="0" step="1" value="1800">
           </div>
           <div class="form-group">
             <label for="prodUnit">หน่วยนับ</label>
-            <input type="text" id="prodUnit" placeholder="ชิ้น, กล่อง, แพ็ก" value="ชิ้น">
+            <input type="text" id="prodUnit" placeholder="ลูก, ชิ้น" value="ลูก">
           </div>
         </div>
 

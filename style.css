@@ -720,6 +720,320 @@ body {
   color: var(--text-muted);
 }
 
+/* ================= 4-Column Compact Stock Table (แบบย่อ ง่าย เบา เร็ว ตามรูป) ================= */
+.inventory-top-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 3px;
+}
+
+.view-mode-toggle .toggle-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.view-mode-toggle .toggle-btn.active {
+  background: var(--card-bg);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.order-summary-alert {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(245, 158, 11, 0.12) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.table-responsive-wrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+.compact-stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-main);
+  text-align: left;
+}
+
+.compact-stock-table th {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--card-border);
+  white-space: nowrap;
+}
+
+.compact-stock-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--card-border);
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+.compact-stock-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.compact-stock-table tbody tr {
+  transition: var(--transition);
+}
+
+.compact-stock-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.compact-stock-table tbody tr.row-needs-order {
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.compact-stock-table tbody tr.row-needs-order:hover {
+  background: rgba(239, 68, 68, 0.07);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Columns */
+.col-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.battery-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.battery-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.battery-badge-cat {
+  background: var(--bg-tertiary);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+}
+
+/* Target Column */
+.target-val {
+  font-family: var(--font-code);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Actual Column (Stepper) */
+.actual-count-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  padding: 3px 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+}
+
+.stepper-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.stepper-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.actual-val {
+  font-family: var(--font-code);
+  font-size: 1.25rem;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: center;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.actual-val:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Order Column (Formula and Badge) */
+.formula-order-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.formula-code-pill {
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.order-badge-result {
+  font-family: var(--font-code);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.order-badge-result.need-order {
+  background: var(--danger-light);
+  color: var(--danger-text);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.order-badge-result.stock-ok {
+  background: var(--success-light);
+  color: var(--success-text);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* Actions in Table */
+.table-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-table-action {
+  background: var(--bg-tertiary);
+  color: var(--text-main);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-table-action:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Footnote formula explanation */
+.table-formula-footnote {
+  padding: 16px 20px;
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--card-border);
+}
+
+.footnote-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.footnote-bullet {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.footnote-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.footnote-title {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.formula-code {
+  font-family: var(--font-code);
+  font-weight: 700;
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 1px solid var(--card-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.footnote-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 /* ================= Product Cards Grid ================= */
 .product-cards-grid {
   display: grid;
@@ -1443,5 +1757,43 @@ body {
   .icon-btn {
     width: 36px;
     height: 36px;
+  }
+
+  .inventory-top-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .compact-stock-table th,
+  .compact-stock-table td {
+    padding: 10px 8px;
+  }
+
+  .battery-name {
+    font-size: 0.95rem;
+  }
+
+  .formula-code-pill {
+    display: none; /* Hide Excel formula on small mobile screens to save space, result badge stays prominent */
+  }
+
+  .order-badge-result {
+    font-size: 0.82rem;
+    padding: 3px 8px;
+  }
+
+  .stepper-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.95rem;
+  }
+
+  .actual-val {
+    font-size: 1.05rem;
+    min-width: 24px;
+  }
+
+  .target-val {
+    font-size: 1.05rem;
   }
 }
