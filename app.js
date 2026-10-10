@@ -30,7 +30,7 @@ const DEFAULT_PRODUCTS = [
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B2)
     costPrice: 1400,   // ราคาทุน/หน่วย
     price: 1850,       // ราคาขาย/หน่วย
-    unit: "ลูก",
+    unit: "",
     updatedAt: new Date().toISOString()
   },
   {
@@ -43,7 +43,7 @@ const DEFAULT_PRODUCTS = [
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B3)
     costPrice: 1600,   // ราคาทุน/หน่วย
     price: 2100,       // ราคาขาย/หน่วย
-    unit: "ลูก",
+    unit: "",
     updatedAt: new Date().toISOString()
   },
   {
@@ -56,7 +56,7 @@ const DEFAULT_PRODUCTS = [
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B4)
     costPrice: 2200,   // ราคาทุน/หน่วย
     price: 2850,       // ราคาขาย/หน่วย
-    unit: "ลูก",
+    unit: "",
     updatedAt: new Date().toISOString()
   },
   {
@@ -69,7 +69,7 @@ const DEFAULT_PRODUCTS = [
     minAlert: 5,       // สต็อกเป้าหมาย (ช่อง B5)
     costPrice: 2500,   // ราคาทุน/หน่วย
     price: 3200,       // ราคาขาย/หน่วย
-    unit: "ลูก",
+    unit: "",
     updatedAt: new Date().toISOString()
   },
   {
@@ -82,7 +82,7 @@ const DEFAULT_PRODUCTS = [
     minAlert: 5,
     costPrice: 1500,   // ราคาทุน/หน่วย
     price: 1950,       // ราคาขาย/หน่วย
-    unit: "ลูก",
+    unit: "",
     updatedAt: new Date().toISOString()
   },
   {
@@ -95,7 +95,7 @@ const DEFAULT_PRODUCTS = [
     minAlert: 4,
     costPrice: 1750,   // ราคาทุน/หน่วย
     price: 2250,       // ราคาขาย/หน่วย
-    unit: "ลูก",
+    unit: "",
     updatedAt: new Date().toISOString()
   }
 ];
@@ -204,10 +204,19 @@ class MultiStoreStockApp {
     };
     let costUpdated = false;
     this.products = this.products.map(p => {
-      if (p.costPrice === undefined || p.costPrice === null) {
+      let updated = { ...p };
+      let changed = false;
+      if (updated.costPrice === undefined || updated.costPrice === null) {
+        updated.costPrice = defaultCosts[p.sku] || Math.round((p.price || 0) * 0.75);
+        changed = true;
+      }
+      if (updated.unit === 'ลูก') {
+        updated.unit = '';
+        changed = true;
+      }
+      if (changed) {
         costUpdated = true;
-        const fallback = defaultCosts[p.sku] || Math.round((p.price || 0) * 0.75);
-        return { ...p, costPrice: fallback };
+        return updated;
       }
       return p;
     });
@@ -593,7 +602,7 @@ class MultiStoreStockApp {
       document.getElementById('prodPrice').value = product.price || 0;
       document.getElementById('prodMinAlert').value = product.minAlert || 5;
       document.getElementById('prodQuantity').value = product.quantity !== undefined ? product.quantity : 5;
-      const currentUnit = product.unit || (isBattery ? 'ลูก' : 'ชิ้น');
+      const currentUnit = (product.unit && product.unit !== 'ลูก') ? product.unit : '';
       document.getElementById('prodUnit').value = currentUnit;
       this.setModalUnit(currentUnit);
     } else {
@@ -605,7 +614,7 @@ class MultiStoreStockApp {
       if (catEl) catEl.value = isBattery ? 'แบตเตอรี่' : 'ทั่วไป';
 
       // Smart Defaults for easiest and fastest input
-      const defaultUnit = isBattery ? 'ลูก' : 'ชิ้น';
+      const defaultUnit = '';
       document.getElementById('prodCostPrice').value = isBattery ? 1400 : 180;
       document.getElementById('prodPrice').value = isBattery ? 1850 : 250;
       document.getElementById('prodMinAlert').value = 5;
@@ -631,7 +640,7 @@ class MultiStoreStockApp {
     const store = this.stores.find(s => s.id === this.currentStoreId);
     const isBattery = store && store.name.includes('แบต');
     const defaultCat = isBattery ? 'แบตเตอรี่' : 'ทั่วไป';
-    const defaultUnit = isBattery ? 'ลูก' : 'ชิ้น';
+    const defaultUnit = '';
 
     const editId = document.getElementById('editProductId').value;
     const name = document.getElementById('prodName').value.trim();
@@ -1140,7 +1149,7 @@ class MultiStoreStockApp {
         const target = item.minAlert || 5;
         const actual = item.quantity || 0;
         const needOrder = Math.max(0, target - actual);
-        const unit = item.unit ? ` ${this.escapeHtml(item.unit)}` : '';
+        const unit = (item.unit && item.unit !== 'ลูก') ? ` ${this.escapeHtml(item.unit)}` : '';
 
         return `
           <tr class="${needOrder > 0 ? 'row-needs-order' : ''}">
@@ -1154,14 +1163,14 @@ class MultiStoreStockApp {
             <!-- 2. ราคาทุน/หน่วย -->
             <td class="text-center">
               <div class="price-val-wrapper">
-                <span class="cost-price-val">฿${(item.costPrice || 0).toLocaleString()}</span><span class="table-unit-sub">/${item.unit || 'ลูก'}</span>
+                <span class="cost-price-val">฿${(item.costPrice || 0).toLocaleString()}</span>
               </div>
             </td>
 
             <!-- 3. ราคาขาย/หน่วย -->
             <td class="text-center">
               <div class="price-val-wrapper">
-                <span class="sell-price-val">฿${(item.price || 0).toLocaleString()}</span><span class="table-unit-sub">/${item.unit || 'ลูก'}</span>
+                <span class="sell-price-val">฿${(item.price || 0).toLocaleString()}</span>
               </div>
             </td>
 
@@ -1223,11 +1232,11 @@ class MultiStoreStockApp {
             <div class="product-stats-row">
               <div class="product-qty-block">
                 <span class="product-qty-number ${isLow ? 'alert-text' : ''}">${item.quantity}</span>
-                <span class="product-unit">${this.escapeHtml(item.unit || 'ลูก')}</span>
+                <span class="product-unit">${(item.unit && item.unit !== 'ลูก') ? this.escapeHtml(item.unit) : ''}</span>
               </div>
               <div class="product-price-block">
                 <div class="product-unit-price">฿${(item.price || 0).toLocaleString()}</div>
-                <div class="product-min-threshold">เป้าหมาย: ${item.minAlert} ${this.escapeHtml(item.unit || 'ลูก')}</div>
+                <div class="product-min-threshold">เป้าหมาย: ${item.minAlert}${(item.unit && item.unit !== 'ลูก') ? ' ' + this.escapeHtml(item.unit) : ''}</div>
               </div>
             </div>
 
@@ -1287,7 +1296,8 @@ class MultiStoreStockApp {
 
     this.saveProducts();
     this.renderStoreDetail();
-    this.showToast(`${product.name}: ปรับสต็อกเป้าหมายเป็น ${newTarget} ${product.unit || 'ลูก'}`, 'info');
+    const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
+    this.showToast(`${product.name}: ปรับสต็อกเป้าหมายเป็น ${newTarget}${unitStr}`, 'info');
   }
 
   quickSetTarget(productId) {
@@ -1308,7 +1318,8 @@ class MultiStoreStockApp {
 
     this.saveProducts();
     this.renderStoreDetail();
-    this.showToast(`อัปเดตเป้าหมาย "${product.name}" เป็น ${newTarget} ${product.unit || 'ลูก'} เรียบร้อย`, 'success');
+    const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
+    this.showToast(`อัปเดตเป้าหมาย "${product.name}" เป็น ${newTarget}${unitStr} เรียบร้อย`, 'success');
   }
 
   quickAdjustCount(productId, delta) {
@@ -1334,7 +1345,8 @@ class MultiStoreStockApp {
 
     this.saveProducts();
     this.renderStoreDetail();
-    this.showToast(`${product.name}: นับได้จริง ${newQty} ${product.unit || 'ลูก'}`, 'info');
+    const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
+    this.showToast(`${product.name}: นับได้จริง ${newQty}${unitStr}`, 'info');
   }
 
   quickSetCount(productId) {
@@ -1369,7 +1381,8 @@ class MultiStoreStockApp {
 
     this.saveProducts();
     this.renderStoreDetail();
-    this.showToast(`อัปเดต "${product.name}" เป็น ${newQty} ${product.unit || 'ลูก'} เรียบร้อย`, 'success');
+    const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
+    this.showToast(`อัปเดต "${product.name}" เป็น ${newQty}${unitStr} เรียบร้อย`, 'success');
   }
 
   copyOrderList() {
@@ -1383,18 +1396,19 @@ class MultiStoreStockApp {
     }
 
     const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
-    let text = `🔋 รายการสั่งแบตเตอรี่เพิ่ม - ${store ? store.name : 'ร้านแบตเตอรี่'}\n`;
+    let text = `📦 รายการสั่งของเพิ่ม - ${store ? store.name : 'ร้านค้า'}\n`;
     text += `📅 ประจำวันที่: ${dateStr}\n`;
     text += `====================================\n`;
     needOrderItems.forEach((p, idx) => {
       const target = p.minAlert || 5;
       const actual = p.quantity || 0;
       const need = Math.max(0, target - actual);
-      text += `${idx + 1}. ${p.name} : สั่งเพิ่ม ${need} ${p.unit || 'ลูก'} (เป้า ${target}, นับได้ ${actual})\n`;
+      const unitLabel = (p.unit && p.unit !== 'ลูก') ? ` ${p.unit}` : '';
+      text += `${idx + 1}. ${p.name} : สั่งเพิ่ม ${need}${unitLabel} (เป้า ${target}, นับได้ ${actual})\n`;
     });
     const totalOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
     text += `====================================\n`;
-    text += `📌 รวมต้องสั่งทั้งหมด: ${totalOrder} ลูก (${needOrderItems.length} รุ่น)\n`;
+    text += `📌 รวมต้องสั่งทั้งหมด: ${totalOrder} (${needOrderItems.length} รายการ)\n`;
     text += `(คำนวณจากสูตร: =MAX(0, สต็อกเป้าหมาย - นับได้จริง))`;
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
