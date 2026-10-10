@@ -57,11 +57,8 @@
             <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="ส่งรายการสั่งของเข้า LINE ตามที่ตั้งค่าไว้">
               <span>📋 สั่งของเข้า LINE</span>
             </button>
-            <button id="openLineSettingsBtn" class="icon-btn line-setting-icon-btn" title="⚙️ ตั้งค่า LINE ผู้รับรายการสั่งของ" aria-label="ตั้งค่า LINE ผู้รับ">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
+            <button id="openLineSettingsBtn" class="btn btn-secondary btn-sm line-settings-pill-btn" title="⚙️ ตั้งค่า LINE ID ของผู้รับ">
+              <span>⚙️ ตั้งค่า LINE ID</span>
             </button>
           </div>
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
@@ -372,6 +369,12 @@
         <p class="backup-desc">ข้อมูลร้านค้า สต็อกสินค้า และประวัติทั้งหมด สามารถดาวน์โหลดเก็บไว้และนำไปเปิดบนเครื่องอื่นได้ทันที</p>
         
         <div class="backup-actions-grid">
+          <div class="backup-action-box">
+            <h4>💬 ตั้งค่า LINE ID สำหรับสั่งของ</h4>
+            <p>กำหนด LINE ID หรือ LINE OA ของซัพพลายเออร์สำหรับส่งรายการสั่งของอัตโนมัติ</p>
+            <button id="openLineFromBackupBtn" class="btn btn-primary full-width" type="button">⚙️ ตั้งค่า LINE ID</button>
+          </div>
+
           <div class="backup-action-box">
             <h4>💾 ดาวน์โหลดข้อมูลสำรองทุกร้าน (Export)</h4>
             <p>บันทึกข้อมูลทุกสาขา สต็อก และประวัติทั้งหมดเป็นไฟล์ JSON</p>

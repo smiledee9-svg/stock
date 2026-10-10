@@ -387,6 +387,15 @@ class MultiStoreStockApp {
     if (clearLineSettingsBtn) clearLineSettingsBtn.addEventListener('click', () => this.clearLineSettings());
     if (lineSettingsForm) lineSettingsForm.addEventListener('submit', (e) => this.handleSaveLineSettings(e));
 
+    const openLineFromBackupBtn = document.getElementById('openLineFromBackupBtn');
+    if (openLineFromBackupBtn) {
+      openLineFromBackupBtn.addEventListener('click', () => {
+        const backupModal = document.getElementById('backupModal');
+        if (backupModal) this.closeModal(backupModal);
+        this.openLineSettingsModal();
+      });
+    }
+
     // Product Modal
     const productModal = document.getElementById('productModal');
     document.getElementById('openAddModalBtn').addEventListener('click', () => this.openProductModal());
