@@ -1134,9 +1134,13 @@ class MultiStoreStockApp {
               </div>
             </td>
 
-            <!-- 4. สต็อกเป้าหมาย -->
+            <!-- 4. สต็อกเป้าหมาย (ปรับได้แบบส่วนนับได้จริง) -->
             <td class="text-center">
-              <span class="target-val">${target}</span>
+              <div class="actual-count-stepper">
+                <button class="stepper-btn" type="button" title="ลดเป้าหมาย 1" onclick="window.app.quickAdjustTarget('${item.id}', -1)">−</button>
+                <span class="actual-val" title="คลิกเพื่อพิมพ์สต็อกเป้าหมาย" onclick="window.app.quickSetTarget('${item.id}')">${target}</span>
+                <button class="stepper-btn" type="button" title="เพิ่มเป้าหมาย 1" onclick="window.app.quickAdjustTarget('${item.id}', 1)">+</button>
+              </div>
             </td>
 
             <!-- 5. นับได้จริง (นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
@@ -1237,6 +1241,43 @@ class MultiStoreStockApp {
       if (cardsView) cardsView.style.display = 'grid';
       if (tableView) tableView.style.display = 'none';
     }
+  }
+
+  quickAdjustTarget(productId, delta) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const oldTarget = product.minAlert || 0;
+    const newTarget = Math.max(0, oldTarget + delta);
+    if (newTarget === oldTarget) return;
+
+    product.minAlert = newTarget;
+    product.updatedAt = new Date().toISOString();
+
+    this.saveProducts();
+    this.renderStoreDetail();
+    this.showToast(`${product.name}: ปรับสต็อกเป้าหมายเป็น ${newTarget} ${product.unit || 'ลูก'}`, 'info');
+  }
+
+  quickSetTarget(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const input = prompt(`กรอกสต็อกเป้าหมายของ "${product.name}":`, product.minAlert || 0);
+    if (input === null) return;
+
+    const newTarget = parseInt(input, 10);
+    if (isNaN(newTarget) || newTarget < 0) {
+      alert('กรุณากรอกตัวเลขจำนวนเต็มที่ถูกต้อง (0 ขึ้นไป)');
+      return;
+    }
+
+    product.minAlert = newTarget;
+    product.updatedAt = new Date().toISOString();
+
+    this.saveProducts();
+    this.renderStoreDetail();
+    this.showToast(`อัปเดตเป้าหมาย "${product.name}" เป็น ${newTarget} ${product.unit || 'ลูก'} เรียบร้อย`, 'success');
   }
 
   quickAdjustCount(productId, delta) {
