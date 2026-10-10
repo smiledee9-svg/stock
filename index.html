@@ -151,7 +151,7 @@
           <!-- Order Summary Alert Banner -->
           <div id="orderSummaryBanner" class="order-summary-alert" style="display: none;"></div>
 
-          <!-- 1. COMPACT 4-COLUMN TABLE VIEW (แบบย่อ ง่าย เบา เร็ว ตามรูป) -->
+          <!-- 1. COMPACT 4-COLUMN TABLE VIEW (แบบย่อ สะอาด สรุปชัดเจน) -->
           <div class="table-responsive-wrapper" id="inventoryTableView">
             <table class="compact-stock-table" id="stockTable">
               <thead>
@@ -160,25 +160,12 @@
                   <th class="col-target text-center">สต็อกเป้าหมาย</th>
                   <th class="col-actual text-center">นับได้จริง</th>
                   <th class="col-order text-center">ต้องสั่งเพิ่ม</th>
-                  <th class="col-actions text-center">จัดการ</th>
                 </tr>
               </thead>
               <tbody id="stockTableBody">
                 <!-- Dynamically populated via JS -->
               </tbody>
             </table>
-
-            <!-- Footnote formula explanation as in screenshot -->
-            <div class="table-formula-footnote">
-              <div class="footnote-item">
-                <span class="footnote-bullet">&#9675;</span>
-                <div class="footnote-content">
-                  <span class="footnote-title">สูตรในช่อง "ต้องสั่งเพิ่ม" (ช่อง D2):</span>
-                  <code class="formula-code">=MAX(0, B2-C2)</code>
-                  <p class="footnote-desc">(เอาสต็อกเป้าหมาย 5 ลบด้วยจำนวนที่นับได้ หากนับได้เกิน 5 ระบบจะปัดเป็น 0 ทันที ไม่ติดลบ)</p>
-                </div>
-              </div>
-            </div>
           </div>
 
           <!-- 2. PRODUCT CARDS GRID VIEW (ทางเลือกมุมมองการ์ด) -->

@@ -1047,10 +1047,8 @@ class MultiStoreStockApp {
         summaryBanner.innerHTML = `
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 1.35rem;">🚨</span>
-            <div>
-              <div><strong>มี ${needOrderItems.length} รุ่นที่ต้องสั่งเพิ่มด่วน</strong> (รวมทั้งหมด <strong>${totalPiecesToOrder} ลูก</strong>)</div>
-              <div style="font-size: 0.8rem; opacity: 0.85; font-weight: 400;">คำนวณจากสูตร: =MAX(0, สต็อกเป้าหมาย - นับได้จริง) ปัดเป็น 0 ไม่ติดลบ</div>
-            </div>
+              <div><strong>มี ${needOrderItems.length} รายการที่ต้องสั่งเพิ่มด่วน</strong> (รวมทั้งหมด <strong>${totalPiecesToOrder} ${store && store.name.includes('แบต') ? 'ลูก' : 'ชิ้น'}</strong>)</div>
+              <div style="font-size: 0.82rem; opacity: 0.9; font-weight: 500;">สรุปตามสต็อกที่นับได้จริง พร้อมกดคัดลอกส่งสั่งของได้ทันที</div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="window.app.copyOrderList()">
             <span>📋 คัดลอกรายการสั่งของ</span>
@@ -1064,10 +1062,11 @@ class MultiStoreStockApp {
     // 1. Render Compact 4-Column Table View (แบบย่อ ง่าย เบา เร็ว ตามรูป)
     if (tableBody) {
       tableBody.innerHTML = filtered.map((item, idx) => {
-        const rowNum = idx + 2; // Rows start from 2 (like Excel B2, C2, D2)
+        const rowNum = idx + 2;
         const target = item.minAlert || 5;
         const actual = item.quantity || 0;
         const needOrder = Math.max(0, target - actual);
+        const unit = item.unit ? ` ${this.escapeHtml(item.unit)}` : '';
 
         return `
           <tr class="${needOrder > 0 ? 'row-needs-order' : ''}">
@@ -1076,53 +1075,32 @@ class MultiStoreStockApp {
               <div class="col-name-wrapper">
                 <span class="battery-name">${this.escapeHtml(item.name)}</span>
                 <div class="battery-meta">
-                  <span class="battery-badge-cat">${this.escapeHtml(item.category || 'แบตเตอรี่')}</span>
+                  <span class="battery-badge-cat">${this.escapeHtml(item.category || 'สินค้า')}</span>
                   ${item.sku ? `<span>${this.escapeHtml(item.sku)}</span>` : ''}
-                  <span>• ฿${(item.price || 0).toLocaleString()} / ${this.escapeHtml(item.unit || 'ลูก')}</span>
+                  <span>• ฿${(item.price || 0).toLocaleString()}${unit ? ` /${unit}` : ''}</span>
                 </div>
               </div>
             </td>
 
-            <!-- 2. สต็อกเป้าหมาย (ช่อง B) -->
+            <!-- 2. สต็อกเป้าหมาย -->
             <td class="text-center">
               <span class="target-val">${target}</span>
             </td>
 
-            <!-- 3. นับได้จริง (ช่อง C - นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
+            <!-- 3. นับได้จริง (นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
             <td class="text-center">
               <div class="actual-count-stepper">
-                <button class="stepper-btn" type="button" title="ลด 1 ลูก" onclick="window.app.quickAdjustCount('${item.id}', -1)">−</button>
+                <button class="stepper-btn" type="button" title="ลด 1" onclick="window.app.quickAdjustCount('${item.id}', -1)">−</button>
                 <span class="actual-val" title="คลิกเพื่อพิมพ์จำนวนที่นับได้ตรงๆ" onclick="window.app.quickSetCount('${item.id}')">${actual}</span>
-                <button class="stepper-btn" type="button" title="เพิ่ม 1 ลูก" onclick="window.app.quickAdjustCount('${item.id}', 1)">+</button>
+                <button class="stepper-btn" type="button" title="เพิ่ม 1" onclick="window.app.quickAdjustCount('${item.id}', 1)">+</button>
               </div>
             </td>
 
-            <!-- 4. ต้องสั่งเพิ่ม (ช่อง D - สูตร =MAX(0, B2-C2) ตามรูปเป๊ะ) -->
+            <!-- 4. ต้องสั่งเพิ่ม (สรุปสั้นๆ: เพิ่มเท่าไร สีแดง / ไม่ต้องเพิ่ม สีเขียว) -->
             <td class="text-center">
-              <div class="formula-order-box">
-                <span class="formula-code-pill">=MAX(0, B${rowNum}-C${rowNum})</span>
-                <span class="order-badge-result ${needOrder > 0 ? 'need-order' : 'stock-ok'}">
-                  (ได้ ${needOrder}) ${needOrder > 0 ? `🚨 สั่งเพิ่ม ${needOrder} ${this.escapeHtml(item.unit || 'ลูก')}` : `✅ สต็อกพอดี`}
-                </span>
-              </div>
-            </td>
-
-            <!-- จัดการด่วน -->
-            <td class="text-center">
-              <div class="table-row-actions">
-                <button class="btn-table-action" type="button" title="รับของเข้าสต็อก" onclick="window.app.openStockAction('${item.id}', 'IN')">
-                  📥 รับ
-                </button>
-                <button class="btn-table-action" type="button" title="ตัดของออกจากสต็อก" onclick="window.app.openStockAction('${item.id}', 'OUT')">
-                  📤 ตัด
-                </button>
-                <button class="btn-table-action" type="button" title="แก้ไขรุ่นนี้" onclick="window.app.editProductById('${item.id}')">
-                  ✏️
-                </button>
-                <button class="btn-table-action" type="button" title="ลบรุ่นนี้" onclick="window.app.deleteProduct('${item.id}')">
-                  🗑️
-                </button>
-              </div>
+              ${needOrder > 0 
+                ? `<span class="order-badge-simple need-order">เพิ่ม ${needOrder}${unit}</span>` 
+                : `<span class="order-badge-simple stock-ok">ไม่ต้องเพิ่ม</span>`}
             </td>
           </tr>
         `;

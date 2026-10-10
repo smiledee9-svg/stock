@@ -953,44 +953,42 @@ body {
   color: var(--primary);
 }
 
-/* Order Column (Formula and Badge) */
-.formula-order-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.formula-code-pill {
-  font-family: var(--font-code);
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  background: var(--bg-tertiary);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-}
-
-.order-badge-result {
-  font-family: var(--font-code);
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
+/* Order Column (สรุปสั้นๆ: สีแดงเพิ่มเท่าไร / สีเขียวไม่ต้องเพิ่ม) */
+.order-badge-simple {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-main);
+  font-size: 0.98rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
-.order-badge-result.need-order {
-  background: var(--danger-light);
-  color: var(--danger-text);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+.order-badge-simple.need-order {
+  background: rgba(239, 68, 68, 0.14);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.order-badge-result.stock-ok {
-  background: var(--success-light);
-  color: var(--success-text);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+.order-badge-simple.stock-ok {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .order-badge-simple.need-order {
+  background: rgba(239, 68, 68, 0.22);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+[data-theme="dark"] .order-badge-simple.stock-ok {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
 }
 
 /* Actions in Table */
