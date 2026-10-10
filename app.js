@@ -887,17 +887,16 @@ class MultiStoreStockApp {
       return `
         <article class="store-card">
           <div>
+            <!-- บรรทัดบน: สำหรับ 01 ฝั่งซ้าย และ ข้อความใกล้หมด ฝั่งขวา -->
             <div class="store-card-header">
-              <div class="store-header-left">
-                <div class="store-avatar">${storeCode}</div>
-                <div>
-                  <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
-                </div>
-              </div>
+              <div class="store-avatar">${storeCode}</div>
               <div>
                 ${lowCount > 0 ? `<span class="stock-status-pill status-warning">⚠️ ใกล้หมด ${lowCount}</span>` : `<span class="stock-status-pill status-normal">ปกติ</span>`}
               </div>
             </div>
+
+            <!-- บรรทัดที่สอง: สำหรับข้อความใหญ่สีขาว เต็มพื้นที่ทำให้อ่านง่าย -->
+            <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
 
             <p class="store-desc-text">${this.escapeHtml(store.desc || 'ไม่มีรายละเอียด')}</p>
 

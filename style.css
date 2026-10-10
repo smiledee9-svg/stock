@@ -289,16 +289,9 @@ body {
 
 .store-card-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.store-header-left {
-  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
 .store-avatar {
@@ -329,10 +322,12 @@ body {
 }
 
 .store-name-title {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-main);
-  line-height: 1.3;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  word-break: break-word;
 }
 
 .store-tag-badge {
