@@ -1520,15 +1520,16 @@ class MultiStoreStockApp {
       navigator.clipboard.writeText(text).catch(() => {});
     }
 
-    // Check if LINE target is configured
-    if (!lineTarget) {
-      this.openLineSettingsModal();
-      this.showToast('กรุณาตั้งค่า LINE ID ของผู้รับก่อนส่ง (ตั้งค่าครั้งเดียว)', 'info');
+    let lineUrl = '';
+    const cleanTarget = (lineTarget || '').trim();
+
+    if (!cleanTarget) {
+      // โหมดแชร์ LINE อิสระ (ไม่ระบุผู้รับ): รองรับทั้ง PC และมือถือ เลือกกลุ่มหรือ Keep Memo ส่งได้ทันที ไม่ติด QR Code
+      lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+      window.open(lineUrl, '_blank');
+      this.showToast('เปิด LINE เรียบร้อย 🚀 เลือกกลุ่มหรือ Keep Memo เพื่อส่งได้ทันที!', 'success');
       return;
     }
-
-    let lineUrl = '';
-    const cleanTarget = lineTarget.trim();
 
     if (cleanTarget.startsWith('http://') || cleanTarget.startsWith('https://')) {
       lineUrl = cleanTarget;
