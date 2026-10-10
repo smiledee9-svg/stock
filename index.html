@@ -59,6 +59,10 @@
             </svg>
             <span class="add-store-text">เพิ่มร้านใหม่</span>
           </button>
+          <!-- ปุ่มคัดลอกรายการสั่งของ รวมไว้ในแถบด้านบนตามคำขอ -->
+          <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="คัดลอกรายการที่ต้องสั่งเพิ่ม" style="display: none;">
+            <span>📋 คัดลอกรายการสั่งของ</span>
+          </button>
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
             <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -127,17 +131,6 @@
 
         <!-- Product Inventory Section -->
         <section class="products-section">
-          <div class="section-title-row">
-            <div>
-              <h3 class="section-title" id="inventorySectionTitle">ตารางสต็อกสินค้า</h3>
-            </div>
-            <div class="inventory-top-tools">
-              <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="คัดลอกรายการที่ต้องสั่งเพิ่ม">
-                <span>📋 คัดลอกรายการสั่งของ</span>
-              </button>
-            </div>
-          </div>
-
           <!-- 1. COMPACT 4-COLUMN TABLE VIEW (แบบย่อ สะอาด สรุปชัดเจน) -->
           <div class="table-responsive-wrapper" id="inventoryTableView">
             <table class="compact-stock-table" id="stockTable">
