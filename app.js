@@ -537,6 +537,8 @@ class MultiStoreStockApp {
     const form = document.getElementById('productForm');
     const title = document.getElementById('modalTitle');
     const editIdInput = document.getElementById('editProductId');
+    const store = this.stores.find(s => s.id === this.currentStoreId);
+    const isBattery = store && store.name.includes('แบต');
 
     form.reset();
 
@@ -549,14 +551,14 @@ class MultiStoreStockApp {
       document.getElementById('prodQuantity').value = product.quantity;
       document.getElementById('prodMinAlert').value = product.minAlert;
       document.getElementById('prodPrice').value = product.price || 0;
-      document.getElementById('prodUnit').value = product.unit || 'ชิ้น';
+      document.getElementById('prodUnit').value = product.unit || (isBattery ? 'ลูก' : 'ชิ้น');
     } else {
-      title.textContent = 'เพิ่มสินค้าในร้านนี้';
+      title.textContent = `เพิ่มสินค้าใหม่ใน "${store ? store.name : 'ร้านนี้'}"`;
       editIdInput.value = '';
       document.getElementById('prodQuantity').value = 5;
       document.getElementById('prodMinAlert').value = 5;
-      document.getElementById('prodPrice').value = 1800;
-      document.getElementById('prodUnit').value = 'ลูก';
+      document.getElementById('prodPrice').value = isBattery ? 1800 : 250;
+      document.getElementById('prodUnit').value = isBattery ? 'ลูก' : 'ชิ้น';
     }
 
     this.openModal(modal);
@@ -564,16 +566,29 @@ class MultiStoreStockApp {
 
   handleSaveProduct(e) {
     e.preventDefault();
-    if (!this.currentStoreId) return;
+    if (!this.currentStoreId) {
+      this.showToast('กรุณาเลือกร้านค้าก่อนเพิ่มสินค้า', 'warning');
+      return;
+    }
+
+    const store = this.stores.find(s => s.id === this.currentStoreId);
+    const isBattery = store && store.name.includes('แบต');
+    const defaultCat = isBattery ? 'แบตเตอรี่' : 'ทั่วไป';
+    const defaultUnit = isBattery ? 'ลูก' : 'ชิ้น';
 
     const editId = document.getElementById('editProductId').value;
     const name = document.getElementById('prodName').value.trim();
+    if (!name) {
+      this.showToast('กรุณากรอกชื่อสินค้า', 'warning');
+      return;
+    }
+
     const sku = document.getElementById('prodSku').value.trim();
-    const category = document.getElementById('prodCategory').value.trim() || 'แบตเตอรี่';
+    const category = document.getElementById('prodCategory').value.trim() || defaultCat;
     const quantity = parseInt(document.getElementById('prodQuantity').value, 10) || 0;
     const minAlert = parseInt(document.getElementById('prodMinAlert').value, 10) || 0;
     const price = parseFloat(document.getElementById('prodPrice').value) || 0;
-    const unit = document.getElementById('prodUnit').value.trim() || 'ลูก';
+    const unit = document.getElementById('prodUnit').value.trim() || defaultUnit;
 
     if (editId) {
       const index = this.products.findIndex(p => p.id === editId);
@@ -632,7 +647,7 @@ class MultiStoreStockApp {
         });
       }
 
-      this.showToast(`เพิ่ม "${name}" เข้าร้านสำเร็จ`, 'success');
+      this.showToast(`เพิ่ม "${name}" เข้าร้านสำเร็จ 🎉`, 'success');
     }
 
     this.saveProducts();
@@ -1000,6 +1015,7 @@ class MultiStoreStockApp {
     const countBadge = document.getElementById('productCountBadge');
     const summaryBanner = document.getElementById('orderSummaryBanner');
 
+    const store = this.stores.find(s => s.id === this.currentStoreId);
     const storeProducts = this.products.filter(p => p.storeId === this.currentStoreId);
 
     const queryWords = this.searchQuery ? this.searchQuery.toLowerCase().split(/\s+/).filter(Boolean) : [];
@@ -1044,11 +1060,14 @@ class MultiStoreStockApp {
     if (summaryBanner) {
       if (needOrderItems.length > 0) {
         summaryBanner.style.display = 'flex';
+        const unitWord = store && store.name.includes('แบต') ? 'ลูก' : 'ชิ้น';
         summaryBanner.innerHTML = `
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 1.35rem;">🚨</span>
-              <div><strong>มี ${needOrderItems.length} รายการที่ต้องสั่งเพิ่มด่วน</strong> (รวมทั้งหมด <strong>${totalPiecesToOrder} ${store && store.name.includes('แบต') ? 'ลูก' : 'ชิ้น'}</strong>)</div>
+            <div>
+              <div><strong>มี ${needOrderItems.length} รายการที่ต้องสั่งเพิ่มด่วน</strong> (รวมทั้งหมด <strong>${totalPiecesToOrder} ${unitWord}</strong>)</div>
               <div style="font-size: 0.82rem; opacity: 0.9; font-weight: 500;">สรุปตามสต็อกที่นับได้จริง พร้อมกดคัดลอกส่งสั่งของได้ทันที</div>
+            </div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="window.app.copyOrderList()">
             <span>📋 คัดลอกรายการสั่งของ</span>

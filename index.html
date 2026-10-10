@@ -287,40 +287,40 @@
         <input type="hidden" id="editProductId">
         
         <div class="form-group">
-          <label for="prodName">ยี่ห้อ / รุ่น แบตเตอรี่ <span class="required">*</span></label>
-          <input type="text" id="prodName" required placeholder="เช่น GS 46B24L, 3K 55D23L, FB 105D31L, Amaron LN3">
+          <label for="prodName" id="prodNameLabel">ชื่อสินค้า / ยี่ห้อ / รุ่น <span class="required">*</span></label>
+          <input type="text" id="prodName" required placeholder="เช่น GS 46B24L, หมวกแก๊ป, กระเป๋าผ้า, เสื้อยืด...">
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="prodSku">รหัสสินค้า / รหัสรุ่น</label>
-            <input type="text" id="prodSku" placeholder="เช่น GS-46B24L">
+            <input type="text" id="prodSku" placeholder="เช่น GS-46B24L, CAP-01">
           </div>
           <div class="form-group">
             <label for="prodCategory">หมวดหมู่</label>
-            <input type="text" id="prodCategory" placeholder="เช่น ขั้ว L, ขั้ว R, DIN ยุโรป, กะบะ/ดีเซล">
+            <input type="text" id="prodCategory" placeholder="เช่น ขั้ว L, หมวก, เสื้อผ้า, เครื่องประดับ">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="prodMinAlert">สต็อกเป้าหมาย (ช่อง B) <span class="required">*</span></label>
-            <input type="number" id="prodMinAlert" required min="1" step="1" value="5" placeholder="เช่น 5">
+            <label for="prodMinAlert">สต็อกเป้าหมาย <span class="required">*</span></label>
+            <input type="number" id="prodMinAlert" required min="0" step="1" value="5" placeholder="เช่น 5">
           </div>
           <div class="form-group">
-            <label for="prodQuantity">นับได้จริงเริ่มต้น (ช่อง C) <span class="required">*</span></label>
-            <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="เช่น 2 หรือ 5">
+            <label for="prodQuantity">นับได้จริงเริ่มต้น <span class="required">*</span></label>
+            <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="เช่น 0, 2 หรือ 5">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="prodPrice">ราคาขายต่อลูก (บาท)</label>
-            <input type="number" id="prodPrice" min="0" step="1" value="1800">
+            <label for="prodPrice">ราคาขาย (บาท)</label>
+            <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
           </div>
           <div class="form-group">
             <label for="prodUnit">หน่วยนับ</label>
-            <input type="text" id="prodUnit" placeholder="ลูก, ชิ้น" value="ลูก">
+            <input type="text" id="prodUnit" placeholder="เช่น ชิ้น, ลูก, ใบ, ตัว" value="ชิ้น">
           </div>
         </div>
 
