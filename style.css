@@ -846,6 +846,27 @@ body {
   border-bottom: none;
 }
 
+/* Column Width Allocation - ยกพื้นที่ว่างในแถวทั้งหมดให้คอลัมน์ "รายการ" ขยายได้ยาวที่สุด */
+.compact-stock-table th.col-name,
+.compact-stock-table td:first-child {
+  width: auto;
+  min-width: 220px;
+}
+
+.compact-stock-table th.col-cost,
+.compact-stock-table td:nth-child(2),
+.compact-stock-table th.col-price,
+.compact-stock-table td:nth-child(3),
+.compact-stock-table th.col-target,
+.compact-stock-table td:nth-child(4),
+.compact-stock-table th.col-actual,
+.compact-stock-table td:nth-child(5),
+.compact-stock-table th.col-order,
+.compact-stock-table td:nth-child(6) {
+  width: 1%;
+  white-space: nowrap;
+}
+
 .compact-stock-table tbody tr {
   transition: var(--transition);
 }
@@ -1801,6 +1822,64 @@ body {
 }
 
 /* ================= Responsive Breakpoints ================= */
+/* Tablet & Medium Screen (แนวตั้งบนแท็บเล็ต iPad / Android ~768px - 960px) */
+@media (max-width: 960px) {
+  .app-container {
+    padding: 12px 10px; /* ลดขอบข้างหน้าจอ คืนพื้นที่ให้ตารางได้กว้างที่สุด */
+  }
+
+  /* กระชับ Padding คอลัมน์ตัวเลขและปุ่ม ไม่ให้มีช่องว่างสูญเปล่า */
+  .compact-stock-table th,
+  .compact-stock-table td {
+    padding: 12px 6px;
+  }
+
+  .compact-stock-table th.col-name,
+  .compact-stock-table td:first-child {
+    padding-left: 14px;
+    padding-right: 10px;
+    min-width: 240px;
+  }
+
+  .battery-name {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  /* กระชับปุ่ม Stepper ให้อยู่ในระยะพอดีนิ้วสัมผัส */
+  .actual-count-stepper {
+    gap: 3px;
+    padding: 2px 4px;
+  }
+
+  .stepper-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 1.05rem;
+  }
+
+  .actual-val {
+    font-size: 1.15rem;
+    min-width: 24px;
+    padding: 1px 2px;
+  }
+
+  .cost-price-val,
+  .sell-price-val {
+    font-size: 1rem;
+  }
+
+  .table-unit-sub {
+    font-size: 0.75rem;
+  }
+
+  .order-badge-simple {
+    padding: 5px 10px;
+    font-size: 0.88rem;
+  }
+}
+
 @media (max-width: 640px) {
   .app-container {
     padding: 12px 14px;
