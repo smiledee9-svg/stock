@@ -272,29 +272,6 @@
         <input type="hidden" id="prodCategory" value="">
         <input type="hidden" id="prodUnit" value="ชิ้น">
         
-        <!-- Smart Voice Bar: พูดเพื่อกรอกข้อมูลอัตโนมัติ -->
-        <div class="voice-banner-wrapper">
-          <button type="button" class="voice-smart-btn" id="voiceSmartBtn" title="แตะแล้วพูดเพื่อกรอกทั้งหมดอัตโนมัติ">
-            <div class="voice-smart-icon-box">
-              <svg class="mic-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="22"></line>
-                <line x1="8" y1="22" x2="16" y2="22"></line>
-              </svg>
-            </div>
-            <div class="voice-smart-info">
-              <div class="voice-smart-title" id="voiceSmartTitle">🎙️ แตะแล้วพูดเพื่อกรอกอัตโนมัติ</div>
-              <div class="voice-smart-hint" id="voiceSmartHint">เช่น "GS 46B24L ทุน 1400 ขาย 1850 เป้า 5 นับได้ 2"</div>
-            </div>
-            <span class="voice-status-indicator" id="voiceStatusIndicator"></span>
-          </button>
-          <div class="voice-live-transcript" id="voiceLiveTranscript" style="display: none;">
-            <span class="transcript-tag">กำลังฟัง:</span>
-            <span class="transcript-text" id="voiceTranscriptText">...</span>
-          </div>
-        </div>
-
         <!-- 1. รายการ -->
         <div class="form-group">
           <div class="form-label-row">
@@ -328,6 +305,29 @@
         <div class="form-group">
           <label for="prodQuantity">นับได้จริง</label>
           <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
+        </div>
+
+        <!-- Smart Voice Bar: พูดเพื่อกรอกข้อมูลอัตโนมัติ (จัดวางไว้ส่วนล่างฟอร์ม) -->
+        <div class="voice-banner-wrapper" style="margin-top: 14px; margin-bottom: 6px;">
+          <button type="button" class="voice-smart-btn" id="voiceSmartBtn" title="แตะแล้วพูดเพื่อกรอกทั้งหมดอัตโนมัติ">
+            <div class="voice-smart-icon-box">
+              <svg class="mic-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+                <line x1="8" y1="22" x2="16" y2="22"></line>
+              </svg>
+            </div>
+            <div class="voice-smart-info">
+              <div class="voice-smart-title" id="voiceSmartTitle">🎙️ แตะแล้วพูดเพื่อกรอกอัตโนมัติ</div>
+              <div class="voice-smart-hint" id="voiceSmartHint">เช่น "GS 46B24L ทุน 1400 ขาย 1850 เป้า 5 นับได้ 2"</div>
+            </div>
+            <span class="voice-status-indicator" id="voiceStatusIndicator"></span>
+          </button>
+          <div class="voice-live-transcript" id="voiceLiveTranscript" style="display: none;">
+            <span class="transcript-tag">กำลังฟัง:</span>
+            <span class="transcript-text" id="voiceTranscriptText">...</span>
+          </div>
         </div>
 
         <div class="modal-footer">

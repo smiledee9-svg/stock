@@ -1680,27 +1680,45 @@ body {
 }
 
 #productModal .form-group {
-  margin-bottom: 18px;
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
 #productModal .form-group label {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+#productModal .form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+#productModal .form-label-row label {
+  margin-bottom: 0;
 }
 
 #productModal .form-group input {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  padding: 13px 16px;
+  padding: 10px 16px;
   border-radius: var(--radius-md);
   font-family: var(--font-main);
   color: var(--text-main);
+  width: 100%;
 }
 
 #productModal .form-group input::placeholder {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 400;
   color: var(--text-light);
 }
@@ -2261,5 +2279,15 @@ body {
 
   #productModal .modal-header h3 {
     font-size: 1.08rem;
+  }
+
+  #productModal .form-group {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  #productModal .form-label-row {
+    margin-bottom: 4px;
   }
 }
