@@ -1733,17 +1733,17 @@ class MultiStoreStockApp {
     text = text.replace(/บ๊อช|บอช/gi, 'Bosch');
     text = text.replace(/ดีไอเอ็น|ดิน/gi, 'DIN');
 
-    // Standardize battery size letters (B, D, L, R, LN)
-    text = text.replace(/(\d+)\s*b\s*(\d+)\s*l/gi, '$1B$2L');
-    text = text.replace(/(\d+)\s*b\s*(\d+)\s*r/gi, '$1B$2R');
-    text = text.replace(/(\d+)\s*d\s*(\d+)\s*l/gi, '$1D$2L');
-    text = text.replace(/(\d+)\s*d\s*(\d+)\s*r/gi, '$1D$2R');
-    text = text.replace(/ln\s*(\d+)/gi, 'LN$1');
-    text = text.replace(/din\s*(\d+)/gi, 'DIN$1');
+    // Standardize battery size letters (B, D, L, R, LN) both English and Thai spoken
+    text = text.replace(/(\d+)\s*(?:b|บี)\s*(\d+)\s*(?:l|แอล)/gi, '$1B$2L');
+    text = text.replace(/(\d+)\s*(?:b|บี)\s*(\d+)\s*(?:r|อาร์)/gi, '$1B$2R');
+    text = text.replace(/(\d+)\s*(?:d|ดี)\s*(\d+)\s*(?:l|แอล)/gi, '$1D$2L');
+    text = text.replace(/(\d+)\s*(?:d|ดี)\s*(\d+)\s*(?:r|อาร์)/gi, '$1D$2R');
+    text = text.replace(/(?:ln|แอล\s*เอ็น)\s*(\d+)/gi, 'LN$1');
+    text = text.replace(/(?:din|ดิน|ดี\s*ไอ\s*เอ็น)\s*(\d+)/gi, 'DIN$1');
 
     // Clean Thai polarity terms
-    text = text.replace(/ขั้ว\s*แอล/gi, 'ขั้ว L');
-    text = text.replace(/ขั้ว\s*อาร์/gi, 'ขั้ว R');
+    text = text.replace(/ขั้ว\s*(?:แอล|l)/gi, 'ขั้ว L');
+    text = text.replace(/ขั้ว\s*(?:อาร์|r)/gi, 'ขั้ว R');
 
     return text;
   }
@@ -1758,14 +1758,14 @@ class MultiStoreStockApp {
       quantity: null
     };
 
-    // Convert Thai spoken small numbers
+    // Convert Thai spoken small numbers with Thai-friendly boundary
     const thaiNumMap = {
       'ศูนย์': 0, 'หนึ่ง': 1, 'สอง': 2, 'สาม': 3, 'สี่': 4,
       'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9, 'สิบ': 10
     };
     for (const [k, v] of Object.entries(thaiNumMap)) {
-      const r = new RegExp(`\\b${k}\\b`, 'g');
-      text = text.replace(r, v);
+      const r = new RegExp('(^|[^ก-๙a-zA-Z0-9])' + k + '(?=[^ก-๙a-zA-Z0-9]|$)', 'g');
+      text = text.replace(r, '$1' + v);
     }
 
     // 1. Cost Price: "ทุน 1400", "ราคาทุน 1400", "ซื้อมา 1400"
@@ -1790,7 +1790,7 @@ class MultiStoreStockApp {
     }
 
     // 4. Actual Counted Stock: "นับได้จริง 2", "นับได้ 2", "มีจริง 2", "มี 2", "เหลือ 2"
-    const actualMatch = text.match(/(?:นับได้จริง|นับได้|มีจริง|มีสต็อก|มี|เหลือ)\s*[:=]?\s*([0-9]+)(?:\s*(?:ลูก|ชิ้น|กล่อง))?/i);
+    const actualMatch = text.match(/(?:นับได้จริง|นับได้|มีจริง|มีสต็อก|มี|เหลือ)\s*[:=]?\s*([0-9]+)(?:\s*(?:ลูก|ชิ้น|กล่อง|ตัว|ก้อน))?/i);
     if (actualMatch) {
       result.quantity = parseInt(actualMatch[1], 10);
       text = text.replace(actualMatch[0], ' ');
