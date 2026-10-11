@@ -1502,15 +1502,14 @@ class MultiStoreStockApp {
     let text = `📦 ${customHeader} - ${store ? store.name : 'ร้านค้า'}\n`;
     text += `📅 วันที่: ${dateStr}\n`;
     text += `------------------------------------\n`;
-    text += `รายการ | จำนวน\n`;
-    text += `------------------------------------\n`;
     needOrderItems.forEach((p, idx) => {
       const target = p.minAlert || 5;
       const actual = p.quantity || 0;
       const need = Math.max(0, target - actual);
       const unitLabel = (p.unit && p.unit !== 'ลูก') ? ` ${p.unit}` : '';
-      text += `${idx + 1}. ${p.name} | ${need}${unitLabel}\n`;
+      text += `${idx + 1}. ${p.name}\n   จำนวน: ${need}${unitLabel}\n\n`;
     });
+    text = text.trimEnd() + '\n';
     const totalOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
     text += `------------------------------------\n`;
     text += `รวมทั้งหมด: ${totalOrder}`;
