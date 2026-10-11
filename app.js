@@ -938,8 +938,7 @@ class MultiStoreStockApp {
     const headerStoreInfo = document.getElementById('headerStoreInfo');
     const editBtn = document.getElementById('editCurrentStoreBtn');
     const openAddStoreBtn = document.getElementById('openAddStoreBtn');
-    const lineOrderGroup = document.getElementById('lineOrderBtnGroup');
-    const copyOrderBtn = document.getElementById('copyOrderListBtn');
+    const backToHubBtn = document.getElementById('backToHubBtn');
 
     if (!this.currentStoreId) {
       // Show Hub View
@@ -949,8 +948,7 @@ class MultiStoreStockApp {
       if (headerStoreInfo) headerStoreInfo.style.display = 'none';
       if (editBtn) editBtn.style.display = 'none';
       if (openAddStoreBtn) openAddStoreBtn.style.display = 'inline-flex';
-      if (lineOrderGroup) lineOrderGroup.style.display = 'none';
-      if (copyOrderBtn) copyOrderBtn.style.display = 'none';
+      if (backToHubBtn) backToHubBtn.style.display = 'none';
       if (subtitle) subtitle.textContent = 'เลือกร้านค้าเพื่อเริ่มต้น';
       this.renderHub();
     } else {
@@ -967,8 +965,7 @@ class MultiStoreStockApp {
       if (headerStoreInfo) headerStoreInfo.style.display = 'flex';
       if (editBtn) editBtn.style.display = 'none'; // หน้านี้ไม่ได้ใช้ ซ่อนตามคำขอ
       if (openAddStoreBtn) openAddStoreBtn.style.display = 'none'; // หน้านี้ไม่ได้ใช้ ซ่อนตามคำขอ
-      if (lineOrderGroup) lineOrderGroup.style.display = 'inline-flex'; // รวมไว้ที่แถบด้านบนตามคำขอ
-      if (copyOrderBtn) copyOrderBtn.style.display = 'inline-flex';
+      if (backToHubBtn) backToHubBtn.style.display = 'inline-flex'; // แสดงปุ่มเลือกร้านอื่นที่แถบ Header ด้านบน
       if (subtitle) subtitle.textContent = `กำลังจัดการ: ${currentStore.name}`;
 
       const nameEl = document.getElementById('currentStoreName');
@@ -1164,9 +1161,9 @@ class MultiStoreStockApp {
     const copyOrderBtn = document.getElementById('copyOrderListBtn');
     if (copyOrderBtn) {
       if (needOrderItems.length > 0) {
-        copyOrderBtn.className = 'btn btn-primary btn-sm';
+        copyOrderBtn.className = 'btn btn-primary';
       } else {
-        copyOrderBtn.className = 'btn btn-secondary btn-sm';
+        copyOrderBtn.className = 'btn btn-secondary';
       }
       copyOrderBtn.innerHTML = `<span>📋 สั่งของเข้า LINE</span>`;
     }

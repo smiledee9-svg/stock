@@ -52,12 +52,14 @@
             </svg>
             <span class="add-store-text">เพิ่มร้านใหม่</span>
           </button>
-          <!-- ปุ่มสั่งของเข้า LINE -->
-          <div class="line-btn-wrapper" id="lineOrderBtnGroup" style="display: none;">
-            <button id="copyOrderListBtn" class="btn btn-primary btn-sm" title="ส่งรายการสั่งของเข้า LINE (ตั้งค่า LINE ID เพิ่มเติมได้ที่ปุ่ม 💾 จัดการข้อมูล)">
-              <span>📋 สั่งของเข้า LINE</span>
-            </button>
-          </div>
+          <!-- ปุ่มเลือกร้านอื่น (แสดงในแถบด้านบนเมื่อกำลังจัดการร้าน) -->
+          <button id="backToHubBtn" class="btn btn-secondary btn-sm" title="กลับไปเลือกร้านอื่น" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span class="back-btn-text">เลือกร้านอื่น</span>
+          </button>
           <button id="themeToggleBtn" class="icon-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="Toggle Theme">
             <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -112,12 +114,9 @@
           </div>
 
           <div class="filter-actions">
-            <button id="backToHubBtn" class="btn btn-secondary" title="กลับไปเลือกร้านอื่น">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
-              <span>เลือกร้านอื่น</span>
+            <!-- ปุ่มสั่งของเข้า LINE ย้ายมาอยู่ข้างปุ่มเพิ่มสินค้าในร้านนี้ -->
+            <button id="copyOrderListBtn" class="btn btn-primary" title="ส่งรายการสั่งของเข้า LINE (ตั้งค่า LINE ID เพิ่มเติมได้ที่ปุ่ม 💾 จัดการข้อมูล)">
+              <span>📋 สั่งของเข้า LINE</span>
             </button>
             <button id="openAddModalBtn" class="btn btn-primary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
