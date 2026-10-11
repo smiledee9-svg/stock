@@ -1497,22 +1497,23 @@ class MultiStoreStockApp {
 
     const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
     const lineTarget = (store && store.lineTarget) || localStorage.getItem('smartstock_line_target') || '';
-    const customHeader = (store && store.lineCustomHeader) || localStorage.getItem('smartstock_line_header') || 'รายการสั่งของเพิ่ม';
+    const customHeader = (store && store.lineCustomHeader) || localStorage.getItem('smartstock_line_header') || 'รายการสั่งของ';
 
     let text = `📦 ${customHeader} - ${store ? store.name : 'ร้านค้า'}\n`;
-    text += `📅 ประจำวันที่: ${dateStr}\n`;
-    text += `====================================\n`;
+    text += `📅 วันที่: ${dateStr}\n`;
+    text += `------------------------------------\n`;
+    text += `รายการ | จำนวน\n`;
+    text += `------------------------------------\n`;
     needOrderItems.forEach((p, idx) => {
       const target = p.minAlert || 5;
       const actual = p.quantity || 0;
       const need = Math.max(0, target - actual);
       const unitLabel = (p.unit && p.unit !== 'ลูก') ? ` ${p.unit}` : '';
-      text += `${idx + 1}. ${p.name} : สั่งเพิ่ม ${need}${unitLabel} (เป้า ${target}, นับได้ ${actual})\n`;
+      text += `${idx + 1}. ${p.name} | ${need}${unitLabel}\n`;
     });
     const totalOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
-    text += `====================================\n`;
-    text += `📌 รวมต้องสั่งทั้งหมด: ${totalOrder} (${needOrderItems.length} รายการ)\n`;
-    text += `(คำนวณจากสูตร: =MAX(0, สต็อกเป้าหมาย - นับได้จริง))`;
+    text += `------------------------------------\n`;
+    text += `รวมทั้งหมด: ${totalOrder}`;
 
     // Copy to clipboard always for safety/instant paste
     if (navigator.clipboard && navigator.clipboard.writeText) {
