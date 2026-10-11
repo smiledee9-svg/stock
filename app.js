@@ -460,6 +460,9 @@ class MultiStoreStockApp {
         this.closeModal(e.target);
       }
     });
+
+    // Voice Input System Initialization
+    this.initVoiceSystem();
   }
 
   // View Navigation
@@ -500,6 +503,7 @@ class MultiStoreStockApp {
 
   closeModal(elem) {
     elem.classList.remove('active');
+    this.stopAnyActiveVoice();
   }
 
   // Store Management
@@ -1645,6 +1649,445 @@ class MultiStoreStockApp {
       });
     } catch (e) {
       return isoString;
+    }
+  }
+
+  // ================= VOICE INPUT & SPEECH SYSTEM =================
+  initVoiceSystem() {
+    this.activeVoiceRecognition = null;
+    this.currentVoiceTarget = null;
+
+    // Check Speech Recognition support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.speechSupported = !!SpeechRecognition;
+
+    // 1. Smart Voice Button in Product Modal
+    const voiceSmartBtn = document.getElementById('voiceSmartBtn');
+    if (voiceSmartBtn) {
+      voiceSmartBtn.addEventListener('click', () => this.toggleVoiceSmartInput());
+    }
+
+    // 2. Specific field voice button (ชื่อสินค้า)
+    const voiceNameFieldBtn = document.getElementById('voiceNameFieldBtn');
+    if (voiceNameFieldBtn) {
+      voiceNameFieldBtn.addEventListener('click', () => this.toggleVoiceFieldInput('prodName'));
+    }
+
+    // 3. Search Bar Voice Button
+    const voiceSearchBtn = document.getElementById('voiceSearchBtn');
+    if (voiceSearchBtn) {
+      voiceSearchBtn.addEventListener('click', () => this.toggleVoiceSearchInput());
+    }
+  }
+
+  playVoiceSound(type = 'start') {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'start') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      } else if (type === 'success') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.25);
+      } else if (type === 'error') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(220, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      }
+    } catch (e) {}
+  }
+
+  normalizeVoiceText(raw) {
+    if (!raw) return '';
+    let text = raw.trim();
+
+    // Standardize common Thai battery brands into standard uppercase
+    text = text.replace(/จี\s*เอส/gi, 'GS');
+    text = text.replace(/สาม\s*เค|3\s*เค/gi, '3K');
+    text = text.replace(/เอฟ\s*บี/gi, 'FB');
+    text = text.replace(/พานาโซนิค|พานา/gi, 'Panasonic');
+    text = text.replace(/ยัวซ่า|ยูอาซ่า/gi, 'Yuasa');
+    text = text.replace(/อมารอน|อามารอน/gi, 'Amaron');
+    text = text.replace(/โบลิเดน|โบลิเด็น/gi, 'Boliden');
+    text = text.replace(/พูม่า|พูมา/gi, 'Puma');
+    text = text.replace(/บ๊อช|บอช/gi, 'Bosch');
+    text = text.replace(/ดีไอเอ็น|ดิน/gi, 'DIN');
+
+    // Standardize battery size letters (B, D, L, R, LN)
+    text = text.replace(/(\d+)\s*b\s*(\d+)\s*l/gi, '$1B$2L');
+    text = text.replace(/(\d+)\s*b\s*(\d+)\s*r/gi, '$1B$2R');
+    text = text.replace(/(\d+)\s*d\s*(\d+)\s*l/gi, '$1D$2L');
+    text = text.replace(/(\d+)\s*d\s*(\d+)\s*r/gi, '$1D$2R');
+    text = text.replace(/ln\s*(\d+)/gi, 'LN$1');
+    text = text.replace(/din\s*(\d+)/gi, 'DIN$1');
+
+    // Clean Thai polarity terms
+    text = text.replace(/ขั้ว\s*แอล/gi, 'ขั้ว L');
+    text = text.replace(/ขั้ว\s*อาร์/gi, 'ขั้ว R');
+
+    return text;
+  }
+
+  parseVoiceProduct(raw) {
+    let text = this.normalizeVoiceText(raw);
+    const result = {
+      name: '',
+      costPrice: null,
+      price: null,
+      minAlert: null,
+      quantity: null
+    };
+
+    // Convert Thai spoken small numbers
+    const thaiNumMap = {
+      'ศูนย์': 0, 'หนึ่ง': 1, 'สอง': 2, 'สาม': 3, 'สี่': 4,
+      'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9, 'สิบ': 10
+    };
+    for (const [k, v] of Object.entries(thaiNumMap)) {
+      const r = new RegExp(`\\b${k}\\b`, 'g');
+      text = text.replace(r, v);
+    }
+
+    // 1. Cost Price: "ทุน 1400", "ราคาทุน 1400", "ซื้อมา 1400"
+    const costMatch = text.match(/(?:ราคาทุน|ทุน|ซื้อมา|ต้นทุน)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)/i);
+    if (costMatch) {
+      result.costPrice = parseFloat(costMatch[1]);
+      text = text.replace(costMatch[0], ' ');
+    }
+
+    // 2. Selling Price: "ราคาขาย 1850", "ขาย 1850", "ขายจริง 1850"
+    const priceMatch = text.match(/(?:ราคาขาย|ขายจริง|ขาย)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)/i);
+    if (priceMatch) {
+      result.price = parseFloat(priceMatch[1]);
+      text = text.replace(priceMatch[0], ' ');
+    }
+
+    // 3. Target Stock: "สต็อกเป้าหมาย 5", "เป้าหมาย 5", "เป้า 5"
+    const targetMatch = text.match(/(?:สต็อกเป้าหมาย|เป้าหมาย|เป้า)\s*[:=]?\s*([0-9]+)/i);
+    if (targetMatch) {
+      result.minAlert = parseInt(targetMatch[1], 10);
+      text = text.replace(targetMatch[0], ' ');
+    }
+
+    // 4. Actual Counted Stock: "นับได้จริง 2", "นับได้ 2", "มีจริง 2", "มี 2", "เหลือ 2"
+    const actualMatch = text.match(/(?:นับได้จริง|นับได้|มีจริง|มีสต็อก|มี|เหลือ)\s*[:=]?\s*([0-9]+)(?:\s*(?:ลูก|ชิ้น|กล่อง))?/i);
+    if (actualMatch) {
+      result.quantity = parseInt(actualMatch[1], 10);
+      text = text.replace(actualMatch[0], ' ');
+    }
+
+    // 5. Clean up trigger phrases from product name
+    text = text.replace(/^(?:เพิ่มสินค้า|เพิ่มรายการ|เพิ่ม|บันทึก|รายการ)\s*/i, '');
+    text = text.replace(/\s+/g, ' ').trim();
+
+    if (text.length > 0) {
+      result.name = text;
+    }
+
+    return result;
+  }
+
+  stopAnyActiveVoice() {
+    if (this.activeVoiceRecognition) {
+      try {
+        this.activeVoiceRecognition.stop();
+      } catch (e) {}
+      this.activeVoiceRecognition = null;
+    }
+    // Reset all voice button UI states
+    const smartBtn = document.getElementById('voiceSmartBtn');
+    if (smartBtn) {
+      smartBtn.classList.remove('listening');
+      const title = document.getElementById('voiceSmartTitle');
+      if (title) title.textContent = '🎙️ แตะแล้วพูดเพื่อกรอกอัตโนมัติ';
+    }
+    const transcriptBox = document.getElementById('voiceLiveTranscript');
+    if (transcriptBox) transcriptBox.style.display = 'none';
+
+    const nameBtn = document.getElementById('voiceNameFieldBtn');
+    if (nameBtn) nameBtn.classList.remove('listening');
+
+    const searchBtn = document.getElementById('voiceSearchBtn');
+    if (searchBtn) searchBtn.classList.remove('listening');
+  }
+
+  toggleVoiceSmartInput() {
+    const smartBtn = document.getElementById('voiceSmartBtn');
+    const isListening = smartBtn && smartBtn.classList.contains('listening');
+
+    if (isListening) {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+      return;
+    }
+
+    if (!this.speechSupported) {
+      this.showToast('เบราว์เซอร์นี้ยังไม่รองรับระบบสั่งงานด้วยเสียง แนะนำให้เปิดด้วย Chrome หรือ Safari ครับ', 'warning');
+      return;
+    }
+
+    this.stopAnyActiveVoice();
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'th-TH';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    const transcriptBox = document.getElementById('voiceLiveTranscript');
+    const transcriptText = document.getElementById('voiceTranscriptText');
+    const title = document.getElementById('voiceSmartTitle');
+
+    if (smartBtn) smartBtn.classList.add('listening');
+    if (title) title.textContent = '🎙️ กำลังฟังเสียง... พูดได้เลยครับ';
+    if (transcriptBox) transcriptBox.style.display = 'flex';
+    if (transcriptText) transcriptText.textContent = 'กำลังฟัง...';
+
+    this.playVoiceSound('start');
+    this.activeVoiceRecognition = recognition;
+
+    recognition.onresult = (e) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; ++i) {
+        if (e.results[i].isFinal) {
+          final += e.results[i][0].transcript;
+        } else {
+          interim += e.results[i][0].transcript;
+        }
+      }
+      if (transcriptText) {
+        transcriptText.textContent = final || interim || '...';
+      }
+      if (final) {
+        this.handleSmartVoiceResult(final);
+      }
+    };
+
+    recognition.onerror = (e) => {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+      if (e.error === 'not-allowed') {
+        this.showToast('กรุณากดยินยอม (Allow) ให้เบราว์เซอร์ใช้ไมโครโฟน เพื่อสั่งงานด้วยเสียง', 'warning');
+      } else if (e.error !== 'no-speech') {
+        this.showToast('ไม่ได้ยินเสียง หรือเกิดข้อผิดพลาด ลองใหม่อีกครั้งครับ', 'info');
+      }
+    };
+
+    recognition.onend = () => {
+      this.stopAnyActiveVoice();
+    };
+
+    try {
+      recognition.start();
+    } catch (err) {
+      this.stopAnyActiveVoice();
+    }
+  }
+
+  handleSmartVoiceResult(rawTranscript) {
+    const parsed = this.parseVoiceProduct(rawTranscript);
+    let updatedCount = 0;
+
+    const flashField = (id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('voice-highlight');
+        void el.offsetWidth;
+        el.classList.add('voice-highlight');
+      }
+    };
+
+    if (parsed.name) {
+      const nameEl = document.getElementById('prodName');
+      if (nameEl) {
+        nameEl.value = parsed.name;
+        flashField('prodName');
+        updatedCount++;
+      }
+    }
+
+    if (parsed.costPrice !== null) {
+      const costEl = document.getElementById('prodCostPrice');
+      if (costEl) {
+        costEl.value = parsed.costPrice;
+        flashField('prodCostPrice');
+        updatedCount++;
+      }
+    }
+
+    if (parsed.price !== null) {
+      const priceEl = document.getElementById('prodPrice');
+      if (priceEl) {
+        priceEl.value = parsed.price;
+        flashField('prodPrice');
+        updatedCount++;
+      }
+    }
+
+    if (parsed.minAlert !== null) {
+      const targetEl = document.getElementById('prodMinAlert');
+      if (targetEl) {
+        targetEl.value = parsed.minAlert;
+        flashField('prodMinAlert');
+        updatedCount++;
+      }
+    }
+
+    if (parsed.quantity !== null) {
+      const qtyEl = document.getElementById('prodQuantity');
+      if (qtyEl) {
+        qtyEl.value = parsed.quantity;
+        flashField('prodQuantity');
+        updatedCount++;
+      }
+    }
+
+    this.playVoiceSound('success');
+    if (parsed.name) {
+      this.showToast(`กรอกข้อมูลสำเร็จ: ${parsed.name} 🚀`, 'success');
+    } else {
+      this.showToast('ดึงข้อมูลจากเสียงเรียบร้อย ตรวจสอบและกดบันทึกได้ทันที ✨', 'success');
+    }
+  }
+
+  toggleVoiceFieldInput(fieldId) {
+    const fieldBtn = document.getElementById('voiceNameFieldBtn');
+    const isListening = fieldBtn && fieldBtn.classList.contains('listening');
+
+    if (isListening) {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+      return;
+    }
+
+    if (!this.speechSupported) {
+      this.showToast('เบราว์เซอร์นี้ยังไม่รองรับระบบสั่งงานด้วยเสียง แนะนำให้เปิดด้วย Chrome หรือ Safari ครับ', 'warning');
+      return;
+    }
+
+    this.stopAnyActiveVoice();
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'th-TH';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    if (fieldBtn) fieldBtn.classList.add('listening');
+    this.playVoiceSound('start');
+    this.activeVoiceRecognition = recognition;
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      const normalized = this.normalizeVoiceText(transcript)
+        .replace(/^(?:ชื่อ|รุ่น|สินค้า)\s*/i, '')
+        .trim();
+
+      const input = document.getElementById(fieldId);
+      if (input) {
+        input.value = normalized;
+        input.classList.remove('voice-highlight');
+        void input.offsetWidth;
+        input.classList.add('voice-highlight');
+        input.focus();
+      }
+      this.playVoiceSound('success');
+      this.showToast(`กรอกชื่อสินค้า: ${normalized} 🎙️`, 'success');
+    };
+
+    recognition.onerror = () => {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+    };
+
+    recognition.onend = () => {
+      this.stopAnyActiveVoice();
+    };
+
+    try {
+      recognition.start();
+    } catch (err) {
+      this.stopAnyActiveVoice();
+    }
+  }
+
+  toggleVoiceSearchInput() {
+    const searchBtn = document.getElementById('voiceSearchBtn');
+    const isListening = searchBtn && searchBtn.classList.contains('listening');
+
+    if (isListening) {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+      return;
+    }
+
+    if (!this.speechSupported) {
+      this.showToast('เบราว์เซอร์นี้ยังไม่รองรับระบบสั่งงานด้วยเสียง แนะนำให้เปิดด้วย Chrome หรือ Safari ครับ', 'warning');
+      return;
+    }
+
+    this.stopAnyActiveVoice();
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'th-TH';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    if (searchBtn) searchBtn.classList.add('listening');
+    this.playVoiceSound('start');
+    this.activeVoiceRecognition = recognition;
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      const normalized = this.normalizeVoiceText(transcript).trim();
+
+      const searchInput = document.getElementById('searchInput');
+      const clearSearchBtn = document.getElementById('clearSearchBtn');
+      if (searchInput) {
+        searchInput.value = normalized;
+        this.searchQuery = normalized.toLowerCase();
+        if (clearSearchBtn) clearSearchBtn.hidden = !this.searchQuery;
+        this.renderProducts();
+      }
+      this.playVoiceSound('success');
+      this.showToast(`ค้นหาด้วยเสียง: "${normalized}" 🔍`, 'success');
+    };
+
+    recognition.onerror = () => {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+    };
+
+    recognition.onend = () => {
+      this.stopAnyActiveVoice();
+    };
+
+    try {
+      recognition.start();
+    } catch (err) {
+      this.stopAnyActiveVoice();
     }
   }
 
