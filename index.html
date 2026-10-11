@@ -386,49 +386,59 @@
 
   <!-- MODAL: BACKUP & DATA MANAGEMENT -->
   <div class="modal-overlay" id="backupModal" role="dialog" aria-modal="true">
-    <div class="modal-card">
+    <div class="modal-card backup-modal-card">
       <div class="modal-header">
         <h3>จัดการข้อมูลและสำรองไฟล์</h3>
-        <button class="close-btn" id="closeBackupModalBtn">&times;</button>
+        <button class="close-btn" id="closeBackupModalBtn" aria-label="ปิด">&times;</button>
       </div>
       <div class="modal-body-content">
         <p class="backup-desc">ข้อมูลร้านค้า สต็อกสินค้า และประวัติทั้งหมด สามารถดาวน์โหลดเก็บไว้และนำไปเปิดบนเครื่องอื่นได้ทันที</p>
         
         <div class="backup-actions-grid">
           <div class="backup-action-box">
-            <h4>💬 ตั้งค่า LINE ID สำหรับสั่งของ</h4>
-            <p>กำหนด LINE ID หรือ LINE OA ของซัพพลายเออร์สำหรับส่งรายการสั่งของอัตโนมัติ</p>
-            <button id="openLineFromBackupBtn" class="btn btn-primary full-width" type="button">⚙️ ตั้งค่า LINE ID</button>
+            <div class="action-box-info">
+              <h4>💬 ตั้งค่า LINE ID สำหรับสั่งของ</h4>
+              <p>กำหนด LINE ID ซัพพลายเออร์สำหรับส่งใบสั่งของ</p>
+            </div>
+            <button id="openLineFromBackupBtn" class="btn btn-primary btn-sm full-width" type="button">⚙️ ตั้งค่า LINE ID</button>
           </div>
 
           <div class="backup-action-box">
-            <h4>💾 ดาวน์โหลดข้อมูลสำรองทุกร้าน (Export)</h4>
-            <p>บันทึกข้อมูลทุกสาขา สต็อก และประวัติทั้งหมดเป็นไฟล์ JSON</p>
-            <button id="exportJsonBtn" class="btn btn-secondary full-width">ดาวน์โหลดไฟล์ Backup (.json)</button>
+            <div class="action-box-info">
+              <h4>💾 ดาวน์โหลดข้อมูลสำรอง (Export)</h4>
+              <p>บันทึกข้อมูลทุกสาขา สต็อก และประวัติเป็น JSON</p>
+            </div>
+            <button id="exportJsonBtn" class="btn btn-secondary btn-sm full-width">ดาวน์โหลด Backup (.json)</button>
           </div>
 
           <div class="backup-action-box">
-            <h4>📥 นำเข้าข้อมูล (Import)</h4>
-            <p>กู้คืนข้อมูลจากไฟล์สำรองที่เคยดาวน์โหลดไว้</p>
+            <div class="action-box-info">
+              <h4>📥 นำเข้าข้อมูล (Import)</h4>
+              <p>กู้คืนข้อมูลจากไฟล์สำรองที่เคยดาวน์โหลดไว้</p>
+            </div>
             <input type="file" id="importFileInput" accept=".json" style="display:none">
-            <button id="importJsonBtn" class="btn btn-secondary full-width">เลือกไฟล์เพื่อนำเข้า</button>
+            <button id="importJsonBtn" class="btn btn-secondary btn-sm full-width">เลือกไฟล์เพื่อนำเข้า</button>
           </div>
 
           <div class="backup-action-box">
-            <h4>✨ โหลดตัวอย่างร้านค้า & สินค้า</h4>
-            <p>โหลดชุดข้อมูลตัวอย่าง 2 สาขา สำหรับทดลองระบบ</p>
-            <button id="loadSampleDataBtn" class="btn btn-secondary full-width">โหลดข้อมูลตัวอย่าง</button>
+            <div class="action-box-info">
+              <h4>✨ โหลดข้อมูลตัวอย่าง</h4>
+              <p>โหลดชุดตัวอย่าง 2 สาขา สำหรับทดลองระบบ</p>
+            </div>
+            <button id="loadSampleDataBtn" class="btn btn-secondary btn-sm full-width">โหลดข้อมูลตัวอย่าง</button>
           </div>
 
           <div class="backup-action-box danger-box">
-            <h4>⚠️ ล้างข้อมูลทั้งหมด</h4>
-            <p>ล้างร้านค้า สต็อก และประวัติทั้งหมด</p>
-            <button id="resetAllDataBtn" class="btn btn-danger full-width">ล้างข้อมูลทั้งหมด</button>
+            <div class="danger-box-info">
+              <h4>⚠️ ล้างข้อมูลทั้งหมด</h4>
+              <p>รีเซ็ตร้านค้า สต็อก และประวัติทั้งหมดกลับเป็นศูนย์</p>
+            </div>
+            <button id="resetAllDataBtn" class="btn btn-danger btn-sm">ล้างข้อมูลทั้งหมด</button>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="closeBackupFooterBtn">ปิดหน้าต่าง</button>
+      <div class="modal-footer" style="padding-top: 14px; margin-top: 14px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="closeBackupFooterBtn">ปิดหน้าต่าง</button>
       </div>
     </div>
   </div>
