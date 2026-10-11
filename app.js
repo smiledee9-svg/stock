@@ -1507,12 +1507,12 @@ class MultiStoreStockApp {
       const actual = p.quantity || 0;
       const need = Math.max(0, target - actual);
       const unitLabel = (p.unit && p.unit !== 'ลูก') ? ` ${p.unit}` : '';
-      text += `${idx + 1}. ${p.name}\n   จำนวน: ${need}${unitLabel}\n`;
+      text += `${idx + 1}. ${p.name}\n   └ จำนวน: ${need}${unitLabel}\n`;
     });
     text = text.trimEnd() + '\n';
     const totalOrder = needOrderItems.reduce((sum, p) => sum + Math.max(0, (p.minAlert || 5) - (p.quantity || 0)), 0);
     text += `------------------------------------\n`;
-    text += `รวมทั้งหมด: ${totalOrder}`;
+    text += `📌 รวมทั้งหมด: ${totalOrder}`;
 
     // Copy to clipboard always for safety/instant paste
     if (navigator.clipboard && navigator.clipboard.writeText) {
