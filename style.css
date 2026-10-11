@@ -287,52 +287,86 @@ body {
 }
 
 /* Stores Cards Grid */
+/* Stores Cards List (Horizontal Full-Width Rows) */
 .stores-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }
 
 .store-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 18px 24px;
   box-shadow: var(--shadow-sm);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
+  gap: 24px;
   transition: var(--transition);
   position: relative;
+  width: 100%;
 }
 
 .store-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: rgba(99, 102, 241, 0.45);
 }
 
-.store-card-header {
+.store-card-left {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 18px;
+  flex: 1;
+  min-width: 0;
 }
 
 .store-avatar {
   font-family: var(--font-code);
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--primary);
   background: var(--primary-light);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  width: 44px;
-  height: 44px;
+  border: 1.5px solid rgba(99, 102, 241, 0.28);
+  width: 52px;
+  height: 52px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.store-info-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.store-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.store-name-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.35;
+  margin: 0;
+  word-break: break-word;
+}
+
+.store-status-wrap {
+  display: inline-flex;
+  align-items: center;
 }
 
 .store-code-pill {
@@ -344,23 +378,6 @@ body {
   background: var(--primary-light);
   padding: 3px 10px;
   border-radius: var(--radius-full);
-}
-
-.store-name-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-main);
-  line-height: 1.35;
-  margin-bottom: 8px;
-  word-break: break-word;
-  height: 2.7em;
-  min-height: 2.7em;
-  max-height: 2.7em;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2;
-  overflow: hidden;
 }
 
 .store-tag-badge {
@@ -375,73 +392,115 @@ body {
 }
 
 .store-desc-text {
-  font-size: 1.15rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 400;
   color: var(--text-muted);
-  margin-bottom: 16px;
-  line-height: 1.35;
+  line-height: 1.45;
+  margin: 0;
   word-break: break-word;
-  height: 4.05em;
-  min-height: 4.05em;
-  max-height: 4.05em;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  line-clamp: 3;
-  overflow: hidden;
+}
+
+.store-card-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
 }
 
 .store-stats-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   background: var(--bg-primary);
-  padding: 12px;
+  border: 1px solid var(--card-border);
+  padding: 8px 18px;
   border-radius: var(--radius-md);
-  margin-bottom: 16px;
+  margin: 0;
 }
 
 .store-stat-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 80px;
+}
+
+.store-stat-item:first-child {
+  border-right: 1px solid var(--card-border);
+  padding-right: 16px;
 }
 
 .store-stat-val {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
   font-family: var(--font-code);
   color: var(--text-main);
+  line-height: 1.2;
 }
 
 .store-stat-lbl {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  margin-top: 3px;
 }
 
 .store-card-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
 .btn-open-store {
-  flex: 1;
   background: var(--primary);
   color: #ffffff;
   border: none;
   font-weight: 600;
-  padding: 10px 14px;
+  padding: 11px 20px;
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: var(--transition);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .btn-open-store:hover {
   background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+}
+
+.btn-card-more {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: var(--transition);
+}
+
+.btn-card-more:hover {
+  color: var(--text-main);
+  background: var(--card-border);
+  transform: translateY(-1px);
+}
+
+.btn-card-more.btn-delete-store:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
 }
 
 /* ================= VIEW 2: ACTIVE STORE BANNER ================= */
@@ -2145,11 +2204,60 @@ body {
     padding: 5px 10px;
     font-size: 0.88rem;
   }
+
+  .store-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 18px 20px;
+  }
+
+  .store-card-right {
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .btn-open-store {
+    flex: 1;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 640px) {
   .app-container {
     padding: 12px 14px;
+  }
+
+  .store-card {
+    padding: 16px;
+  }
+
+  .store-card-left {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .store-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  .store-card-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .store-stats-row {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .store-card-actions {
+    width: 100%;
   }
 
   .brand-title {

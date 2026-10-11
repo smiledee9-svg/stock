@@ -1009,20 +1009,20 @@ class MultiStoreStockApp {
 
       return `
         <article class="store-card">
-          <div>
-            <!-- บรรทัดบน: สำหรับ 01 ฝั่งซ้าย และ ข้อความใกล้หมด ฝั่งขวา -->
-            <div class="store-card-header">
-              <div class="store-avatar">${storeCode}</div>
-              <div>
-                ${lowCount > 0 ? `<span class="stock-status-pill status-warning">⚠️ ใกล้หมด ${lowCount}</span>` : `<span class="stock-status-pill status-normal">ปกติ</span>`}
+          <div class="store-card-left">
+            <div class="store-avatar">${storeCode}</div>
+            <div class="store-info-content">
+              <div class="store-title-wrap">
+                <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
+                <div class="store-status-wrap">
+                  ${lowCount > 0 ? `<span class="stock-status-pill status-warning">⚠️ ใกล้หมด ${lowCount}</span>` : `<span class="stock-status-pill status-normal">ปกติ</span>`}
+                </div>
               </div>
+              <p class="store-desc-text">${this.escapeHtml(store.desc || 'ไม่มีรายละเอียด')}</p>
             </div>
+          </div>
 
-            <!-- บรรทัดที่สอง: สำหรับข้อความใหญ่สีขาว เต็มพื้นที่ทำให้อ่านง่าย -->
-            <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
-
-            <p class="store-desc-text">${this.escapeHtml(store.desc || 'ไม่มีรายละเอียด')}</p>
-
+          <div class="store-card-right">
             <div class="store-stats-row">
               <div class="store-stat-item">
                 <span class="store-stat-val">${skuCount}</span>
@@ -1033,21 +1033,21 @@ class MultiStoreStockApp {
                 <span class="store-stat-lbl">จำนวนชิ้นรวม</span>
               </div>
             </div>
-          </div>
 
-          <div class="store-card-actions">
-            <button class="btn-open-store" onclick="window.app.selectStore('${store.id}')">
-              <span>เปิดจัดการสต็อก</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
-            <button class="btn-card-more" title="แก้ไขชื่อร้าน" onclick="window.app.openEditStoreModal('${store.id}')">
-              ✏️
-            </button>
-            <button class="btn-card-more" title="ลบร้านนี้" onclick="window.app.deleteStore('${store.id}')">
-              🗑️
-            </button>
+            <div class="store-card-actions">
+              <button class="btn-open-store" onclick="window.app.selectStore('${store.id}')">
+                <span>เปิดจัดการสต็อก</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+              <button class="btn-card-more" title="แก้ไขข้อมูลร้าน" onclick="window.app.openEditStoreModal('${store.id}')">
+                ✏️
+              </button>
+              <button class="btn-card-more btn-delete-store" title="ลบร้านนี้" onclick="window.app.deleteStore('${store.id}')">
+                🗑️
+              </button>
+            </div>
           </div>
         </article>
       `;
