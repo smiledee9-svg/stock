@@ -1161,11 +1161,10 @@ class MultiStoreStockApp {
     if (copyOrderBtn) {
       if (needOrderItems.length > 0) {
         copyOrderBtn.className = 'btn btn-primary btn-sm';
-        copyOrderBtn.innerHTML = `<span>📋 สั่งของเข้า LINE (${needOrderItems.length})</span>`;
       } else {
         copyOrderBtn.className = 'btn btn-secondary btn-sm';
-        copyOrderBtn.innerHTML = `<span>📋 สั่งของเข้า LINE</span>`;
       }
+      copyOrderBtn.innerHTML = `<span>📋 สั่งของเข้า LINE</span>`;
     }
 
     // 1. Render Compact 4-Column Table View (แบบย่อ ง่าย เบา เร็ว ตามรูป)
