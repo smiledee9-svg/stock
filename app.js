@@ -1403,21 +1403,35 @@ class MultiStoreStockApp {
               </div>
             </td>
 
-            <!-- 4. สต็อกเป้าหมาย (ปรับได้แบบส่วนนับได้จริง) -->
+            <!-- 4. สต็อกเป้าหมาย (ปรับได้ด้วยปุ่ม +/- พิมพ์ หรือกดไอคอนไมค์สั่งด้วยเสียง) -->
             <td class="text-center">
-              <div class="actual-count-stepper">
+              <div class="actual-count-stepper target-stepper">
                 <button class="stepper-btn" type="button" title="ลดเป้าหมาย 1" onclick="window.app.quickAdjustTarget('${item.id}', -1)">−</button>
-                <span class="actual-val" title="คลิกเพื่อพิมพ์สต็อกเป้าหมาย" onclick="window.app.quickSetTarget('${item.id}')">${target}</span>
+                <span class="actual-val" id="val-target-${item.id}" title="คลิกเพื่อพิมพ์สต็อกเป้าหมาย" onclick="window.app.quickSetTarget('${item.id}')">${target}</span>
                 <button class="stepper-btn" type="button" title="เพิ่มเป้าหมาย 1" onclick="window.app.quickAdjustTarget('${item.id}', 1)">+</button>
+                <button class="stepper-mic-btn mic-target-btn" type="button" id="mic-target-${item.id}" title="พูดสต็อกเป้าหมาย (เช่น '5', 'เป้า 5')" onclick="window.app.toggleRowVoiceInput('${item.id}', 'target')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                  </svg>
+                </button>
               </div>
             </td>
 
-            <!-- 5. นับได้จริง (นับง่ายเร็วด้วยปุ่ม +/- หรือคลิกพิมพ์เลข) -->
+            <!-- 5. นับได้จริง (ปรับได้ด้วยปุ่ม +/- พิมพ์ หรือกดไอคอนไมค์สั่งด้วยเสียง) -->
             <td class="text-center">
-              <div class="actual-count-stepper">
+              <div class="actual-count-stepper actual-stepper">
                 <button class="stepper-btn" type="button" title="ลด 1" onclick="window.app.quickAdjustCount('${item.id}', -1)">−</button>
-                <span class="actual-val" title="คลิกเพื่อพิมพ์จำนวนที่นับได้ตรงๆ" onclick="window.app.quickSetCount('${item.id}')">${actual}</span>
+                <span class="actual-val" id="val-actual-${item.id}" title="คลิกเพื่อพิมพ์จำนวนที่นับได้ตรงๆ" onclick="window.app.quickSetCount('${item.id}')">${actual}</span>
                 <button class="stepper-btn" type="button" title="เพิ่ม 1" onclick="window.app.quickAdjustCount('${item.id}', 1)">+</button>
+                <button class="stepper-mic-btn mic-actual-btn" type="button" id="mic-actual-${item.id}" title="พูดจำนวนนับได้จริง (เช่น '2', 'นับได้ 2')" onclick="window.app.toggleRowVoiceInput('${item.id}', 'actual')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                  </svg>
+                </button>
               </div>
             </td>
 
@@ -1612,6 +1626,179 @@ class MultiStoreStockApp {
     this.renderStoreDetail();
     const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
     this.showToast(`อัปเดต "${product.name}" เป็น ${newQty}${unitStr} เรียบร้อย`, 'success');
+  }
+
+  // แยกวิเคราะห์ตัวเลขสำหรับระบบเสียงสั่งปรับสต็อก (เป้าหมาย / นับได้จริง)
+  parseQuantityFromVoice(rawText) {
+    if (!rawText) return null;
+    let text = String(rawText).trim();
+
+    // 1. นำ comma ในตัวเลขออก (เช่น "1,000" -> "1000")
+    text = text.replace(/(\d),(\d)/g, '$1$2');
+
+    // 2. ตรวจหาตัวเลขอารบิกโดยตรง (เช่น "5", "เป้า 5", "นับได้ 2", "10 ชิ้น")
+    const numMatch = text.match(/\d+/);
+    if (numMatch) {
+      const val = parseInt(numMatch[0], 10);
+      if (!isNaN(val)) return val;
+    }
+
+    // 3. แปลงเลขไทย (๑, ๒, ๓...)
+    const thaiDigitMap = { '๐': 0, '๑': 1, '๒': 2, '๓': 3, '๔': 4, '๕': 5, '๖': 6, '๗': 7, '๘': 8, '๙': 9 };
+    let thaiDigitStr = '';
+    for (const ch of text) {
+      if (thaiDigitMap[ch] !== undefined) thaiDigitStr += thaiDigitMap[ch];
+    }
+    if (thaiDigitStr.length > 0) {
+      const val = parseInt(thaiDigitStr, 10);
+      if (!isNaN(val)) return val;
+    }
+
+    // 4. ตัดคำนำหน้าและคำลงท้าย
+    let clean = text
+      .replace(/(?:สต็อกเป้าหมาย|เป้าสต็อก|สต็อกเป้า|เป้าหมาย|ตั้งเป้า|เป้า|สต็อกจริง|นับได้จริง|นับจริง|นับได้|มีสต็อก|ของมี|ยอดนับ|มีจริง|มี|เหลือ|จำนวน|ปรับเป็น)/gi, '')
+      .replace(/(?:ลูก|ชิ้น|กล่อง|ตัว|ก้อน|ใบ|อัน|แพ็ค|เครื่อง|ถัง|กระป๋อง|ครับ|ค่ะ|คะ)/gi, '')
+      .trim();
+
+    // 5. แปลงเลขหลักสิบผสมหลักหน่วย (เช่น ยี่สิบสอง, สามสิบห้า, สี่สิบสอง)
+    const tensMap = { 'ยี่สิบ': 20, 'สามสิบ': 30, 'สี่สิบ': 40, 'ห้าสิบ': 50, 'หกสิบ': 60, 'เจ็ดสิบ': 70, 'แปดสิบ': 80, 'เก้าสิบ': 90 };
+    const onesMap = { 'หนึ่ง': 1, 'เอ็ด': 1, 'สอง': 2, 'สาม': 3, 'สี่': 4, 'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9 };
+    for (const [tWord, tVal] of Object.entries(tensMap)) {
+      if (clean.includes(tWord)) {
+        const remainder = clean.replace(tWord, '').trim();
+        if (!remainder) return tVal;
+        for (const [oWord, oVal] of Object.entries(onesMap)) {
+          if (remainder.includes(oWord)) {
+            return tVal + oVal;
+          }
+        }
+        return tVal;
+      }
+    }
+
+    // 6. แปลงคำอ่านภาษาไทยเดี่ยวๆ
+    const thaiWordMap = {
+      'ศูนย์': 0, 'หนึ่ง': 1, 'เอ็ด': 1, 'สอง': 2, 'ยี่': 2, 'สาม': 3, 'สี่': 4,
+      'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9, 'สิบ': 10,
+      'สิบเอ็ด': 11, 'สิบสอง': 12, 'สิบสาม': 13, 'สิบสี่': 14, 'สิบห้า': 15,
+      'สิบหก': 16, 'สิบเจ็ด': 17, 'สิบแปด': 18, 'สิบเก้า': 19,
+      'หนึ่งร้อย': 100, 'ร้อย': 100
+    };
+
+    if (thaiWordMap[clean] !== undefined) {
+      return thaiWordMap[clean];
+    }
+
+    const sortedWords = Object.keys(thaiWordMap).sort((a, b) => b.length - a.length);
+    for (const w of sortedWords) {
+      if (clean.includes(w)) {
+        return thaiWordMap[w];
+      }
+    }
+
+    return null;
+  }
+
+  // กดไอคอนไมค์ประจำช่อง (แยกอิสระ: 'target' สต็อกเป้าหมาย / 'actual' นับได้จริง)
+  toggleRowVoiceInput(productId, fieldType) {
+    const btnId = `mic-${fieldType}-${productId}`;
+    const btn = document.getElementById(btnId);
+    const isListening = btn && btn.classList.contains('listening');
+
+    if (isListening) {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+      return;
+    }
+
+    if (!this.speechSupported) {
+      this.showToast('เบราว์เซอร์นี้ยังไม่รองรับระบบสั่งงานด้วยเสียง แนะนำให้เปิดด้วย Chrome หรือ Safari ครับ', 'warning');
+      return;
+    }
+
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    this.stopAnyActiveVoice();
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'th-TH';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    const valEl = document.getElementById(`val-${fieldType}-${productId}`);
+
+    if (btn) btn.classList.add('listening');
+    if (valEl) valEl.classList.add('listening-val');
+    this.playVoiceSound('start');
+    this.activeVoiceRecognition = recognition;
+
+    const fieldLabel = fieldType === 'target' ? 'สต็อกเป้าหมาย' : 'นับได้จริง';
+    this.showToast(`🎙️ กำลังฟัง [${fieldLabel}] ของ "${product.name}"... พูดตัวเลขได้เลย`, 'info', 2500);
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      const parsedNumber = this.parseQuantityFromVoice(transcript);
+
+      if (parsedNumber !== null && !isNaN(parsedNumber) && parsedNumber >= 0) {
+        if (fieldType === 'target') {
+          product.minAlert = parsedNumber;
+          product.updatedAt = new Date().toISOString();
+          this.saveProducts();
+          this.renderStoreDetail();
+          this.playVoiceSound('success');
+          const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
+          this.showToast(`🎯 ${product.name}: ปรับสต็อกเป้าหมายเป็น ${parsedNumber}${unitStr} 🎙️`, 'success');
+        } else {
+          const oldQty = product.quantity || 0;
+          const diff = parsedNumber - oldQty;
+          product.quantity = parsedNumber;
+          product.updatedAt = new Date().toISOString();
+
+          if (diff !== 0) {
+            this.logHistory({
+              storeId: product.storeId,
+              productId: product.id,
+              productName: product.name,
+              type: diff > 0 ? 'IN' : 'OUT',
+              amount: Math.abs(diff),
+              balanceAfter: parsedNumber,
+              reason: 'นับสต็อกด้วยเสียงหน้าร้าน'
+            });
+          }
+
+          this.saveProducts();
+          this.renderStoreDetail();
+          this.playVoiceSound('success');
+          const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
+          this.showToast(`📦 ${product.name}: นับได้จริง ${parsedNumber}${unitStr} 🎙️`, 'success');
+        }
+      } else {
+        this.playVoiceSound('error');
+        this.showToast(`ได้ยินว่า "${transcript}" แต่ไม่พบตัวเลข กรุณาลองพูดตัวเลขชัดๆ อีกครั้งครับ`, 'warning');
+      }
+    };
+
+    recognition.onerror = (e) => {
+      this.stopAnyActiveVoice();
+      this.playVoiceSound('error');
+      if (e.error === 'not-allowed') {
+        this.showToast('กรุณากดยินยอม (Allow) ให้เบราว์เซอร์ใช้ไมโครโฟน เพื่อสั่งงานด้วยเสียง', 'warning');
+      }
+    };
+
+    recognition.onend = () => {
+      if (btn) btn.classList.remove('listening');
+      if (valEl) valEl.classList.remove('listening-val');
+      this.activeVoiceRecognition = null;
+    };
+
+    try {
+      recognition.start();
+    } catch (err) {
+      this.stopAnyActiveVoice();
+    }
   }
 
   openLineSettingsModal() {
@@ -2031,6 +2218,8 @@ class MultiStoreStockApp {
       } catch (e) {}
       this.activeVoiceRecognition = null;
     }
+    document.querySelectorAll('.stepper-mic-btn.listening').forEach(btn => btn.classList.remove('listening'));
+    document.querySelectorAll('.actual-val.listening-val').forEach(el => el.classList.remove('listening-val'));
     this.setVoiceUiState('idle');
   }
 
@@ -2057,6 +2246,8 @@ class MultiStoreStockApp {
       if (nameBtn) nameBtn.classList.remove('listening');
       const searchBtn = document.getElementById('voiceSearchBtn');
       if (searchBtn) searchBtn.classList.remove('listening');
+      document.querySelectorAll('.stepper-mic-btn.listening').forEach(btn => btn.classList.remove('listening'));
+      document.querySelectorAll('.actual-val.listening-val').forEach(el => el.classList.remove('listening-val'));
 
     } else if (state === 'connecting') {
       if (smartBtn) {
