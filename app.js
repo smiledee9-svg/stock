@@ -1885,6 +1885,9 @@ class MultiStoreStockApp {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
@@ -1921,7 +1924,10 @@ class MultiStoreStockApp {
     if (!raw) return '';
     let text = raw.trim();
 
-    // Standardize common Thai battery brands into standard uppercase
+    // 1. Remove commas inside numbers (e.g. "1,400" -> "1400", "1,850" -> "1850")
+    text = text.replace(/(\d),(\d)/g, '$1$2');
+
+    // 2. Standardize common Thai battery brands into standard uppercase
     text = text.replace(/จี\s*เอส/gi, 'GS');
     text = text.replace(/สาม\s*เค|3\s*เค/gi, '3K');
     text = text.replace(/เอฟ\s*บี/gi, 'FB');
@@ -1931,9 +1937,26 @@ class MultiStoreStockApp {
     text = text.replace(/โบลิเดน|โบลิเด็น/gi, 'Boliden');
     text = text.replace(/พูม่า|พูมา/gi, 'Puma');
     text = text.replace(/บ๊อช|บอช/gi, 'Bosch');
+    text = text.replace(/ฮิตาชิ/gi, 'Hitachi');
+    text = text.replace(/เดลคอร์/gi, 'Delkor');
+    text = text.replace(/วาร์ต้า|วาร์ตา/gi, 'Varta');
+    text = text.replace(/โรเค็ต|ร็อกเก็ต/gi, 'Rocket');
     text = text.replace(/ดีไอเอ็น|ดิน/gi, 'DIN');
+    text = text.replace(/อี\s*เอฟ\s*บี/gi, 'EFB');
+    text = text.replace(/เอ\s*จี\s*เอ็ม/gi, 'AGM');
 
-    // Standardize battery size letters (B, D, L, R, LN) both English and Thai spoken
+    // 3. Convert Thai spoken numbers directly attached to action keywords
+    const thaiNumMap = {
+      'ศูนย์': 0, 'หนึ่ง': 1, 'สอง': 2, 'สาม': 3, 'สี่': 4,
+      'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9, 'สิบ': 10
+    };
+    for (const [k, v] of Object.entries(thaiNumMap)) {
+      // Handles both connected words (e.g. "เป้าห้า" -> "เป้า 5", "นับได้สอง" -> "นับได้ 2")
+      const rKeyword = new RegExp(`(สต็อกเป้าหมาย|เป้าสต็อก|สต็อกเป้า|เป้าหมาย|ตั้งเป้า|เป้า|สต็อกจริง|นับได้จริง|นับจริง|นับได้|มีสต็อก|ของมี|ยอดนับ|มีจริง|มี|เหลือ|ทุน|ขาย)\\s*${k}`, 'gi');
+      text = text.replace(rKeyword, `$1 ${v}`);
+    }
+
+    // 4. Standardize battery size letters (B, D, L, R, LN, DIN)
     text = text.replace(/(\d+)\s*(?:b|บี)\s*(\d+)\s*(?:l|แอล)/gi, '$1B$2L');
     text = text.replace(/(\d+)\s*(?:b|บี)\s*(\d+)\s*(?:r|อาร์)/gi, '$1B$2R');
     text = text.replace(/(\d+)\s*(?:d|ดี)\s*(\d+)\s*(?:l|แอล)/gi, '$1D$2L');
@@ -1941,9 +1964,10 @@ class MultiStoreStockApp {
     text = text.replace(/(?:ln|แอล\s*เอ็น)\s*(\d+)/gi, 'LN$1');
     text = text.replace(/(?:din|ดิน|ดี\s*ไอ\s*เอ็น)\s*(\d+)/gi, 'DIN$1');
 
-    // Clean Thai polarity terms
+    // 5. Clean Thai polarity & vehicle terms
     text = text.replace(/ขั้ว\s*(?:แอล|l)/gi, 'ขั้ว L');
     text = text.replace(/ขั้ว\s*(?:อาร์|r)/gi, 'ขั้ว R');
+    text = text.replace(/กะบะ/gi, 'กระบะ');
 
     return text;
   }
@@ -1958,46 +1982,39 @@ class MultiStoreStockApp {
       quantity: null
     };
 
-    // Convert Thai spoken small numbers with Thai-friendly boundary
-    const thaiNumMap = {
-      'ศูนย์': 0, 'หนึ่ง': 1, 'สอง': 2, 'สาม': 3, 'สี่': 4,
-      'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9, 'สิบ': 10
-    };
-    for (const [k, v] of Object.entries(thaiNumMap)) {
-      const r = new RegExp('(^|[^ก-๙a-zA-Z0-9])' + k + '(?=[^ก-๙a-zA-Z0-9]|$)', 'g');
-      text = text.replace(r, '$1' + v);
-    }
-
-    // 1. Cost Price: "ทุน 1400", "ราคาทุน 1400", "ซื้อมา 1400"
-    const costMatch = text.match(/(?:ราคาทุน|ทุน|ซื้อมา|ต้นทุน)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)/i);
+    // 1. Cost Price: "ทุน 1400", "ทุน 1,400 บาท", "รับมา 1400", "ราคาทุน 1400 บาท"
+    const costMatch = text.match(/(?:ราคาทุน|ต้นทุน|ทุนลูกละ|ทุนชิ้นละ|ทุน|ซื้อมา|รับมา)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:บาท)?/i);
     if (costMatch) {
-      result.costPrice = parseFloat(costMatch[1]);
+      result.costPrice = parseFloat(costMatch[1].replace(/,/g, ''));
       text = text.replace(costMatch[0], ' ');
     }
 
-    // 2. Selling Price: "ราคาขาย 1850", "ขาย 1850", "ขายจริง 1850"
-    const priceMatch = text.match(/(?:ราคาขาย|ขายจริง|ขาย)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)/i);
+    // 2. Selling Price: "ราคาขาย 1850", "ขาย 1850 บาท", "ขายจริง 1850", "ขายหน้าร้าน 1850"
+    const priceMatch = text.match(/(?:ราคาขายจริง|ราคาขาย|ขายหน้าร้าน|ขายจริง|ขายลูกละ|ขายชิ้นละ|ขาย)\s*[:=]?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:บาท)?/i);
     if (priceMatch) {
-      result.price = parseFloat(priceMatch[1]);
+      result.price = parseFloat(priceMatch[1].replace(/,/g, ''));
       text = text.replace(priceMatch[0], ' ');
     }
 
-    // 3. Target Stock: "สต็อกเป้าหมาย 5", "เป้าหมาย 5", "เป้า 5"
-    const targetMatch = text.match(/(?:สต็อกเป้าหมาย|เป้าหมาย|เป้า)\s*[:=]?\s*([0-9]+)/i);
+    // 3. Target Stock: "สต็อกเป้าหมาย 5", "เป้าหมาย 5 ลูก", "ตั้งเป้า 5", "เป้า 5"
+    const targetMatch = text.match(/(?:สต็อกเป้าหมาย|เป้าสต็อก|สต็อกเป้า|เป้าหมาย|ตั้งเป้า|เป้า)\s*[:=]?\s*([0-9]+)\s*(?:ลูก|ชิ้น|กล่อง|ตัว|ก้อน|ใบ)?/i);
     if (targetMatch) {
       result.minAlert = parseInt(targetMatch[1], 10);
       text = text.replace(targetMatch[0], ' ');
     }
 
-    // 4. Actual Counted Stock: "นับได้จริง 2", "นับได้ 2", "มีจริง 2", "มี 2", "เหลือ 2"
-    const actualMatch = text.match(/(?:นับได้จริง|นับได้|มีจริง|มีสต็อก|มี|เหลือ)\s*[:=]?\s*([0-9]+)(?:\s*(?:ลูก|ชิ้น|กล่อง|ตัว|ก้อน))?/i);
+    // 4. Actual Counted Stock: "นับได้จริง 2", "นับได้ 2", "มีจริง 2", "เหลือ 2 ลูก"
+    const actualMatch = text.match(/(?:สต็อกจริง|นับได้จริง|นับจริง|นับได้|มีสต็อก|ของมี|ยอดนับ|มีจริง|มี|เหลือ)\s*[:=]?\s*([0-9]+)\s*(?:ลูก|ชิ้น|กล่อง|ตัว|ก้อน|ใบ)?/i);
     if (actualMatch) {
       result.quantity = parseInt(actualMatch[1], 10);
       text = text.replace(actualMatch[0], ' ');
     }
 
-    // 5. Clean up trigger phrases from product name
-    text = text.replace(/^(?:เพิ่มสินค้า|เพิ่มรายการ|เพิ่ม|บันทึก|รายการ)\s*/i, '');
+    // 5. Clean up stray currency words and trigger phrases from product name
+    text = text.replace(/\b(?:บาท)\b/gi, ' ');
+    text = text.replace(/(?:^|\s+)บาท(?:\s+|$)/gi, ' ');
+    text = text.replace(/^(?:เพิ่มสินค้า|เพิ่มรายการ|เพิ่ม|บันทึก|รายการ|สินค้า)\s*/i, '');
+    text = text.replace(/[,;:]+/g, ' ');
     text = text.replace(/\s+/g, ' ').trim();
 
     if (text.length > 0) {
@@ -2124,6 +2141,28 @@ class MultiStoreStockApp {
         nameEl.value = parsed.name;
         flashField('prodName');
         updatedCount++;
+      }
+
+      // Auto-assign smart SKU and category
+      const skuEl = document.getElementById('prodSku');
+      if (skuEl) {
+        skuEl.value = parsed.name.replace(/\s+/g, '-').toUpperCase();
+      }
+
+      const catEl = document.getElementById('prodCategory');
+      if (catEl) {
+        const lowerName = parsed.name.toLowerCase();
+        if (lowerName.includes('ขั้ว l') || lowerName.includes('b24l') || lowerName.includes('d23l') || lowerName.includes('d31l')) {
+          catEl.value = 'แบตเตอรี่ (ขั้ว L)';
+        } else if (lowerName.includes('ขั้ว r') || lowerName.includes('b24r') || lowerName.includes('d23r') || lowerName.includes('d31r')) {
+          catEl.value = 'แบตเตอรี่ (ขั้ว R)';
+        } else if (lowerName.includes('din') || lowerName.includes('ln')) {
+          catEl.value = 'แบตเตอรี่ (DIN ยุโรป)';
+        } else if (lowerName.includes('ดีเซล') || lowerName.includes('กระบะ') || lowerName.includes('d31')) {
+          catEl.value = 'แบตเตอรี่ (กระบะ/ดีเซล)';
+        } else if (lowerName.includes('efb') || lowerName.includes('iss') || lowerName.includes('agm')) {
+          catEl.value = 'แบตเตอรี่ (EFB/ISS)';
+        }
       }
     }
 
