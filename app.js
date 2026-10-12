@@ -2031,26 +2031,74 @@ class MultiStoreStockApp {
       } catch (e) {}
       this.activeVoiceRecognition = null;
     }
-    // Reset all voice button UI states
+    this.setVoiceUiState('idle');
+  }
+
+  setVoiceUiState(state) {
     const smartBtn = document.getElementById('voiceSmartBtn');
-    if (smartBtn) {
-      smartBtn.classList.remove('listening');
-      const title = document.getElementById('voiceSmartTitle');
-      if (title) title.textContent = '🎙️ แตะแล้วพูดเพื่อกรอกอัตโนมัติ';
-    }
+    const title = document.getElementById('voiceSmartTitle');
+    const indicator = document.getElementById('voiceStatusIndicator');
+    const vuMeter = document.getElementById('analogVuMeter');
     const transcriptBox = document.getElementById('voiceLiveTranscript');
-    if (transcriptBox) transcriptBox.style.display = 'none';
 
-    const nameBtn = document.getElementById('voiceNameFieldBtn');
-    if (nameBtn) nameBtn.classList.remove('listening');
+    if (state === 'idle') {
+      if (smartBtn) {
+        smartBtn.classList.remove('listening', 'connecting');
+      }
+      if (title) title.innerHTML = '🎙️ แตะแล้วพูดเพื่อกรอกอัตโนมัติ';
+      if (indicator) {
+        indicator.className = 'voice-status-indicator status-idle';
+        indicator.title = 'สถานะไมค์: สแตนด์บาย (แตะเพื่อเริ่ม)';
+      }
+      if (vuMeter) vuMeter.classList.remove('active');
+      if (transcriptBox) transcriptBox.style.display = 'none';
 
-    const searchBtn = document.getElementById('voiceSearchBtn');
-    if (searchBtn) searchBtn.classList.remove('listening');
+      const nameBtn = document.getElementById('voiceNameFieldBtn');
+      if (nameBtn) nameBtn.classList.remove('listening');
+      const searchBtn = document.getElementById('voiceSearchBtn');
+      if (searchBtn) searchBtn.classList.remove('listening');
+
+    } else if (state === 'connecting') {
+      if (smartBtn) {
+        smartBtn.classList.remove('listening');
+        smartBtn.classList.add('connecting');
+      }
+      if (title) title.innerHTML = '<span style="color: #f59e0b;">⏳ กำลังเชื่อมต่อไมโครโฟน...</span>';
+      if (indicator) {
+        indicator.className = 'voice-status-indicator status-connecting';
+        indicator.title = 'กำลังเชื่อมต่อสัญญาณไมค์...';
+      }
+      if (vuMeter) vuMeter.classList.remove('active');
+
+    } else if (state === 'live') {
+      if (smartBtn) {
+        smartBtn.classList.remove('connecting');
+        smartBtn.classList.add('listening');
+      }
+      if (title) title.innerHTML = '<span style="color: #22c55e;">🟢 ไมค์เชื่อมต่อแล้ว... พูดได้เลยครับ</span>';
+      if (indicator) {
+        indicator.className = 'voice-status-indicator status-live';
+        indicator.title = 'ไมค์เปิดแล้ว สัญญาณพร้อม (กำลังรับฟังเสียง)';
+      }
+      if (vuMeter) vuMeter.classList.add('active');
+      if (transcriptBox) transcriptBox.style.display = 'flex';
+
+    } else if (state === 'error') {
+      if (smartBtn) {
+        smartBtn.classList.remove('listening', 'connecting');
+      }
+      if (title) title.innerHTML = '<span style="color: #ef4444;">❌ ไมค์ไม่พร้อมใช้งาน หรือถูกบล็อก</span>';
+      if (indicator) {
+        indicator.className = 'voice-status-indicator status-error';
+        indicator.title = 'ไมค์ขัดข้องหรือยังไม่ได้อนุญาต';
+      }
+      if (vuMeter) vuMeter.classList.remove('active');
+    }
   }
 
   toggleVoiceSmartInput() {
     const smartBtn = document.getElementById('voiceSmartBtn');
-    const isListening = smartBtn && smartBtn.classList.contains('listening');
+    const isListening = smartBtn && (smartBtn.classList.contains('listening') || smartBtn.classList.contains('connecting'));
 
     if (isListening) {
       this.stopAnyActiveVoice();
@@ -2073,15 +2121,19 @@ class MultiStoreStockApp {
 
     const transcriptBox = document.getElementById('voiceLiveTranscript');
     const transcriptText = document.getElementById('voiceTranscriptText');
-    const title = document.getElementById('voiceSmartTitle');
 
-    if (smartBtn) smartBtn.classList.add('listening');
-    if (title) title.textContent = '🎙️ กำลังฟังเสียง... พูดได้เลยครับ';
-    if (transcriptBox) transcriptBox.style.display = 'flex';
-    if (transcriptText) transcriptText.textContent = 'กำลังฟัง...';
+    // 1. สเต็ปที่ 1: กำลังเชื่อมต่อไมค์ทันทีที่กดปุ่ม (ไฟสีส้ม Connecting)
+    this.setVoiceUiState('connecting');
+    if (transcriptText) transcriptText.textContent = 'กำลังเชื่อมต่อไมโครโฟน...';
 
-    this.playVoiceSound('start');
     this.activeVoiceRecognition = recognition;
+
+    // 2. สเต็ปที่ 2: เมื่อไมโครโฟนของฮาร์ดแวร์เปิดติดจริง (onstart) -> ไฟเขียวอนาล็อกติดสว่าง 🟢 พร้อมเสียงชิล์ม
+    recognition.onstart = () => {
+      this.setVoiceUiState('live');
+      this.playVoiceSound('start');
+      if (transcriptText) transcriptText.textContent = 'กำลังฟัง...';
+    };
 
     recognition.onresult = (e) => {
       let interim = '';
@@ -2102,23 +2154,28 @@ class MultiStoreStockApp {
     };
 
     recognition.onerror = (e) => {
-      this.stopAnyActiveVoice();
+      this.setVoiceUiState('error');
       this.playVoiceSound('error');
       if (e.error === 'not-allowed') {
         this.showToast('กรุณากดยินยอม (Allow) ให้เบราว์เซอร์ใช้ไมโครโฟน เพื่อสั่งงานด้วยเสียง', 'warning');
       } else if (e.error !== 'no-speech') {
         this.showToast('ไม่ได้ยินเสียง หรือเกิดข้อผิดพลาด ลองใหม่อีกครั้งครับ', 'info');
       }
+      setTimeout(() => {
+        this.setVoiceUiState('idle');
+      }, 2500);
     };
 
     recognition.onend = () => {
-      this.stopAnyActiveVoice();
+      this.setVoiceUiState('idle');
+      this.activeVoiceRecognition = null;
     };
 
     try {
       recognition.start();
     } catch (err) {
-      this.stopAnyActiveVoice();
+      this.setVoiceUiState('error');
+      this.activeVoiceRecognition = null;
     }
   }
 

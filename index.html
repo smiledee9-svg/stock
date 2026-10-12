@@ -321,7 +321,15 @@
               <div class="voice-smart-title" id="voiceSmartTitle">🎙️ แตะแล้วพูดเพื่อกรอกอัตโนมัติ</div>
               <div class="voice-smart-hint" id="voiceSmartHint">เช่น "GS 46B24L ทุน 1400 ขาย 1850 เป้า 5 นับได้ 2"</div>
             </div>
-            <span class="voice-status-indicator" id="voiceStatusIndicator"></span>
+            <div class="voice-status-wrap">
+              <div class="analog-vu-meter" id="analogVuMeter">
+                <span class="vu-bar"></span>
+                <span class="vu-bar"></span>
+                <span class="vu-bar"></span>
+                <span class="vu-bar"></span>
+              </div>
+              <span class="voice-status-indicator status-idle" id="voiceStatusIndicator" title="สถานะไมค์: สแตนด์บาย"></span>
+            </div>
           </button>
           <div class="voice-live-transcript" id="voiceLiveTranscript" style="display: none;">
             <span class="transcript-tag">กำลังฟัง:</span>
