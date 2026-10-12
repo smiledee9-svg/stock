@@ -97,6 +97,59 @@ const DEFAULT_PRODUCTS = [
     price: 2250,       // ราคาขาย/หน่วย
     unit: "",
     updatedAt: new Date().toISOString()
+  },
+  // สินค้าตัวอย่างสำหรับ สาขา 2 (คลังสินค้าออนไลน์)
+  {
+    id: "prod_7",
+    storeId: "store_2",
+    name: "GS MFX-60L",
+    sku: "GS-MFX60L",
+    category: "แบตเตอรี่ (ขั้ว L)",
+    quantity: 4,
+    minAlert: 6,
+    costPrice: 1650,
+    price: 2150,
+    unit: "",
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "prod_8",
+    storeId: "store_2",
+    name: "3K MAX-75R",
+    sku: "3K-MAX75R",
+    category: "แบตเตอรี่ (ขั้ว R)",
+    quantity: 1,
+    minAlert: 4,
+    costPrice: 1800,
+    price: 2350,
+    unit: "",
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "prod_9",
+    storeId: "store_2",
+    name: "FB S-95 (Start-Stop)",
+    sku: "FB-S95",
+    category: "แบตเตอรี่ (EFB/ISS)",
+    quantity: 0,
+    minAlert: 3,
+    costPrice: 2700,
+    price: 3450,
+    unit: "",
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "prod_10",
+    storeId: "store_2",
+    name: "Amaron 85D23L Hi-Life",
+    sku: "AMR-85D23L",
+    category: "แบตเตอรี่ (ขั้ว L)",
+    quantity: 5,
+    minAlert: 5,
+    costPrice: 2100,
+    price: 2700,
+    unit: "",
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -133,6 +186,28 @@ const DEFAULT_HISTORY = [
     balanceAfter: 1,
     reason: "รถกระบะเปลี่ยนแบตเตอรี่",
     timestamp: new Date(Date.now() - 3600000 * 3).toISOString()
+  },
+  {
+    id: "hist_4",
+    storeId: "store_2",
+    productId: "prod_7",
+    productName: "GS MFX-60L",
+    type: "IN",
+    amount: 10,
+    balanceAfter: 10,
+    reason: "รับเข้าคลังสินค้าออนไลน์ ล็อตใหม่",
+    timestamp: new Date(Date.now() - 3600000 * 24).toISOString()
+  },
+  {
+    id: "hist_5",
+    storeId: "store_2",
+    productId: "prod_7",
+    productName: "GS MFX-60L",
+    type: "OUT",
+    amount: 6,
+    balanceAfter: 4,
+    reason: "แพ็คส่งออเดอร์ Shopee / TikTok",
+    timestamp: new Date(Date.now() - 3600000 * 5).toISOString()
   }
 ];
 
@@ -169,62 +244,92 @@ class MultiStoreStockApp {
       try {
         this.stores = JSON.parse(savedStores);
       } catch (e) {
-        this.stores = [...DEFAULT_STORES];
+        this.stores = JSON.parse(JSON.stringify(DEFAULT_STORES));
       }
     } else {
-      this.stores = [...DEFAULT_STORES];
-      this.saveStores();
+      this.stores = JSON.parse(JSON.stringify(DEFAULT_STORES));
     }
-
-    // Ensure all stores have sequential code (01, 02, ...)
-    this.stores = this.stores.map((s, idx) => ({
-      ...s,
-      code: s.code || String(idx + 1).padStart(2, '0')
-    }));
 
     if (savedProducts) {
       try {
         this.products = JSON.parse(savedProducts);
       } catch (e) {
-        this.products = [...DEFAULT_PRODUCTS];
+        this.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
       }
     } else {
-      this.products = [...DEFAULT_PRODUCTS];
-      this.saveProducts();
+      this.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
     }
 
-    // Auto-migrate costPrice if missing
+    if (savedHistory) {
+      try {
+        this.history = JSON.parse(savedHistory);
+      } catch (e) {
+        this.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+      }
+    } else {
+      this.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+    }
+
+    // Auto-migrate and upgrade data schema
+    this.upgradeAndMigrateData();
+
+    if (savedTheme === 'dark') {
+      document.body.setAttribute('data-theme', 'dark');
+    }
+
+    if (savedCurrentStore && this.stores.some(s => s.id === savedCurrentStore)) {
+      this.currentStoreId = savedCurrentStore;
+    } else {
+      this.currentStoreId = null;
+    }
+  }
+
+  // ระบบตรวจสอบและอัปเกรดความสมบูรณ์ของโครงสร้างข้อมูล (Data Integrity & Schema Upgrade)
+  upgradeAndMigrateData() {
+    let hasChanges = false;
+
+    // 1. ตรวจสอบร้านค้า (Stores)
+    if (!this.stores || this.stores.length === 0) {
+      this.stores = JSON.parse(JSON.stringify(DEFAULT_STORES));
+      hasChanges = true;
+    }
+
+    this.stores = this.stores.map((s, idx) => {
+      let updatedStore = { ...s };
+      let changed = false;
+      const expectedCode = String(idx + 1).padStart(2, '0');
+      if (!updatedStore.code) {
+        updatedStore.code = expectedCode;
+        changed = true;
+      }
+      if (!updatedStore.createdAt) {
+        updatedStore.createdAt = new Date().toISOString();
+        changed = true;
+      }
+      if (changed) hasChanges = true;
+      return updatedStore;
+    });
+
+    const storeIds = new Set(this.stores.map(s => s.id));
+    const fallbackStoreId = this.stores[0]?.id || 'store_1';
+
+    // 2. ตรวจสอบสินค้า (Products)
     const defaultCosts = {
       'GS-46B24L': 1400,
       '3K-55D23L': 1600,
       'FB-105D31L': 2200,
       'AMR-LN3': 2500,
       'PANA-50B24L': 1500,
-      'YUA-75D23L': 1750
+      'YUA-75D23L': 1750,
+      'GS-MFX60L': 1650,
+      '3K-MAX75R': 1800,
+      'FB-S95': 2700,
+      'AMR-85D23L': 2100
     };
-    let costUpdated = false;
-    this.products = this.products.map(p => {
-      let updated = { ...p };
-      let changed = false;
-      if (updated.costPrice === undefined || updated.costPrice === null) {
-        updated.costPrice = defaultCosts[p.sku] || Math.round((p.price || 0) * 0.75);
-        changed = true;
-      }
-      if (updated.unit === 'ลูก') {
-        updated.unit = '';
-        changed = true;
-      }
-      if (changed) {
-        costUpdated = true;
-        return updated;
-      }
-      return p;
-    });
-    if (costUpdated) {
-      this.saveProducts();
-    }
 
-    // Auto-migrate default clothing store to Battery Shop if detected
+    if (!this.products) this.products = [];
+
+    // Migrate default clothing store to Battery Shop if detected
     const firstStore = this.stores[0];
     const hasClothing = this.products.some(p => p.name && (p.name.includes("เสื้อยืด") || p.name.includes("กางเกง")));
     if (firstStore && (firstStore.name.includes("หน้าร้านสยาม") || hasClothing)) {
@@ -236,31 +341,95 @@ class MultiStoreStockApp {
       const otherProducts = this.products.filter(p => p.storeId !== this.stores[0].id && !p.name.includes("เสื้อยืด") && !p.name.includes("กางเกง"));
       this.products = [...DEFAULT_PRODUCTS, ...otherProducts];
       this.history = [...DEFAULT_HISTORY];
+      hasChanges = true;
+    }
+
+    // Auto-populate default products for store_2 if store_2 exists but has no products
+    const hasStore2 = this.stores.some(s => s.id === 'store_2');
+    const store2HasProducts = this.products.some(p => p.storeId === 'store_2');
+    if (hasStore2 && !store2HasProducts) {
+      const defaultStore2Products = DEFAULT_PRODUCTS.filter(p => p.storeId === 'store_2');
+      if (defaultStore2Products.length > 0) {
+        this.products.push(...JSON.parse(JSON.stringify(defaultStore2Products)));
+        hasChanges = true;
+      }
+    }
+
+    this.products = this.products.map(p => {
+      let updated = { ...p };
+      let changed = false;
+
+      // จัดการสินค้าที่ไม่มีสาขาหรือสาขาถูกลบ (Orphaned product fallback)
+      if (!updated.storeId || !storeIds.has(updated.storeId)) {
+        updated.storeId = fallbackStoreId;
+        changed = true;
+      }
+
+      // ตรวจสอบราคาทุน (costPrice)
+      if (updated.costPrice === undefined || updated.costPrice === null || isNaN(updated.costPrice)) {
+        updated.costPrice = defaultCosts[p.sku] || Math.round((p.price || 0) * 0.75);
+        changed = true;
+      }
+
+      // ตรวจสอบราคาขาย (price)
+      if (updated.price === undefined || updated.price === null || isNaN(updated.price)) {
+        updated.price = Math.round((updated.costPrice || 0) * 1.3);
+        changed = true;
+      }
+
+      // ตรวจสอบสต็อกเป้าหมายและจำนวนนับได้จริง
+      if (typeof updated.minAlert !== 'number' || isNaN(updated.minAlert)) {
+        updated.minAlert = parseInt(updated.minAlert, 10) || 5;
+        changed = true;
+      }
+      if (typeof updated.quantity !== 'number' || isNaN(updated.quantity)) {
+        updated.quantity = parseInt(updated.quantity, 10) || 0;
+        changed = true;
+      }
+
+      // เคลียร์หน่วยนับตกค้าง 'ลูก'
+      if (updated.unit === 'ลูก') {
+        updated.unit = '';
+        changed = true;
+      }
+
+      if (!updated.updatedAt) {
+        updated.updatedAt = new Date().toISOString();
+        changed = true;
+      }
+
+      if (changed) hasChanges = true;
+      return updated;
+    });
+
+    // 3. ตรวจสอบประวัติ (History)
+    if (!this.history) this.history = [];
+    this.history = this.history.map(h => {
+      let updated = { ...h };
+      let changed = false;
+      if (!updated.storeId || !storeIds.has(updated.storeId)) {
+        updated.storeId = fallbackStoreId;
+        changed = true;
+      }
+      if (!updated.timestamp) {
+        updated.timestamp = new Date().toISOString();
+        changed = true;
+      }
+      if (typeof updated.amount !== 'number') {
+        updated.amount = parseInt(updated.amount, 10) || 1;
+        changed = true;
+      }
+      if (changed) hasChanges = true;
+      return updated;
+    });
+
+    if (hasChanges) {
       this.saveStores();
       this.saveProducts();
       this.saveHistory();
     }
 
-    if (savedHistory) {
-      try {
-        this.history = JSON.parse(savedHistory);
-      } catch (e) {
-        this.history = [...DEFAULT_HISTORY];
-      }
-    } else {
-      this.history = [...DEFAULT_HISTORY];
-      this.saveHistory();
-    }
-
-    if (savedTheme === 'dark') {
-      document.body.setAttribute('data-theme', 'dark');
-    }
-
-    if (savedCurrentStore && this.stores.some(s => s.id === savedCurrentStore)) {
-      this.currentStoreId = savedCurrentStore;
-    } else {
-      this.currentStoreId = null;
-    }
+    return hasChanges;
   }
 
   saveStores() {
@@ -617,9 +786,18 @@ class MultiStoreStockApp {
 
     form.reset();
 
+    const deleteBtn = document.getElementById('deleteProductModalBtn');
+
     if (product) {
       title.textContent = 'แก้ไขรายการสินค้า';
       editIdInput.value = product.id;
+      if (deleteBtn) {
+        deleteBtn.style.display = 'inline-flex';
+        deleteBtn.onclick = () => {
+          this.closeModal(modal);
+          this.deleteProduct(product.id);
+        };
+      }
       document.getElementById('prodName').value = product.name;
       const skuEl = document.getElementById('prodSku');
       if (skuEl) skuEl.value = product.sku || '';
@@ -635,6 +813,10 @@ class MultiStoreStockApp {
     } else {
       title.textContent = `เพิ่มรายการใน "${store ? store.name : 'ร้านนี้'}"`;
       editIdInput.value = '';
+      if (deleteBtn) {
+        deleteBtn.style.display = 'none';
+        deleteBtn.onclick = null;
+      }
       const skuEl = document.getElementById('prodSku');
       if (skuEl) skuEl.value = '';
       const catEl = document.getElementById('prodCategory');
@@ -866,10 +1048,15 @@ class MultiStoreStockApp {
   exportBackup() {
     const backupData = {
       app: 'MultiStoreSmartStock',
+      version: '2.0',
       exportedAt: new Date().toISOString(),
       stores: this.stores,
       products: this.products,
-      history: this.history
+      history: this.history,
+      lineSettings: {
+        target: localStorage.getItem('smartstock_line_target') || '',
+        header: localStorage.getItem('smartstock_line_header') || ''
+      }
     };
 
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
@@ -896,13 +1083,26 @@ class MultiStoreStockApp {
           this.stores = parsed.stores;
           this.products = parsed.products;
           this.history = Array.isArray(parsed.history) ? parsed.history : [];
+
+          // Restore LINE configuration if present in backup
+          if (parsed.lineSettings) {
+            if (parsed.lineSettings.target) {
+              localStorage.setItem('smartstock_line_target', parsed.lineSettings.target);
+            }
+            if (parsed.lineSettings.header) {
+              localStorage.setItem('smartstock_line_header', parsed.lineSettings.header);
+            }
+          }
+
+          // Automatically upgrade and sanitize imported data schema
+          this.upgradeAndMigrateData();
           this.saveStores();
           this.saveProducts();
           this.saveHistory();
           this.currentStoreId = null;
           this.render();
           this.closeModal(document.getElementById('backupModal'));
-          this.showToast('กู้คืนข้อมูลทุกสาขาสำเร็จเรียบร้อย! 🎉', 'success');
+          this.showToast('กู้คืนและอัปเกรดข้อมูลทุกสาขาสำเร็จเรียบร้อย! 🎉', 'success');
         } else {
           alert('รูปแบบไฟล์ JSON ไม่ถูกต้องสำหรับระบบ SmartStock');
         }
@@ -1182,7 +1382,10 @@ class MultiStoreStockApp {
             <!-- 1. รายการ (ชื่อสินค้า / ยี่ห้อ / รุ่น) -->
             <td>
               <div class="col-name-wrapper">
-                <span class="battery-name">${this.escapeHtml(item.name)}</span>
+                <button class="battery-name-btn" type="button" title="คลิกเพื่อแก้ไขหรือลบสินค้านี้" onclick="window.app.editProductById('${item.id}')">
+                  <span>${this.escapeHtml(item.name)}</span>
+                  <span class="edit-icon-hint" aria-hidden="true">✏️</span>
+                </button>
               </div>
             </td>
 

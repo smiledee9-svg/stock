@@ -990,6 +990,73 @@ body {
   letter-spacing: -0.01em;
 }
 
+.battery-name-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--transition-fast);
+}
+
+.battery-name-btn:hover {
+  color: var(--primary);
+}
+
+.battery-name-btn .edit-icon-hint {
+  font-size: 0.85rem;
+  opacity: 0.35;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.battery-name-btn:hover .edit-icon-hint {
+  opacity: 1;
+  transform: scale(1.18);
+}
+
+.modal-footer-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.modal-footer-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  font-size: 0.88rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger-outline:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 .battery-meta {
   display: flex;
   align-items: center;
