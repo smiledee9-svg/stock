@@ -1122,57 +1122,61 @@ body {
   color: var(--text-main);
 }
 
-/* Actual Column (Stepper) */
+/* Stock Quantity Cell (Compact Pill: Number + Voice Mic Button) */
+.stock-qty-cell,
 .actual-count-stepper {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   background: var(--bg-tertiary);
-  padding: 3px 6px;
+  padding: 3px 8px 3px 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--card-border);
+  transition: all var(--transition-fast);
 }
 
-.stepper-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: var(--card-bg);
-  color: var(--text-main);
-  font-weight: 700;
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
+.stock-qty-cell:hover,
+.actual-count-stepper:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.stepper-btn:hover {
-  background: var(--primary);
-  color: #ffffff;
-}
-
+.stock-qty-val,
 .actual-val {
   font-family: var(--font-code);
   font-size: 1.25rem;
   font-weight: 700;
-  min-width: 32px;
+  min-width: 28px;
   text-align: center;
   color: var(--text-main);
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 2px 6px;
   border-radius: 4px;
-  transition: var(--transition);
+  transition: var(--transition-fast);
 }
 
+.stock-qty-val:hover,
 .actual-val:hover {
   background: var(--primary-light);
   color: var(--primary);
 }
 
-/* Stepper Mic Voice Buttons (สต็อกเป้าหมาย / นับได้จริง) */
+/* Distinct value colors for target vs actual count */
+.val-target {
+  color: var(--text-main);
+}
+
+.val-actual {
+  color: #10b981;
+}
+
+[data-theme="dark"] .val-actual {
+  color: #34d399;
+}
+
+/* Stepper & Cell Mic Voice Buttons (สต็อกเป้าหมาย / นับได้จริง) */
+.cell-mic-btn,
 .stepper-mic-btn {
   width: 28px;
   height: 28px;
@@ -1184,7 +1188,6 @@ body {
   align-items: center;
   justify-content: center;
   transition: all var(--transition-fast);
-  margin-left: 2px;
   padding: 0;
   position: relative;
 }
@@ -2535,12 +2538,14 @@ body {
     word-break: break-word;
   }
 
-  /* กระชับปุ่ม Stepper ให้อยู่ในระยะพอดีนิ้วสัมผัส */
+  /* กระชับช่องตัวเลขและปุ่มไมค์ */
+  .stock-qty-cell,
   .actual-count-stepper {
-    gap: 3px;
-    padding: 2px 4px;
+    gap: 4px;
+    padding: 2px 5px;
   }
 
+  .cell-mic-btn,
   .stepper-btn,
   .stepper-mic-btn {
     width: 26px;
@@ -2548,9 +2553,10 @@ body {
     font-size: 1.05rem;
   }
 
+  .stock-qty-val,
   .actual-val {
     font-size: 1.15rem;
-    min-width: 24px;
+    min-width: 22px;
     padding: 1px 2px;
   }
 
@@ -2728,6 +2734,13 @@ body {
     padding: 3px 8px;
   }
 
+  .stock-qty-cell,
+  .actual-count-stepper {
+    gap: 3px;
+    padding: 2px 4px;
+  }
+
+  .cell-mic-btn,
   .stepper-btn,
   .stepper-mic-btn {
     width: 24px;
@@ -2735,9 +2748,10 @@ body {
     font-size: 0.95rem;
   }
 
+  .stock-qty-val,
   .actual-val {
     font-size: 1.05rem;
-    min-width: 24px;
+    min-width: 20px;
   }
 
   .target-val {
