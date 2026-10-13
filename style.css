@@ -299,13 +299,12 @@ body {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: 18px 24px;
+  padding: 20px 24px;
   box-shadow: var(--shadow-sm);
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  flex-direction: column; /* แสดงผลแบบเดียวเท่านั้น: เลย์เอาต์แนวตั้ง/สองชั้นสวยงามทุกหน้าจอ */
+  align-items: stretch;
+  gap: 16px;
   transition: var(--transition);
   position: relative;
   width: 100%;
@@ -319,10 +318,9 @@ body {
 
 .store-card-left {
   display: flex;
-  align-items: center;
-  gap: 18px;
-  flex: 1;
-  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 .store-avatar {
@@ -402,9 +400,14 @@ body {
 
 .store-card-right {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 20px;
-  flex-shrink: 0;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border);
 }
 
 .store-stats-row {
@@ -2729,6 +2732,8 @@ body {
     width: 100%;
     flex-wrap: nowrap;
     gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--card-border);
   }
 
   .store-stats-row {
@@ -2821,6 +2826,8 @@ body {
     width: 100%;
     flex-wrap: nowrap;
     gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--card-border);
   }
 
   .store-stats-row {
