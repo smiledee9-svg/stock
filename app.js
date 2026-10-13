@@ -1206,18 +1206,7 @@ class MultiStoreStockApp {
 
       return `
         <article class="store-card">
-          <div class="store-card-left">
-            <div class="store-info-content">
-              <div class="store-title-wrap">
-                <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
-                <div class="store-status-wrap">
-                  ${lowCount > 0 ? `<span class="stock-status-pill status-warning">⚠️ ใกล้หมด ${lowCount}</span>` : `<span class="stock-status-pill status-normal">ปกติ</span>`}
-                </div>
-              </div>
-              <p class="store-desc-text">${this.escapeHtml(store.desc || 'ไม่มีรายละเอียด')}</p>
-            </div>
-          </div>
-
+          <!-- ชั้นบน: กล่องสรุปสถิติ + ปุ่มจัดการสต็อก -->
           <div class="store-card-right">
             <div class="store-stats-row">
               <div class="store-stat-item">
@@ -1257,6 +1246,19 @@ class MultiStoreStockApp {
               <button class="btn-card-more btn-delete-store" title="ลบร้านนี้" onclick="window.app.deleteStore('${store.id}')">
                 🗑️
               </button>
+            </div>
+          </div>
+
+          <!-- ชั้นล่าง: ชื่อสาขา + ป้ายสถานะ + คำอธิบายร้าน -->
+          <div class="store-card-left">
+            <div class="store-info-content">
+              <div class="store-title-wrap">
+                <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
+                <div class="store-status-wrap">
+                  ${lowCount > 0 ? `<span class="stock-status-pill status-warning">⚠️ ใกล้หมด ${lowCount}</span>` : `<span class="stock-status-pill status-normal">ปกติ</span>`}
+                </div>
+              </div>
+              <p class="store-desc-text">${this.escapeHtml(store.desc || 'ไม่มีรายละเอียด')}</p>
             </div>
           </div>
         </article>
