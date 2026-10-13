@@ -1408,7 +1408,7 @@ class MultiStoreStockApp {
               <div class="stock-qty-cell target-cell actual-count-stepper">
                 <span class="stock-qty-val val-target actual-val" id="val-target-${item.id}" title="คลิกเพื่อพิมพ์สต็อกเป้าหมาย" onclick="window.app.quickSetTarget('${item.id}')">${target}</span>
                 <button class="cell-mic-btn stepper-mic-btn mic-target-btn" type="button" id="mic-target-${item.id}" title="พูดสต็อกเป้าหมาย (เช่น '5', 'เป้า 5')" onclick="window.app.toggleRowVoiceInput('${item.id}', 'target')">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                     <line x1="12" y1="19" x2="12" y2="22"></line>
@@ -1422,7 +1422,7 @@ class MultiStoreStockApp {
               <div class="stock-qty-cell actual-cell actual-count-stepper">
                 <span class="stock-qty-val val-actual actual-val" id="val-actual-${item.id}" title="คลิกเพื่อพิมพ์จำนวนที่นับได้ตรงๆ" onclick="window.app.quickSetCount('${item.id}')">${actual}</span>
                 <button class="cell-mic-btn stepper-mic-btn mic-actual-btn" type="button" id="mic-actual-${item.id}" title="พูดจำนวนนับได้จริง (เช่น '2', 'นับได้ 2')" onclick="window.app.toggleRowVoiceInput('${item.id}', 'actual')">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                     <line x1="12" y1="19" x2="12" y2="22"></line>

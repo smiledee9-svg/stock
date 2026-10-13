@@ -1127,19 +1127,21 @@ body {
 .actual-count-stepper {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 6px;
   background: var(--bg-tertiary);
-  padding: 4px 10px;
+  padding: 3px 3px 3px 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--card-border);
+  min-height: 44px;
+  box-sizing: border-box;
   transition: all var(--transition-fast);
 }
 
 .stock-qty-cell:hover,
 .actual-count-stepper:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .stock-qty-val,
@@ -1147,11 +1149,11 @@ body {
   font-family: var(--font-code);
   font-size: 1.2rem;
   font-weight: 700;
-  min-width: 28px;
+  min-width: 32px;
   text-align: center;
   color: var(--text-main);
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 4px 6px;
   border-radius: 4px;
   transition: var(--transition-fast);
 }
@@ -1175,57 +1177,80 @@ body {
   color: #34d399;
 }
 
-/* Stepper & Cell Mic Voice Buttons (สต็อกเป้าหมาย / นับได้จริง) */
+/* Stepper & Cell Mic Voice Buttons (ออกแบบใหม่เป็นรูปทรงผืนผ้า ใหญ่เต็มพื้นที่ กดง่าย) */
 .cell-mic-btn,
 .stepper-mic-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
+  width: 52px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
   background: var(--card-bg);
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all var(--transition-fast);
   padding: 0;
   position: relative;
+  flex-shrink: 0;
 }
 
-/* สีสำหรับไมค์ช่อง "สต็อกเป้าหมาย" (เน้นโทนเทา/คราม สุภาพ) */
+.cell-mic-btn svg,
+.stepper-mic-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.3;
+  transition: transform var(--transition-fast);
+}
+
+/* สีสำหรับไมค์ช่อง "สต็อกเป้าหมาย" (รูปทรงผืนผ้า โทนสีกรมท่า/คราม เรียบหรู) */
 .stepper-mic-btn.mic-target-btn {
   color: #94a3b8;
-  border-color: rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.35);
 }
 
 [data-theme="light"] .stepper-mic-btn.mic-target-btn {
-  color: #64748b;
-  border-color: rgba(100, 116, 139, 0.25);
+  color: #475569;
+  background: #e2e8f0;
+  border-color: rgba(100, 116, 139, 0.35);
 }
 
 .stepper-mic-btn.mic-target-btn:hover {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
-  transform: scale(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(79, 70, 229, 0.35);
 }
 
-/* สีสำหรับไมค์ช่อง "นับได้จริง" (เน้นโทนเขียวมรกต สดใส ชัดเจน) */
+.stepper-mic-btn.mic-target-btn:hover svg {
+  transform: scale(1.12);
+}
+
+/* สีสำหรับไมค์ช่อง "นับได้จริง" (รูปทรงผืนผ้า โทนเขียวมรกต สดใส ชัดเจน กดง่าย) */
 .stepper-mic-btn.mic-actual-btn {
   color: #10b981;
-  border-color: rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 [data-theme="dark"] .stepper-mic-btn.mic-actual-btn {
   color: #34d399;
-  border-color: rgba(52, 211, 153, 0.25);
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(52, 211, 153, 0.45);
 }
 
 .stepper-mic-btn.mic-actual-btn:hover {
   background: #10b981;
   color: #ffffff;
   border-color: #10b981;
-  transform: scale(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.4);
+}
+
+.stepper-mic-btn.mic-actual-btn:hover svg {
+  transform: scale(1.12);
 }
 
 /* สถานะกำลังฟังเสียง (Recording Active Pulsing) */
@@ -2608,15 +2633,23 @@ body {
   /* กระชับช่องตัวเลขและปุ่มไมค์ */
   .stock-qty-cell,
   .actual-count-stepper {
-    gap: 6px;
-    padding: 3px 8px;
+    gap: 5px;
+    padding: 2px 2px 2px 8px;
+    min-height: 42px;
   }
 
   .cell-mic-btn,
   .stepper-btn,
   .stepper-mic-btn {
-    width: 28px;
-    height: 28px;
+    width: 48px;
+    height: 36px;
+    border-radius: 7px;
+  }
+
+  .cell-mic-btn svg,
+  .stepper-mic-btn svg {
+    width: 20px;
+    height: 20px;
   }
 
   .stock-qty-val,
@@ -2806,14 +2839,22 @@ body {
   .stock-qty-cell,
   .actual-count-stepper {
     gap: 4px;
-    padding: 2px 6px;
+    padding: 2px 2px 2px 6px;
+    min-height: 40px;
   }
 
   .cell-mic-btn,
   .stepper-btn,
   .stepper-mic-btn {
-    width: 26px;
-    height: 26px;
+    width: 44px;
+    height: 34px;
+    border-radius: 6px;
+  }
+
+  .cell-mic-btn svg,
+  .stepper-mic-btn svg {
+    width: 19px;
+    height: 19px;
   }
 
   .stock-qty-val,
