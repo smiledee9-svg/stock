@@ -1222,22 +1222,32 @@ class MultiStoreStockApp {
             <div class="store-stats-row">
               <div class="store-stat-item">
                 <span class="store-stat-val store-stat-code">${storeCode}</span>
-                <span class="store-stat-lbl">รหัสสาขา</span>
+                <span class="store-stat-lbl">
+                  <span class="lbl-desktop">รหัสสาขา</span>
+                  <span class="lbl-mobile">รหัส</span>
+                </span>
               </div>
               <div class="store-stat-item">
                 <span class="store-stat-val">${skuCount}</span>
-                <span class="store-stat-lbl">รายการสินค้า</span>
+                <span class="store-stat-lbl">
+                  <span class="lbl-desktop">รายการสินค้า</span>
+                  <span class="lbl-mobile">รายการ</span>
+                </span>
               </div>
               <div class="store-stat-item">
                 <span class="store-stat-val">${piecesCount.toLocaleString()}</span>
-                <span class="store-stat-lbl">จำนวนชิ้นรวม</span>
+                <span class="store-stat-lbl">
+                  <span class="lbl-desktop">จำนวนชิ้นรวม</span>
+                  <span class="lbl-mobile">ชิ้น</span>
+                </span>
               </div>
             </div>
 
             <div class="store-card-actions">
               <button class="btn-open-store" onclick="window.app.selectStore('${store.id}')">
-                <span>เปิดจัดการสต็อก</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <span class="btn-text-desktop">เปิดจัดการสต็อก</span>
+                <span class="btn-text-mobile">เปิดสต็อก</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </button>

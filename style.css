@@ -451,6 +451,16 @@ body {
   margin-top: 4px;
 }
 
+.lbl-mobile,
+.btn-text-mobile {
+  display: none;
+}
+
+.lbl-desktop,
+.btn-text-desktop {
+  display: inline;
+}
+
 .store-card-actions {
   display: flex;
   align-items: center;
@@ -2707,20 +2717,57 @@ body {
   .store-card {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
-    padding: 18px 20px;
+    gap: 14px;
+    padding: 16px 18px;
   }
 
   .store-card-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
-    flex-wrap: wrap;
-    gap: 14px;
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .store-stats-row {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .store-stat-item {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .store-stat-item:not(:last-child) {
+    border-right: 1px solid var(--card-border);
+    padding-right: 8px;
+  }
+
+  .store-card-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
   }
 
   .btn-open-store {
-    flex: 1;
-    justify-content: center;
+    flex: 0 0 auto;
+    padding: 9px 14px;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .btn-card-more {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
   }
 
   #storesHubView .section-title,
@@ -2756,16 +2803,35 @@ body {
     font-size: 1.1rem;
   }
 
+  .lbl-desktop,
+  .btn-text-desktop {
+    display: none;
+  }
+
+  .lbl-mobile,
+  .btn-text-mobile {
+    display: inline;
+  }
+
   .store-card-right {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 6px;
   }
 
   .store-stats-row {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
     justify-content: space-around;
-    padding: 8px 10px;
+    padding: 6px 8px;
+    gap: 4px;
+    background: var(--bg-primary);
   }
 
   .store-stat-item {
@@ -2774,11 +2840,44 @@ body {
   }
 
   .store-stat-item:not(:last-child) {
-    padding-right: 8px;
+    border-right: 1px solid var(--card-border);
+    padding-right: 4px;
+  }
+
+  .store-stat-val {
+    font-size: 1.15rem;
+    line-height: 1.15;
+  }
+
+  .store-stat-lbl {
+    font-size: 0.82rem;
+    margin-top: 2px;
+    white-space: nowrap;
   }
 
   .store-card-actions {
-    width: 100%;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: auto;
+  }
+
+  .btn-open-store {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    font-size: 1.02rem;
+    gap: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+  }
+
+  .btn-card-more {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+    padding: 0;
+    flex-shrink: 0;
   }
 
   .brand-title {
@@ -2947,9 +3046,12 @@ body {
   #storesHubView .stock-status-pill,
   #storesHubView .store-desc-text,
   #storesHubView .store-stat-val,
-  #storesHubView .store-stat-lbl,
   #storesHubView .btn-open-store,
   #storesHubView .btn-open-store span {
     font-size: 1.1rem !important;
+  }
+
+  #storesHubView .store-stat-lbl {
+    font-size: 0.82rem !important;
   }
 }
