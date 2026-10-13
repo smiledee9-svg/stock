@@ -539,7 +539,7 @@ body {
 }
 
 .current-store-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -699,13 +699,13 @@ body {
   background: transparent;
   color: var(--text-main);
   font-family: var(--font-main);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   font-weight: 600;
   outline: none;
 }
 
 .search-box input::placeholder {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 400;
   color: var(--text-light);
 }
@@ -916,9 +916,9 @@ body {
 
 .compact-stock-table th {
   background: var(--bg-tertiary);
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 600;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 700;
   padding: 14px 16px;
   border-bottom: 1px solid var(--card-border);
   white-space: nowrap;
@@ -928,7 +928,7 @@ body {
   padding: 14px 16px;
   border-bottom: 1px solid var(--card-border);
   vertical-align: middle;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
 }
 
 .compact-stock-table tbody tr:last-child td {
@@ -984,7 +984,7 @@ body {
 }
 
 .battery-name {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.01em;
@@ -997,7 +997,7 @@ body {
   margin: 0;
   text-align: left;
   font-family: inherit;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.01em;
@@ -1013,7 +1013,7 @@ body {
 }
 
 .battery-name-btn .edit-icon-hint {
-  font-size: 0.85rem;
+  font-size: 1rem;
   opacity: 0.35;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
@@ -1086,8 +1086,8 @@ body {
 
 .cost-price-val {
   font-family: var(--font-code);
-  font-size: 1.08rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   color: #94a3b8;
   letter-spacing: -0.01em;
 }
@@ -1098,7 +1098,7 @@ body {
 
 .sell-price-val {
   font-family: var(--font-code);
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #10b981;
   letter-spacing: -0.01em;
@@ -1109,7 +1109,7 @@ body {
 }
 
 .table-unit-sub {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -1117,7 +1117,7 @@ body {
 /* Target Column */
 .target-val {
   font-family: var(--font-code);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -1130,7 +1130,7 @@ body {
   justify-content: center;
   gap: 8px;
   background: var(--bg-tertiary);
-  padding: 3px 8px 3px 10px;
+  padding: 4px 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--card-border);
   transition: all var(--transition-fast);
@@ -1145,7 +1145,7 @@ body {
 .stock-qty-val,
 .actual-val {
   font-family: var(--font-code);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   min-width: 28px;
   text-align: center;
@@ -1263,7 +1263,7 @@ body {
   padding: 6px 16px;
   border-radius: var(--radius-full);
   font-family: var(--font-main);
-  font-size: 0.98rem;
+  font-size: 1.2rem;
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: -0.01em;
@@ -1368,6 +1368,61 @@ body {
   font-size: 0.82rem;
   color: var(--text-muted);
   line-height: 1.4;
+}
+
+/* ==========================================================================
+   Store Inventory Page - Uniform Font Size (ข้อความทั้งหน้าขนาดตัวอักษรเท่ากันทั้งหมด)
+   ========================================================================== */
+#headerStoreInfo .current-store-title,
+#headerStoreInfo .store-code-pill,
+#backToHubBtn,
+#backToHubBtn span,
+#editCurrentStoreBtn,
+#editCurrentStoreBtn span,
+#storeDetailView .search-box input,
+#storeDetailView .search-box input::placeholder,
+#storeDetailView .filter-actions .btn,
+#storeDetailView .filter-actions .btn span,
+#storeDetailView .compact-stock-table th,
+#storeDetailView .compact-stock-table td,
+#storeDetailView .battery-name,
+#storeDetailView .battery-name-btn,
+#storeDetailView .battery-name-btn span,
+#storeDetailView .cost-price-val,
+#storeDetailView .sell-price-val,
+#storeDetailView .stock-qty-val,
+#storeDetailView .actual-val,
+#storeDetailView .target-val,
+#storeDetailView .order-badge-simple {
+  font-size: 1.2rem !important;
+}
+
+#headerStoreInfo .store-code-pill {
+  padding: 2px 10px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+#backToHubBtn,
+#editCurrentStoreBtn {
+  height: auto;
+  padding: 8px 16px;
+  font-weight: 600;
+}
+
+#storeDetailView .filter-actions .btn {
+  font-weight: 600;
+  padding: 10px 18px;
+}
+
+#storeDetailView .compact-stock-table th {
+  font-weight: 700;
+  color: var(--text-main);
+  padding: 14px 16px;
+}
+
+#storeDetailView .compact-stock-table td {
+  padding: 14px 16px;
 }
 
 /* ================= Product Cards Grid ================= */
@@ -2532,8 +2587,20 @@ body {
     min-width: 240px;
   }
 
+  .compact-stock-table th,
+  .compact-stock-table td,
+  .battery-name,
+  .battery-name-btn,
+  .stock-qty-val,
+  .actual-val,
+  .target-val,
+  .cost-price-val,
+  .sell-price-val,
+  .order-badge-simple {
+    font-size: 1.15rem;
+  }
+
   .battery-name {
-    font-size: 1.05rem;
     line-height: 1.35;
     word-break: break-word;
   }
@@ -2541,37 +2608,29 @@ body {
   /* กระชับช่องตัวเลขและปุ่มไมค์ */
   .stock-qty-cell,
   .actual-count-stepper {
-    gap: 4px;
-    padding: 2px 5px;
+    gap: 6px;
+    padding: 3px 8px;
   }
 
   .cell-mic-btn,
   .stepper-btn,
   .stepper-mic-btn {
-    width: 26px;
-    height: 26px;
-    font-size: 1.05rem;
+    width: 28px;
+    height: 28px;
   }
 
   .stock-qty-val,
   .actual-val {
-    font-size: 1.15rem;
-    min-width: 22px;
+    min-width: 24px;
     padding: 1px 2px;
   }
 
-  .cost-price-val,
-  .sell-price-val {
-    font-size: 1rem;
-  }
-
   .table-unit-sub {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
   }
 
   .order-badge-simple {
-    padding: 5px 10px;
-    font-size: 0.88rem;
+    padding: 5px 12px;
   }
 
   .store-card {
@@ -2717,45 +2776,49 @@ body {
   }
 
   .compact-stock-table th,
-  .compact-stock-table td {
-    padding: 10px 8px;
+  .compact-stock-table td,
+  .battery-name,
+  .battery-name-btn,
+  .stock-qty-val,
+  .actual-val,
+  .target-val,
+  .cost-price-val,
+  .sell-price-val,
+  .order-badge-simple,
+  .order-badge-result {
+    font-size: 1.1rem;
   }
 
-  .battery-name {
-    font-size: 0.95rem;
+  .compact-stock-table th,
+  .compact-stock-table td {
+    padding: 10px 8px;
   }
 
   .formula-code-pill {
     display: none; /* Hide Excel formula on small mobile screens to save space, result badge stays prominent */
   }
 
-  .order-badge-result {
-    font-size: 0.82rem;
-    padding: 3px 8px;
+  .order-badge-result,
+  .order-badge-simple {
+    padding: 4px 10px;
   }
 
   .stock-qty-cell,
   .actual-count-stepper {
-    gap: 3px;
-    padding: 2px 4px;
+    gap: 4px;
+    padding: 2px 6px;
   }
 
   .cell-mic-btn,
   .stepper-btn,
   .stepper-mic-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 0.95rem;
+    width: 26px;
+    height: 26px;
   }
 
   .stock-qty-val,
   .actual-val {
-    font-size: 1.05rem;
-    min-width: 20px;
-  }
-
-  .target-val {
-    font-size: 1.05rem;
+    min-width: 22px;
   }
 
   #productModal .modal-card {
