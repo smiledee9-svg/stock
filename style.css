@@ -410,10 +410,10 @@ body {
 .store-stats-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   background: var(--bg-primary);
   border: 1px solid var(--card-border);
-  padding: 8px 18px;
+  padding: 8px 16px;
   border-radius: var(--radius-md);
   margin: 0;
 }
@@ -423,12 +423,12 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  min-width: 80px;
+  min-width: 68px;
 }
 
-.store-stat-item:first-child {
+.store-stat-item:not(:last-child) {
   border-right: 1px solid var(--card-border);
-  padding-right: 16px;
+  padding-right: 14px;
 }
 
 .store-stat-val {
@@ -437,6 +437,10 @@ body {
   font-family: var(--font-code);
   color: var(--text-main);
   line-height: 1.2;
+}
+
+.store-stat-code {
+  color: var(--primary);
 }
 
 .store-stat-lbl {
@@ -2713,6 +2717,16 @@ body {
   .store-stats-row {
     width: 100%;
     justify-content: space-around;
+    padding: 8px 10px;
+  }
+
+  .store-stat-item {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .store-stat-item:not(:last-child) {
+    padding-right: 8px;
   }
 
   .store-card-actions {

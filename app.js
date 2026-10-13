@@ -1207,7 +1207,6 @@ class MultiStoreStockApp {
       return `
         <article class="store-card">
           <div class="store-card-left">
-            <div class="store-avatar">${storeCode}</div>
             <div class="store-info-content">
               <div class="store-title-wrap">
                 <h4 class="store-name-title">${this.escapeHtml(store.name)}</h4>
@@ -1221,6 +1220,10 @@ class MultiStoreStockApp {
 
           <div class="store-card-right">
             <div class="store-stats-row">
+              <div class="store-stat-item">
+                <span class="store-stat-val store-stat-code">${storeCode}</span>
+                <span class="store-stat-lbl">รหัสสาขา</span>
+              </div>
               <div class="store-stat-item">
                 <span class="store-stat-val">${skuCount}</span>
                 <span class="store-stat-lbl">รายการสินค้า</span>
