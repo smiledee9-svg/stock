@@ -1442,10 +1442,17 @@ class MultiStoreStockApp {
               </div>
             </td>
 
-            <!-- 5. ราคาขาย/หน่วย -->
+            <!-- 5. ราคาขาย/หน่วย (คลิกพิมพ์ตัวเลข หรือกดไอคอนไมค์สั่งด้วยเสียง) -->
             <td class="text-center">
-              <div class="price-val-wrapper">
-                <span class="sell-price-val">฿${(item.price || 0).toLocaleString()}</span>
+              <div class="stock-qty-cell price-cell actual-count-stepper">
+                <span class="stock-qty-val val-price actual-val" id="val-price-${item.id}" title="คลิกเพื่อพิมพ์ราคาขาย" onclick="window.app.quickSetPrice('${item.id}')">฿${(item.price || 0).toLocaleString()}</span>
+                <button class="cell-mic-btn stepper-mic-btn mic-price-btn" type="button" id="mic-price-${item.id}" title="พูดราคาขาย (เช่น '1850', 'ขาย 1850')" onclick="window.app.toggleRowVoiceInput('${item.id}', 'price')">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                  </svg>
+                </button>
               </div>
             </td>
 
@@ -1642,6 +1649,28 @@ class MultiStoreStockApp {
     this.showToast(`อัปเดต "${product.name}" เป็น ${newQty}${unitStr} เรียบร้อย`, 'success');
   }
 
+  quickSetPrice(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const input = prompt(`กรอกราคาขายของ "${product.name}" (บาท):`, product.price || 0);
+    if (input === null) return;
+
+    const cleanInput = String(input).replace(/,/g, '').trim();
+    const newPrice = parseFloat(cleanInput);
+    if (isNaN(newPrice) || newPrice < 0) {
+      alert('กรุณากรอกราคาขายที่ถูกต้อง (0 ขึ้นไป)');
+      return;
+    }
+
+    product.price = newPrice;
+    product.updatedAt = new Date().toISOString();
+
+    this.saveProducts();
+    this.renderStoreDetail();
+    this.showToast(`🏷️ ปรับราคาขาย "${product.name}" เป็น ฿${newPrice.toLocaleString()} เรียบร้อย`, 'success');
+  }
+
   // แยกวิเคราะห์ตัวเลขสำหรับระบบเสียงสั่งปรับสต็อก (เป้าหมาย / นับได้จริง)
   parseQuantityFromVoice(rawText) {
     if (!rawText) return null;
@@ -1713,7 +1742,92 @@ class MultiStoreStockApp {
     return null;
   }
 
-  // กดไอคอนไมค์ประจำช่อง (แยกอิสระ: 'target' สต็อกเป้าหมาย / 'actual' นับได้จริง)
+  // แยกวิเคราะห์ตัวเลขสำหรับระบบเสียงสั่งปรับราคาขาย
+  parsePriceFromVoice(rawText) {
+    if (!rawText) return null;
+    let text = String(rawText).trim();
+
+    // 1. นำ comma ในตัวเลขออก (เช่น "1,850" -> "1850")
+    text = text.replace(/(\d),(\d)/g, '$1$2');
+
+    // 2. ค้นหาตัวเลขอารบิกตรงๆ (รวมทศนิยม) เช่น "1850", "1850.50", "ขาย 1850", "1850 บาท"
+    const numMatch = text.match(/\d+(?:\.\d+)?/);
+    if (numMatch) {
+      const val = parseFloat(numMatch[0]);
+      if (!isNaN(val)) return val;
+    }
+
+    // 3. แปลงเลขไทย (๑, ๒, ๓...)
+    const thaiDigitMap = { '๐': 0, '๑': 1, '๒': 2, '๓': 3, '๔': 4, '๕': 5, '๖': 6, '๗': 7, '๘': 8, '๙': 9 };
+    let thaiDigitStr = '';
+    for (const ch of text) {
+      if (thaiDigitMap[ch] !== undefined) thaiDigitStr += thaiDigitMap[ch];
+    }
+    if (thaiDigitStr.length > 0) {
+      const val = parseFloat(thaiDigitStr);
+      if (!isNaN(val)) return val;
+    }
+
+    // 4. ตัดคำนำหน้าและคำลงท้าย
+    let clean = text
+      .replace(/(?:ราคาขายจริง|ราคาขาย|ราคา|ขายจริง|ขายหน้าร้าน|ขาย|ตั้งขาย|บาท|ครับ|ค่ะ|คะ)/gi, '')
+      .trim();
+
+    // ตรวจสอบกับ parseQuantityFromVoice เผื่อเป็นเลขหลักสิบ/หลักร้อย
+    const qVal = this.parseQuantityFromVoice(clean);
+    if (qVal !== null && !isNaN(qVal)) return qVal;
+
+    // คำนวณคำอ่านตัวเลขภาษาไทยสำหรับหลักหมื่น หลักพัน หลักร้อย
+    const digitMap = {
+      'หนึ่ง': 1, 'เอ็ด': 1, 'สอง': 2, 'ยี่': 2, 'สาม': 3, 'สี่': 4,
+      'ห้า': 5, 'หก': 6, 'เจ็ด': 7, 'แปด': 8, 'เก้า': 9
+    };
+
+    let total = 0;
+    let matched = false;
+
+    // ตรวจหลักหมื่น (เช่น สองหมื่น)
+    const tenThousandMatch = clean.match(/(หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า)?\s*หมื่น/);
+    if (tenThousandMatch) {
+      matched = true;
+      const mult = digitMap[tenThousandMatch[1]] || 1;
+      total += mult * 10000;
+      clean = clean.replace(tenThousandMatch[0], ' ').trim();
+    }
+
+    // ตรวจหลักพัน (เช่น สองพัน, พันแปด, พันห้า)
+    const thousandMatch = clean.match(/(หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า)?\s*พัน/);
+    if (thousandMatch) {
+      matched = true;
+      const mult = digitMap[thousandMatch[1]] || 1;
+      total += mult * 1000;
+      clean = clean.replace(thousandMatch[0], ' ').trim();
+    }
+
+    // ตรวจหลักร้อย (เช่น แปดร้อย, ห้าร้อย)
+    const hundredMatch = clean.match(/(หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า)?\s*ร้อย/);
+    if (hundredMatch) {
+      matched = true;
+      const mult = digitMap[hundredMatch[1]] || 1;
+      total += mult * 100;
+      clean = clean.replace(hundredMatch[0], ' ').trim();
+    }
+
+    // เศษที่เหลือ (สิบ + หน่วย)
+    if (clean) {
+      const remainder = this.parseQuantityFromVoice(clean);
+      if (remainder !== null && !isNaN(remainder)) {
+        total += remainder;
+        matched = true;
+      }
+    }
+
+    if (matched && total > 0) return total;
+
+    return null;
+  }
+
+  // กดไอคอนไมค์ประจำช่อง (แยกอิสระ: 'target' สต็อกเป้าหมาย / 'actual' นับได้จริง / 'price' ราคาขาย)
   toggleRowVoiceInput(productId, fieldType) {
     const btnId = `mic-${fieldType}-${productId}`;
     const btn = document.getElementById(btnId);
@@ -1748,12 +1862,16 @@ class MultiStoreStockApp {
     this.playVoiceSound('start');
     this.activeVoiceRecognition = recognition;
 
-    const fieldLabel = fieldType === 'target' ? 'สต็อกเป้าหมาย' : 'นับได้จริง';
+    const fieldLabel = fieldType === 'target' 
+      ? 'สต็อกเป้าหมาย' 
+      : (fieldType === 'price' ? 'ราคาขาย' : 'นับได้จริง');
     this.showToast(`🎙️ กำลังฟัง [${fieldLabel}] ของ "${product.name}"... พูดตัวเลขได้เลย`, 'info', 2500);
 
     recognition.onresult = (e) => {
       const transcript = e.results[0][0].transcript;
-      const parsedNumber = this.parseQuantityFromVoice(transcript);
+      const parsedNumber = fieldType === 'price' 
+        ? this.parsePriceFromVoice(transcript) 
+        : this.parseQuantityFromVoice(transcript);
 
       if (parsedNumber !== null && !isNaN(parsedNumber) && parsedNumber >= 0) {
         if (fieldType === 'target') {
@@ -1764,6 +1882,13 @@ class MultiStoreStockApp {
           this.playVoiceSound('success');
           const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
           this.showToast(`🎯 ${product.name}: ปรับสต็อกเป้าหมายเป็น ${parsedNumber}${unitStr} 🎙️`, 'success');
+        } else if (fieldType === 'price') {
+          product.price = parsedNumber;
+          product.updatedAt = new Date().toISOString();
+          this.saveProducts();
+          this.renderStoreDetail();
+          this.playVoiceSound('success');
+          this.showToast(`🏷️ ${product.name}: ปรับราคาขายเป็น ฿${parsedNumber.toLocaleString()} 🎙️`, 'success');
         } else {
           const oldQty = product.quantity || 0;
           const diff = parsedNumber - oldQty;
