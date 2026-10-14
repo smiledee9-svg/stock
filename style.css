@@ -435,7 +435,7 @@ body {
 }
 
 .store-stat-val {
-  font-size: 0.84rem;
+  font-size: 1.2rem;
   font-weight: 800;
   font-family: var(--font-code);
   color: var(--text-main);
@@ -1488,6 +1488,7 @@ body {
 #storesHubView .store-name-title,
 #storesHubView .stock-status-pill,
 #storesHubView .store-desc-text,
+#storesHubView .store-stat-val,
 #storesHubView .store-stat-lbl {
   font-size: 1.2rem !important;
 }
@@ -1507,17 +1508,15 @@ body {
   font-weight: 600;
 }
 
-/* ปุ่มกดทั้งหมดในหน้ารวมร้านค้าและตัวเลขสถิติ ใช้ขนาดตัวอักษรเท่ากันเป๊ะ */
+/* ปุ่มกดทั้งหมดในหน้ารวมร้านค้าและปุ่มด้านบนสุด ใช้ขนาดตัวอักษรเท่ากันเป๊ะ */
 #openAddStoreBtn,
 #openAddStoreBtn span,
 .btn-open-store,
 .btn-open-store span,
 #storesHubView .btn-open-store,
-#storesHubView .btn-open-store span,
-.store-stat-val,
-#storesHubView .store-stat-val {
+#storesHubView .btn-open-store span {
   font-size: 0.84rem !important;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 #storesHubView .btn-open-store {
@@ -2804,6 +2803,7 @@ body {
   #storesHubView .store-name-title,
   #storesHubView .stock-status-pill,
   #storesHubView .store-desc-text,
+  #storesHubView .store-stat-val,
   #storesHubView .store-stat-lbl {
     font-size: 1.15rem !important;
   }
@@ -2873,7 +2873,7 @@ body {
   }
 
   .store-stat-val {
-    font-size: 0.82rem !important;
+    font-size: 1.15rem;
     line-height: 1.15;
   }
 
@@ -3073,15 +3073,12 @@ body {
   #storesHubView .item-count-badge,
   #storesHubView .store-name-title,
   #storesHubView .stock-status-pill,
-  #storesHubView .store-desc-text {
+  #storesHubView .store-desc-text,
+  #storesHubView .store-stat-val {
     font-size: 1.1rem !important;
   }
 
   #storesHubView .store-stat-lbl {
-    font-size: 0.82rem !important;
-  }
-
-  #storesHubView .store-stat-val {
     font-size: 0.82rem !important;
   }
 }
