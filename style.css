@@ -546,21 +546,25 @@ body {
 .current-store-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .store-status-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--success);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  flex-shrink: 0;
 }
 
 .current-store-title {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.7rem;
+  font-weight: 800;
   color: var(--text-main);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 /* ================= Navigation Tabs ================= */
@@ -1418,7 +1422,6 @@ body {
 /* ==========================================================================
    Store Inventory Page - Uniform Font Size (ข้อความทั้งหน้าขนาดตัวอักษรเท่ากันทั้งหมด)
    ========================================================================== */
-#headerStoreInfo .current-store-title,
 #headerStoreInfo .store-code-pill,
 #backToHubBtn,
 #backToHubBtn span,
@@ -1440,6 +1443,15 @@ body {
 #storeDetailView .target-val,
 #storeDetailView .order-badge-simple {
   font-size: 1.2rem !important;
+}
+
+/* ชื่อร้านค้าด้านบน: ขนาดใหญ่คงที่เท่ากันทุกหน้าจอตามคำขอ */
+#headerStoreInfo .current-store-title {
+  font-size: 1.7rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
 }
 
 #headerStoreInfo .store-code-pill {
@@ -2938,8 +2950,8 @@ body {
   }
 
   .current-store-title {
-    font-size: 1.05rem;
-    max-width: 320px;
+    /* ขนาดใหญ่คงที่เท่ากันทุกจอ ไม่ลดขนาดลง */
+    font-size: 1.7rem !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
