@@ -969,11 +969,11 @@ body {
 
 .compact-stock-table th.col-cost,
 .compact-stock-table td:nth-child(2),
-.compact-stock-table th.col-price,
+.compact-stock-table th.col-actual,
 .compact-stock-table td:nth-child(3),
 .compact-stock-table th.col-target,
 .compact-stock-table td:nth-child(4),
-.compact-stock-table th.col-actual,
+.compact-stock-table th.col-price,
 .compact-stock-table td:nth-child(5),
 .compact-stock-table th.col-order,
 .compact-stock-table td:nth-child(6) {

@@ -141,9 +141,9 @@
                 <tr>
                   <th class="col-name">รายการ/หน่วย</th>
                   <th class="col-cost text-center">ราคาทุน</th>
-                  <th class="col-price text-center">ราคาขาย</th>
-                  <th class="col-target text-center">สต็อกเป้าหมาย</th>
                   <th class="col-actual text-center">นับได้จริง</th>
+                  <th class="col-target text-center">สต็อกเป้าหมาย</th>
+                  <th class="col-price text-center">ราคาขาย</th>
                   <th class="col-order text-center">ต้องสั่งเพิ่ม</th>
                 </tr>
               </thead>
@@ -292,10 +292,10 @@
           <input type="number" id="prodCostPrice" min="0" step="any" value="180" placeholder="0">
         </div>
 
-        <!-- 3. ราคาขาย/หน่วย -->
+        <!-- 3. นับได้จริง -->
         <div class="form-group">
-          <label for="prodPrice">ราคาขาย/หน่วย (บาท)</label>
-          <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
+          <label for="prodQuantity">นับได้จริง</label>
+          <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
         </div>
 
         <!-- 4. สต็อกเป้าหมาย -->
@@ -304,10 +304,10 @@
           <input type="number" id="prodMinAlert" required min="0" step="1" value="5" placeholder="5">
         </div>
 
-        <!-- 5. นับได้จริง -->
+        <!-- 5. ราคาขาย/หน่วย -->
         <div class="form-group">
-          <label for="prodQuantity">นับได้จริง</label>
-          <input type="number" id="prodQuantity" required min="0" step="1" value="5" placeholder="5">
+          <label for="prodPrice">ราคาขาย/หน่วย (บาท)</label>
+          <input type="number" id="prodPrice" min="0" step="any" value="250" placeholder="0">
         </div>
 
         <!-- Smart Voice Bar: พูดเพื่อกรอกข้อมูลอัตโนมัติ (จัดวางไว้ส่วนล่างฟอร์ม) -->
