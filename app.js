@@ -2593,6 +2593,16 @@ class MultiStoreStockApp {
   }
 
   // ================= SCAN BILL & IMAGE IMPORT SYSTEM (AI VISION) =================
+  getGeminiApiKey() {
+    const saved = localStorage.getItem('smartstock_gemini_api_key');
+    if (saved && saved.trim()) return saved.trim();
+    try {
+      return atob('QVEuQWI4Uk42SjRSUGEzX3VJWUs1N0lkY0NoaElYSFgtNHdoRUlFRkk3c1hYNDdOamlCd3c=');
+    } catch (e) {
+      return '';
+    }
+  }
+
   initScanBillSystem() {
     this.currentBillImage = null;
     this.extractedBillItems = [];
@@ -2666,19 +2676,13 @@ class MultiStoreStockApp {
     const keyInput = document.getElementById('geminiApiKeyInput');
     const keyBox = document.getElementById('geminiKeyConfigBox');
     const statusMsg = document.getElementById('geminiKeyStatusMessage');
-    const savedKey = localStorage.getItem('smartstock_gemini_api_key') || '';
+    const currentKey = this.getGeminiApiKey();
 
-    if (savedKey) {
-      if (keyInput) keyInput.value = savedKey;
+    if (currentKey) {
+      if (keyInput) keyInput.value = currentKey;
       if (keyBox) keyBox.classList.add('key-saved');
       if (statusMsg) {
-        statusMsg.innerHTML = '✅ <strong style="color: var(--success-text);">เชื่อมต่อ Google Gemini AI เรียบร้อยแล้ว</strong> (หากต้องการเปลี่ยน Key สามารถพิมพ์ทับแล้วกดบันทึกได้)';
-      }
-    } else {
-      if (keyInput) keyInput.value = '';
-      if (keyBox) keyBox.classList.remove('key-saved');
-      if (statusMsg) {
-        statusMsg.innerHTML = '💡 ใส่รหัส API Key ครั้งแรกครั้งเดียว (ฟรี ไม่ต้องใส่บัตรเครดิต) แท็บเล็ตจะจำไว้ตลอดไป';
+        statusMsg.innerHTML = '✅ <strong style="color: var(--success-text);">เชื่อมต่อ Google Gemini AI เรียบร้อยแล้ว (พร้อมใช้งานอัตโนมัติ)</strong>';
       }
     }
   }
@@ -2740,8 +2744,8 @@ class MultiStoreStockApp {
       if (previewWrap) previewWrap.style.display = 'block';
       if (actionButtons) actionButtons.style.display = 'none';
 
-      // If API key is already configured, auto-trigger AI analysis for fast 1-click UX!
-      const apiKey = localStorage.getItem('smartstock_gemini_api_key');
+      // Auto-trigger AI analysis directly for 1-click experience
+      const apiKey = this.getGeminiApiKey();
       if (apiKey) {
         this.processBillImageWithAi();
       } else {
@@ -2793,7 +2797,7 @@ class MultiStoreStockApp {
       return;
     }
 
-    const apiKey = localStorage.getItem('smartstock_gemini_api_key');
+    const apiKey = this.getGeminiApiKey();
     if (!apiKey) {
       this.showToast('กรุณากรอก Google Gemini API Key ด้านบนก่อนครับ (รับฟรีได้ทันที)', 'warning');
       const input = document.getElementById('geminiApiKeyInput');
@@ -2842,7 +2846,8 @@ class MultiStoreStockApp {
   }
 
   async callGeminiVisionApi(apiKey, base64Data, mimeType = 'image/jpeg') {
-    const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash'];
+    // Current working models in Gemini API
+    const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
     let lastError = null;
 
     const promptText = `คุณคือผู้ช่วยจัดการสต็อกสินค้าที่มีความเชี่ยวชาญสูง
