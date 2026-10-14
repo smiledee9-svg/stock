@@ -2616,23 +2616,6 @@ class MultiStoreStockApp {
     if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal(modal));
     if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeModal(modal));
 
-    // API Key Save Button
-    const saveKeyBtn = document.getElementById('saveGeminiApiKeyBtn');
-    if (saveKeyBtn) {
-      saveKeyBtn.addEventListener('click', () => this.saveGeminiApiKey());
-    }
-
-    // Toggle API Key Box (hidden by default)
-    const toggleKeyBtn = document.getElementById('toggleKeyConfigBtn');
-    const keyBox = document.getElementById('geminiKeyConfigBox');
-    if (toggleKeyBtn && keyBox) {
-      toggleKeyBtn.addEventListener('click', () => {
-        const isHidden = window.getComputedStyle(keyBox).display === 'none';
-        keyBox.style.display = isHidden ? 'block' : 'none';
-        toggleKeyBtn.textContent = isHidden ? '🔼 ซ่อนการตั้งค่า Key' : '⚙️ ตั้งค่า Key';
-      });
-    }
-
     // Camera & Gallery Trigger Buttons
     const triggerCamBtn = document.getElementById('triggerCameraBtn');
     const triggerGalBtn = document.getElementById('triggerGalleryBtn');
@@ -2679,38 +2662,15 @@ class MultiStoreStockApp {
     if (!modal) return;
 
     this.resetScanImageState();
-    this.updateGeminiKeyStatusUI();
     this.openModal(modal);
   }
 
   updateGeminiKeyStatusUI() {
-    const keyInput = document.getElementById('geminiApiKeyInput');
-    const keyBox = document.getElementById('geminiKeyConfigBox');
-    const statusMsg = document.getElementById('geminiKeyStatusMessage');
-    const currentKey = this.getGeminiApiKey();
-
-    if (currentKey) {
-      if (keyInput) keyInput.value = currentKey;
-      if (keyBox) keyBox.classList.add('key-saved');
-      if (statusMsg) {
-        statusMsg.innerHTML = '✅ <strong style="color: var(--success-text);">เชื่อมต่อ Google Gemini AI เรียบร้อยแล้ว (พร้อมใช้งานอัตโนมัติ)</strong>';
-      }
-    }
+    // Key is safely embedded in app.js
   }
 
   saveGeminiApiKey() {
-    const keyInput = document.getElementById('geminiApiKeyInput');
-    const key = keyInput ? keyInput.value.trim() : '';
-
-    if (!key) {
-      this.showToast('กรุณากรอกรหัส Google Gemini API Key', 'warning');
-      return;
-    }
-
-    localStorage.setItem('smartstock_gemini_api_key', key);
-    this.updateGeminiKeyStatusUI();
-    this.showToast('บันทึก Google Gemini API Key สำเร็จ 🎉', 'success');
-    this.playVoiceSound('success');
+    // Kept for backward compatibility
   }
 
   resetScanImageState() {
@@ -2725,13 +2685,8 @@ class MultiStoreStockApp {
     const cameraInput = document.getElementById('billCameraInput');
     const galleryInput = document.getElementById('billGalleryInput');
 
-    const keyBox = document.getElementById('geminiKeyConfigBox');
-    const toggleKeyBtn = document.getElementById('toggleKeyConfigBtn');
-
     if (cameraInput) cameraInput.value = '';
     if (galleryInput) galleryInput.value = '';
-    if (keyBox) keyBox.style.display = 'none';
-    if (toggleKeyBtn) toggleKeyBtn.textContent = '⚙️ ตั้งค่า Key';
     if (actionButtons) actionButtons.style.display = 'grid';
     if (previewWrap) previewWrap.style.display = 'none';
     if (loadingWrap) loadingWrap.style.display = 'none';
@@ -2815,9 +2770,7 @@ class MultiStoreStockApp {
 
     const apiKey = this.getGeminiApiKey();
     if (!apiKey) {
-      this.showToast('กรุณากรอก Google Gemini API Key ด้านบนก่อนครับ (รับฟรีได้ทันที)', 'warning');
-      const input = document.getElementById('geminiApiKeyInput');
-      if (input) input.focus();
+      this.showToast('ไม่พบ Google Gemini API Key ในระบบ', 'danger');
       return;
     }
 

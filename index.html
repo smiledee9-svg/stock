@@ -512,21 +512,6 @@
       </div>
       
       <div class="modal-body-content">
-        <!-- API KEY CONFIGURATION BOX (ซ่อนไว้เนื่องจากระบบฝังรหัสใช้งานให้อัตโนมัติแล้ว) -->
-        <div id="geminiKeyConfigBox" class="scan-key-box" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
-            <span class="scan-key-title">🔑 Google Gemini AI Key (ใช้งานฟรี)</span>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key">กดรับ API Key ฟรีคลิกที่นี่ ↗</a>
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <input type="password" id="geminiApiKeyInput" placeholder="วางรหัส AQ.Ab... ที่นี่" autocomplete="off" style="flex: 1; font-size: 1.35rem; padding: 10px 14px;">
-            <button type="button" id="saveGeminiApiKeyBtn" class="btn btn-primary btn-scan-action" style="white-space: nowrap;">บันทึก Key</button>
-          </div>
-          <div id="geminiKeyStatusMessage" class="key-status-msg">
-            💡 ใส่ครั้งแรกครั้งเดียว แท็บเล็ตจะจำไว้ตลอดไป (โควตาฟรี 1,500 ครั้ง/วัน)
-          </div>
-        </div>
-
         <!-- CAMERA / FILE UPLOAD CONTROLS -->
         <div class="scan-upload-zone" id="scanUploadZone">
           <input type="file" id="billCameraInput" accept="image/*" capture="environment" style="display: none;">
@@ -581,10 +566,7 @@
       </div>
 
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <button type="button" class="btn btn-secondary btn-scan-footer" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
-          <button type="button" id="toggleKeyConfigBtn" class="btn-link-key" style="background: none; border: none; font-size: 1.15rem; color: var(--text-muted); text-decoration: underline; cursor: pointer; padding: 6px;" title="คลิกเพื่อเปิด/ปิดการตั้งค่า Google Gemini API Key">⚙️ ตั้งค่า Key</button>
-        </div>
+        <button type="button" class="btn btn-secondary btn-scan-footer" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
         <button type="button" class="btn btn-primary btn-scan-footer" id="confirmImportScannedBtn" style="display: none;">
           📥 นำเข้ารายการสินค้าลงสต็อก
         </button>
