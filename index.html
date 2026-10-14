@@ -501,11 +501,11 @@
   <div class="modal-overlay" id="scanBillModal" role="dialog" aria-modal="true">
     <div class="modal-card scan-bill-modal-card">
       <div class="modal-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.6rem;">📷</span>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="scan-header-icon">📷</span>
           <div>
-            <h3 style="margin: 0; font-size: 1.25rem;">สแกนบิลนำเข้ารายการสินค้า</h3>
-            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">ดึงเฉพาะชื่อรายการสินค้าจากรูปภาพ/กล้องแท็บเล็ตเข้าสู่ร้านนี้</p>
+            <h3 class="scan-modal-title">สแกนบิลนำเข้ารายการสินค้า</h3>
+            <p class="scan-modal-subtitle">ดึงเฉพาะชื่อรายการสินค้าจากรูปภาพ/กล้องแท็บเล็ตเข้าสู่ร้านนี้</p>
           </div>
         </div>
         <button class="close-btn" id="closeScanBillModalBtn" aria-label="ปิด">&times;</button>
@@ -514,13 +514,13 @@
       <div class="modal-body-content">
         <!-- API KEY CONFIGURATION BOX (ซ่อนไว้เนื่องจากระบบฝังรหัสใช้งานให้อัตโนมัติแล้ว) -->
         <div id="geminiKeyConfigBox" class="scan-key-box" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-            <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">🔑 Google Gemini AI Key (ใช้งานฟรี)</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <span class="scan-key-title">🔑 Google Gemini AI Key (ใช้งานฟรี)</span>
             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key">กดรับ API Key ฟรีคลิกที่นี่ ↗</a>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <input type="password" id="geminiApiKeyInput" placeholder="วางรหัส AQ.Ab... ที่นี่" autocomplete="off" style="flex: 1;">
-            <button type="button" id="saveGeminiApiKeyBtn" class="btn btn-primary btn-sm" style="white-space: nowrap;">บันทึก Key</button>
+          <div style="display: flex; gap: 10px;">
+            <input type="password" id="geminiApiKeyInput" placeholder="วางรหัส AQ.Ab... ที่นี่" autocomplete="off" style="flex: 1; font-size: 1.35rem; padding: 10px 14px;">
+            <button type="button" id="saveGeminiApiKeyBtn" class="btn btn-primary btn-scan-action" style="white-space: nowrap;">บันทึก Key</button>
           </div>
           <div id="geminiKeyStatusMessage" class="key-status-msg">
             💡 ใส่ครั้งแรกครั้งเดียว แท็บเล็ตจะจำไว้ตลอดไป (โควตาฟรี 1,500 ครั้ง/วัน)
@@ -551,27 +551,27 @@
               <img id="scanImagePreview" alt="ตัวอย่างรูปภาพบิล">
             </div>
             <div class="preview-actions-bar">
-              <button type="button" id="reselectImageBtn" class="btn btn-secondary btn-sm">🔄 ถ่ายใหม่ / เปลี่ยนรูป</button>
-              <button type="button" id="processAiBtn" class="btn btn-primary btn-sm">✨ เริ่มวิเคราะห์ดึงรายการสินค้า</button>
+              <button type="button" id="reselectImageBtn" class="btn btn-secondary btn-scan-action">🔄 ถ่ายใหม่ / เปลี่ยนรูป</button>
+              <button type="button" id="processAiBtn" class="btn btn-primary btn-scan-action">✨ เริ่มวิเคราะห์ดึงรายการสินค้า</button>
             </div>
           </div>
         </div>
 
         <!-- LOADING SPINNER -->
         <div id="scanLoadingWrap" class="scan-loading-wrap" style="display: none;">
-          <div class="loading-spinner"></div>
-          <h4 style="margin-top: 14px; font-size: 1.15rem; color: var(--text-main);">AI กำลังอ่านและกรองเฉพาะรายการสินค้า...</h4>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">กรองทิ้งหัวบิล วันที่ ราคา และข้อมูลอื่นให้อัตโนมัติ (1-3 วินาที)</p>
+          <div class="loading-spinner" style="width: 50px; height: 50px; border-width: 4px;"></div>
+          <h4 class="scan-loading-title">AI กำลังอ่านและกรองเฉพาะรายการสินค้า...</h4>
+          <p class="scan-loading-subtitle">กรองทิ้งหัวบิล วันที่ ราคา และข้อมูลอื่นให้อัตโนมัติ (1-3 วินาที)</p>
         </div>
 
         <!-- SCAN RESULTS SECTION -->
         <div id="scanResultSection" class="scan-result-section" style="display: none;">
           <div class="result-header-row">
             <div>
-              <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);" id="scannedCountText">พบ 0 รายการ</span>
-              <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">ตรวจเช็คความถูกต้อง สามารถแก้ไขชื่อหรือลบแถวที่ไม่ต้องการได้</p>
+              <span class="scan-count-title" id="scannedCountText">พบ 0 รายการ</span>
+              <p class="scan-result-subtitle">ตรวจเช็คความถูกต้อง สามารถแก้ไขชื่อหรือลบแถวที่ไม่ต้องการได้</p>
             </div>
-            <button type="button" id="addNewExtractedRowBtn" class="btn btn-secondary btn-sm">+ เพิ่มรายการ</button>
+            <button type="button" id="addNewExtractedRowBtn" class="btn btn-secondary btn-scan-action">+ เพิ่มรายการ</button>
           </div>
 
           <div class="extracted-items-list" id="extractedItemsList">
@@ -580,12 +580,12 @@
         </div>
       </div>
 
-      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button type="button" class="btn btn-secondary" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
-          <button type="button" id="toggleKeyConfigBtn" class="btn-link-key" style="background: none; border: none; font-size: 0.78rem; color: var(--text-muted); text-decoration: underline; cursor: pointer; padding: 4px;" title="คลิกเพื่อเปิด/ปิดการตั้งค่า Google Gemini API Key">⚙️ ตั้งค่า Key</button>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button type="button" class="btn btn-secondary btn-scan-footer" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
+          <button type="button" id="toggleKeyConfigBtn" class="btn-link-key" style="background: none; border: none; font-size: 1.15rem; color: var(--text-muted); text-decoration: underline; cursor: pointer; padding: 6px;" title="คลิกเพื่อเปิด/ปิดการตั้งค่า Google Gemini API Key">⚙️ ตั้งค่า Key</button>
         </div>
-        <button type="button" class="btn btn-primary" id="confirmImportScannedBtn" style="display: none;">
+        <button type="button" class="btn btn-primary btn-scan-footer" id="confirmImportScannedBtn" style="display: none;">
           📥 นำเข้ารายการสินค้าลงสต็อก
         </button>
       </div>

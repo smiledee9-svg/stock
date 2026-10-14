@@ -3108,16 +3108,48 @@ body {
    Scan Bill / Import Products From Image (สแกนบิลนำเข้ารายการสินค้า)
    ========================================================================== */
 .scan-bill-modal-card {
-  max-width: 620px;
+  max-width: 950px;
   width: 95%;
+  font-size: 1.4rem;
+}
+
+.scan-bill-modal-card .modal-header {
+  padding: 20px 24px;
+}
+
+.scan-bill-modal-card .close-btn {
+  font-size: 2.4rem;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.scan-header-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.scan-modal-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.scan-modal-subtitle {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 6px 0 0 0;
+  line-height: 1.4;
 }
 
 .scan-key-box {
   background: var(--bg-tertiary);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
-  margin-bottom: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
   transition: var(--transition);
 }
 
@@ -3126,11 +3158,17 @@ body {
   background: var(--success-light);
 }
 
+.scan-key-title {
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--text-main);
+}
+
 .link-get-key {
   color: var(--primary);
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: underline;
-  font-size: 0.82rem;
+  font-size: 1.25rem;
 }
 
 .link-get-key:hover {
@@ -3138,23 +3176,23 @@ body {
 }
 
 .key-status-msg {
-  font-size: 0.8rem;
+  font-size: 1.3rem;
   color: var(--text-muted);
-  margin-top: 6px;
-  line-height: 1.4;
+  margin-top: 10px;
+  line-height: 1.5;
 }
 
 .scan-upload-zone {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .scan-action-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 20px;
 }
 
 .scan-btn-lg {
@@ -3162,49 +3200,53 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 18px 14px;
-  min-height: 104px;
+  padding: 28px 20px;
+  min-height: 160px;
   text-align: center;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: var(--transition);
+  box-shadow: var(--shadow-md);
 }
 
 .scan-btn-lg:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
 }
 
 .scan-btn-icon {
-  font-size: 2rem;
+  font-size: 3.5rem;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 
 .scan-btn-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.25;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.3;
 }
 
 .scan-btn-sub {
-  font-size: 0.78rem;
-  opacity: 0.82;
-  margin-top: 4px;
+  font-size: 1.35rem;
+  font-weight: 500;
+  opacity: 0.95;
+  margin-top: 8px;
+  line-height: 1.35;
 }
 
 .scan-image-preview-wrap {
   background: var(--bg-tertiary);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 16px;
   text-align: center;
 }
 
 .preview-img-box {
-  max-height: 240px;
+  max-height: 380px;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   background: rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
@@ -3212,7 +3254,7 @@ body {
 }
 
 #scanImagePreview {
-  max-height: 240px;
+  max-height: 380px;
   max-width: 100%;
   object-fit: contain;
   border-radius: var(--radius-sm);
@@ -3220,84 +3262,123 @@ body {
 
 .preview-actions-bar {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
+.btn-scan-action {
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  padding: 12px 24px !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.btn-scan-footer {
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  padding: 12px 28px !important;
+  border-radius: var(--radius-md) !important;
+}
+
 .scan-loading-wrap {
   text-align: center;
-  padding: 28px 16px;
+  padding: 40px 20px;
   background: var(--bg-tertiary);
   border-radius: var(--radius-md);
-  border: 1px dashed var(--primary);
-  margin-bottom: 16px;
+  border: 2px dashed var(--primary);
+  margin-bottom: 20px;
+}
+
+.scan-loading-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 16px 0 0;
+}
+
+.scan-loading-subtitle {
+  font-size: 1.35rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
 }
 
 .scan-result-section {
   background: var(--bg-tertiary);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
-  padding: 14px;
-  margin-bottom: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .result-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--card-border);
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+}
+
+.scan-count-title {
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--text-main);
+}
+
+.scan-result-subtitle {
+  font-size: 1.35rem;
+  color: var(--text-muted);
+  margin: 4px 0 0;
 }
 
 .extracted-items-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 280px;
+  gap: 12px;
+  max-height: 380px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 6px;
 }
 
 .extracted-item-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
 }
 
 .extracted-item-num {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: var(--text-muted);
-  min-width: 20px;
+  min-width: 32px;
 }
 
 .extracted-item-input {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 0.95rem;
+  font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-main);
   outline: none;
-  padding: 4px 6px;
+  padding: 6px 10px;
 }
 
 .extracted-item-input:focus {
   background: var(--bg-primary);
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .badge-item-status {
-  font-size: 0.75rem;
-  padding: 3px 8px;
+  font-size: 1.2rem;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
   white-space: nowrap;
   font-weight: 700;
@@ -3317,10 +3398,10 @@ body {
   background: none;
   border: none;
   color: var(--danger);
-  font-size: 1.3rem;
+  font-size: 2rem;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
   line-height: 1;
   transition: var(--transition);
 }
@@ -3330,6 +3411,9 @@ body {
 }
 
 @media (max-width: 640px) {
+  .scan-bill-modal-card {
+    width: 98%;
+  }
   .scan-action-buttons {
     grid-template-columns: 1fr;
   }
