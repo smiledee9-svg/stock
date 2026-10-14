@@ -2944,16 +2944,36 @@ class MultiStoreStockApp {
     const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash'];
     let lastError = null;
 
-    const promptText = `คุณคือผู้ช่วยจัดการสต็อกสินค้าที่มีความเชี่ยวชาญสูง
-วิเคราะห์รูปภาพนี้ซึ่งเป็นบิล, ใบเสร็จ, ใบส่งของ, หรือกระดาษจดสต็อก
-หน้าที่สำคัญที่สุดของคุณ: ค้นหาและดึงเอาเฉพาะ "ชื่อรุ่น หรือ ชื่อรายการสินค้า" เท่านั้น!
+    const promptText = `คุณคือผู้ช่วยจัดการสต็อกสินค้าที่มีความเชี่ยวชาญสูงในการอ่านบิล ใบเสร็จ ใบส่งของ และใบกำกับภาษี
+หน้าที่ของคุณ:
+1. ดึง "ชื่อรุ่น หรือ ชื่อรายการสินค้า" ทุกรายการที่ปรากฏในบิล
+2. ค้นหาและคำนวณ "ราคาขายต่อ 1 ชิ้น" (unit price per 1 piece):
+   - หากในบิลระบุเป็น "ลัง", "กล่อง", "แพ็ค", "โหล" (เช่น ปลั๊กไฟ 1 ลัง 1,200 บาท ในบิลระบุหรือรู้ว่าลังละ 12 ตัว):
+     ให้ตรวจหาจำนวนชิ้นต่อลัง (เช่น 12) แล้วคำนวณราคาต่อ 1 ชิ้นออกมา: 1,200 / 12 = 100
+   - หากในบิลระบุราคาต่อชิ้น/ตัว/ลูก อยู่แล้ว ให้ใช้ราคานั้นได้เลย
+   - กฎสำคัญ: หากข้อมูลในบิลไม่ชัดเจน ข้อมูลไม่พอ ไม่มีราคา หรือไม่สามารถทราบจำนวนชิ้นต่อลังได้อย่างมั่นใจ ให้ใส่ price เป็น null (ไม่ต้องเดา ไม่ต้องบังคับเติม ให้เว้นว่างไว้)
+3. ระบุ "packInfo" เป็นข้อความสั้นๆ อธิบายที่มา เช่น "ลังละ 12 ตัว (1,200฿)", "แพ็ค 6", หรือเว้นว่าง "" ถ้าเป็นชิ้นเดี่ยวหรือไม่มีข้อมูล
 
-กฎเหล็กที่ต้องปฏิบัติตามอย่างเคร่งครัด:
-1. กรองทิ้งข้อมูลอื่นทั้งหมด: ห้ามเอาชื่อร้านค้า, ห้ามเอาเลขที่บิล, ห้ามเอาวันที่, ห้ามเอาที่อยู่, ห้ามเอาเบอร์โทร, ห้ามเอาราคา, ห้ามเอายอดเงินรวม, ห้ามเอาภาษี, ห้ามเอาลายเซ็น
-2. แยกแต่ละรายการสินค้าออกมา ห้ามรวมเป็นก้อนเดียว
-3. ส่งคำตอบกลับมาเป็น JSON Array ของ String เท่านั้น ห้ามใส่คำอธิบายอื่น ห้ามใส่ข้อความเกริ่นนำ
-ตัวอย่างผลลัพธ์ที่ถูกต้อง:
-["แบตเตอรี่ GS MFX-60L", "3K ADX65L ขั้ว L", "FB S-650"]`;
+กฎเหล็ก:
+- ส่งคำตอบกลับมาเป็น JSON Array ของ Object เท่านั้น ห้ามใส่คำอธิบายอื่น ห้ามใส่ข้อความเกริ่นนำ
+โครงสร้าง JSON ตัวอย่าง:
+[
+  {
+    "name": "ปลั๊กไฟ 3 ตา 3 ช่อง",
+    "price": 100,
+    "packInfo": "ลังละ 12 ตัว (1,200฿)"
+  },
+  {
+    "name": "แบตเตอรี่ GS MFX-60L",
+    "price": 1850,
+    "packInfo": ""
+  },
+  {
+    "name": "หลอดไฟ LED T8",
+    "price": null,
+    "packInfo": ""
+  }
+]`;
 
     for (const model of models) {
       try {
@@ -3009,7 +3029,20 @@ class MultiStoreStockApp {
     try {
       const parsed = JSON.parse(clean);
       if (Array.isArray(parsed)) {
-        return parsed.map(item => String(item).trim()).filter(Boolean);
+        return parsed.map(item => {
+          if (typeof item === 'object' && item !== null) {
+            const name = String(item.name || '').trim();
+            let price = null;
+            if (item.price !== null && item.price !== undefined && item.price !== '') {
+              const p = parseFloat(String(item.price).replace(/,/g, ''));
+              if (!isNaN(p) && p >= 0) price = p;
+            }
+            const packInfo = String(item.packInfo || '').trim();
+            return { name, price, packInfo };
+          } else {
+            return { name: String(item).trim(), price: null, packInfo: '' };
+          }
+        }).filter(item => item.name.length > 0);
       }
     } catch (e) {}
 
@@ -3017,7 +3050,8 @@ class MultiStoreStockApp {
     return clean
       .split('\n')
       .map(line => line.replace(/^[-*•\d+.)\s]+/, '').replace(/^["']|["'],?$/g, '').trim())
-      .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith(']'));
+      .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith(']'))
+      .map(line => ({ name: line, price: null, packInfo: '' }));
   }
 
   renderExtractedItems(items) {
@@ -3032,16 +3066,20 @@ class MultiStoreStockApp {
     resultSection.style.display = 'block';
     if (confirmBtn) confirmBtn.style.display = 'inline-flex';
 
-    items.forEach((itemText, idx) => {
-      this.createExtractedRowElement(listContainer, itemText, idx + 1);
+    items.forEach((item, idx) => {
+      this.createExtractedRowElement(listContainer, item, idx + 1);
     });
 
     this.updateExtractedCountBadge();
   }
 
-  createExtractedRowElement(container, nameText, num) {
+  createExtractedRowElement(container, itemData, num) {
     const row = document.createElement('div');
     row.className = 'extracted-item-row';
+
+    const nameText = typeof itemData === 'object' && itemData ? (itemData.name || '') : String(itemData || '');
+    const priceVal = typeof itemData === 'object' && itemData && itemData.price !== null && itemData.price !== undefined ? itemData.price : '';
+    const packInfo = typeof itemData === 'object' && itemData ? (itemData.packInfo || '') : '';
 
     // Check if store already has this product name (case-insensitive)
     const exists = this.products.some(p => 
@@ -3051,20 +3089,28 @@ class MultiStoreStockApp {
 
     row.innerHTML = `
       <span class="extracted-item-num">${num}.</span>
-      <input type="text" class="extracted-item-input" value="${this.escapeHtml(nameText)}" placeholder="ชื่อรายการสินค้า" autocomplete="off">
+      <div class="extracted-item-name-wrap">
+        <input type="text" class="extracted-item-input extracted-name-input" value="${this.escapeHtml(nameText)}" placeholder="ชื่อรายการสินค้า" autocomplete="off">
+        ${packInfo ? `<span class="extracted-pack-hint" title="ข้อมูลบรรจุภัณฑ์จากบิล">📦 ${this.escapeHtml(packInfo)}</span>` : ''}
+      </div>
+      <div class="extracted-item-price-wrap" title="ราคาขายต่อ 1 ชิ้น (แก้ไขได้ หรือเว้นว่างได้)">
+        <span class="extracted-currency-sym">฿</span>
+        <input type="number" step="any" min="0" class="extracted-price-input" value="${priceVal !== '' ? priceVal : ''}" placeholder="ว่าง">
+        <span class="extracted-unit-label">/ชิ้น</span>
+      </div>
       <span class="badge-item-status ${exists ? 'badge-item-exists' : 'badge-item-new'}">
         ${exists ? '✓ มีในร้านแล้ว' : '✨ สินค้าใหม่'}
       </span>
       <button type="button" class="btn-remove-extracted" title="ลบรายการนี้" aria-label="ลบ">&times;</button>
     `;
 
-    const input = row.querySelector('.extracted-item-input');
+    const nameInput = row.querySelector('.extracted-name-input');
     const badge = row.querySelector('.badge-item-status');
     const removeBtn = row.querySelector('.btn-remove-extracted');
 
-    if (input && badge) {
-      input.addEventListener('input', () => {
-        const currentName = input.value.trim().toLowerCase();
+    if (nameInput && badge) {
+      nameInput.addEventListener('input', () => {
+        const currentName = nameInput.value.trim().toLowerCase();
         const nowExists = this.products.some(p => 
           p.storeId === this.currentStoreId && 
           p.name.trim().toLowerCase() === currentName
@@ -3090,15 +3136,15 @@ class MultiStoreStockApp {
     container.appendChild(row);
   }
 
-  addNewExtractedRow(initialName = '') {
+  addNewExtractedRow(initialName = '', initialPrice = '', initialPackInfo = '') {
     const container = document.getElementById('extractedItemsList');
     if (!container) return;
     const count = container.querySelectorAll('.extracted-item-row').length;
-    this.createExtractedRowElement(container, initialName, count + 1);
+    this.createExtractedRowElement(container, { name: initialName, price: initialPrice, packInfo: initialPackInfo }, count + 1);
     this.updateExtractedCountBadge();
 
     // Focus on new input
-    const inputs = container.querySelectorAll('.extracted-item-input');
+    const inputs = container.querySelectorAll('.extracted-name-input');
     if (inputs.length > 0) {
       const lastInput = inputs[inputs.length - 1];
       lastInput.focus();
@@ -3136,9 +3182,15 @@ class MultiStoreStockApp {
     const rows = document.querySelectorAll('#extractedItemsList .extracted-item-row');
     const itemsToAdd = [];
     rows.forEach(row => {
-      const input = row.querySelector('.extracted-item-input');
-      const name = input ? input.value.trim() : '';
-      if (name) itemsToAdd.push(name);
+      const nameInput = row.querySelector('.extracted-name-input') || row.querySelector('.extracted-item-input');
+      const priceInput = row.querySelector('.extracted-price-input');
+      const name = nameInput ? nameInput.value.trim() : '';
+      let price = 0;
+      if (priceInput && priceInput.value.trim() !== '') {
+        const parsed = parseFloat(priceInput.value.trim());
+        if (!isNaN(parsed) && parsed >= 0) price = parsed;
+      }
+      if (name) itemsToAdd.push({ name, price });
     });
 
     if (itemsToAdd.length === 0) {
@@ -3152,22 +3204,29 @@ class MultiStoreStockApp {
 
     let addedCount = 0;
     let existingCount = 0;
+    let updatedPriceCount = 0;
 
-    itemsToAdd.forEach(name => {
+    itemsToAdd.forEach(item => {
       // Check if store already has this product name (case-insensitive)
       const existing = this.products.find(p => 
         p.storeId === this.currentStoreId && 
-        p.name.trim().toLowerCase() === name.toLowerCase()
+        p.name.trim().toLowerCase() === item.name.toLowerCase()
       );
 
       if (existing) {
         existingCount++;
+        // If existing product had no price, update with scanned price
+        if (item.price > 0 && (!existing.price || existing.price === 0)) {
+          existing.price = item.price;
+          existing.updatedAt = new Date().toISOString();
+          updatedPriceCount++;
+        }
         return; // Don't duplicate if identical name already exists
       }
 
       // Smart category deduction
       let category = defaultCat;
-      const lower = name.toLowerCase();
+      const lower = item.name.toLowerCase();
       if (lower.includes('ขั้ว l') || lower.includes('b24l') || lower.includes('d23l') || lower.includes('d31l')) {
         category = 'แบตเตอรี่ (ขั้ว L)';
       } else if (lower.includes('ขั้ว r') || lower.includes('b24r') || lower.includes('d23r') || lower.includes('d31r')) {
@@ -3183,13 +3242,13 @@ class MultiStoreStockApp {
       const newProduct = {
         id: 'prod_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         storeId: this.currentStoreId,
-        name: name,
-        sku: name.replace(/\s+/g, '-').toUpperCase(),
+        name: item.name,
+        sku: item.name.replace(/\s+/g, '-').toUpperCase(),
         category: category,
         quantity: 0,
         minAlert: 5,
         costPrice: 0,
-        price: 0,
+        price: item.price || 0,
         unit: isBattery ? 'ลูก' : 'ชิ้น',
         updatedAt: new Date().toISOString()
       };
@@ -3198,7 +3257,7 @@ class MultiStoreStockApp {
       addedCount++;
     });
 
-    if (addedCount > 0) {
+    if (addedCount > 0 || updatedPriceCount > 0) {
       this.saveProducts();
       this.renderStoreDetail();
       this.closeModal(document.getElementById('scanBillModal'));
