@@ -2622,6 +2622,17 @@ class MultiStoreStockApp {
       saveKeyBtn.addEventListener('click', () => this.saveGeminiApiKey());
     }
 
+    // Toggle API Key Box (hidden by default)
+    const toggleKeyBtn = document.getElementById('toggleKeyConfigBtn');
+    const keyBox = document.getElementById('geminiKeyConfigBox');
+    if (toggleKeyBtn && keyBox) {
+      toggleKeyBtn.addEventListener('click', () => {
+        const isHidden = window.getComputedStyle(keyBox).display === 'none';
+        keyBox.style.display = isHidden ? 'block' : 'none';
+        toggleKeyBtn.textContent = isHidden ? '🔼 ซ่อนการตั้งค่า Key' : '⚙️ ตั้งค่า Key';
+      });
+    }
+
     // Camera & Gallery Trigger Buttons
     const triggerCamBtn = document.getElementById('triggerCameraBtn');
     const triggerGalBtn = document.getElementById('triggerGalleryBtn');
@@ -2714,8 +2725,13 @@ class MultiStoreStockApp {
     const cameraInput = document.getElementById('billCameraInput');
     const galleryInput = document.getElementById('billGalleryInput');
 
+    const keyBox = document.getElementById('geminiKeyConfigBox');
+    const toggleKeyBtn = document.getElementById('toggleKeyConfigBtn');
+
     if (cameraInput) cameraInput.value = '';
     if (galleryInput) galleryInput.value = '';
+    if (keyBox) keyBox.style.display = 'none';
+    if (toggleKeyBtn) toggleKeyBtn.textContent = '⚙️ ตั้งค่า Key';
     if (actionButtons) actionButtons.style.display = 'grid';
     if (previewWrap) previewWrap.style.display = 'none';
     if (loadingWrap) loadingWrap.style.display = 'none';

@@ -512,8 +512,8 @@
       </div>
       
       <div class="modal-body-content">
-        <!-- API KEY CONFIGURATION BOX -->
-        <div id="geminiKeyConfigBox" class="scan-key-box">
+        <!-- API KEY CONFIGURATION BOX (ซ่อนไว้เนื่องจากระบบฝังรหัสใช้งานให้อัตโนมัติแล้ว) -->
+        <div id="geminiKeyConfigBox" class="scan-key-box" style="display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
             <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">🔑 Google Gemini AI Key (ใช้งานฟรี)</span>
             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key">กดรับ API Key ฟรีคลิกที่นี่ ↗</a>
@@ -581,7 +581,10 @@
       </div>
 
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <button type="button" class="btn btn-secondary" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
+          <button type="button" id="toggleKeyConfigBtn" class="btn-link-key" style="background: none; border: none; font-size: 0.78rem; color: var(--text-muted); text-decoration: underline; cursor: pointer; padding: 4px;" title="คลิกเพื่อเปิด/ปิดการตั้งค่า Google Gemini API Key">⚙️ ตั้งค่า Key</button>
+        </div>
         <button type="button" class="btn btn-primary" id="confirmImportScannedBtn" style="display: none;">
           📥 นำเข้ารายการสินค้าลงสต็อก
         </button>
