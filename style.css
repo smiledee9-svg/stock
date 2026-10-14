@@ -476,9 +476,10 @@ body {
   border: none;
   font-weight: 600;
   padding: 8px 16px;
-  height: 40px;
+  height: auto;
+  min-height: 40px;
   border-radius: var(--radius-md);
-  font-size: 0.85rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: var(--transition);
   display: flex;
@@ -1489,7 +1490,13 @@ body {
 #storesHubView .stock-status-pill,
 #storesHubView .store-desc-text,
 #storesHubView .store-stat-val,
-#storesHubView .store-stat-lbl {
+#storesHubView .store-stat-lbl,
+#storesHubView .btn-open-store,
+#storesHubView .btn-open-store span,
+#openAddStoreBtn,
+#openAddStoreBtn span,
+.btn-open-store,
+.btn-open-store span {
   font-size: 1.2rem !important;
 }
 
@@ -1508,20 +1515,22 @@ body {
   font-weight: 600;
 }
 
-/* ปุ่มกดทั้งหมดในหน้ารวมร้านค้าและปุ่มด้านบนสุด ใช้ขนาดตัวอักษรเท่ากันเป๊ะ */
+/* ปุ่มกดทั้งหมดในหน้ารวมร้านค้าและปุ่มด้านบนสุด ใช้ขนาดตัวอักษรเท่ากับข้อความทั้งหน้าต่าง (1.2rem) */
 #openAddStoreBtn,
 #openAddStoreBtn span,
 .btn-open-store,
 .btn-open-store span,
 #storesHubView .btn-open-store,
 #storesHubView .btn-open-store span {
-  font-size: 0.84rem !important;
-  font-weight: 600;
+  font-size: 1.2rem !important;
+  font-weight: 700;
 }
 
-#storesHubView .btn-open-store {
+#storesHubView .btn-open-store,
+#openAddStoreBtn {
+  height: auto;
+  min-height: 42px;
   padding: 8px 16px;
-  height: 40px;
 }
 
 /* ================= Product Cards Grid ================= */
@@ -2804,7 +2813,13 @@ body {
   #storesHubView .stock-status-pill,
   #storesHubView .store-desc-text,
   #storesHubView .store-stat-val,
-  #storesHubView .store-stat-lbl {
+  #storesHubView .store-stat-lbl,
+  #storesHubView .btn-open-store,
+  #storesHubView .btn-open-store span,
+  #openAddStoreBtn,
+  #openAddStoreBtn span,
+  .btn-open-store,
+  .btn-open-store span {
     font-size: 1.15rem !important;
   }
 }
@@ -2894,8 +2909,8 @@ body {
   .btn-open-store {
     flex: 0 0 auto;
     padding: 6px 12px;
-    height: 36px;
-    font-size: 0.82rem;
+    height: auto;
+    min-height: 38px;
     gap: 4px;
     white-space: nowrap;
     box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
@@ -3074,7 +3089,13 @@ body {
   #storesHubView .store-name-title,
   #storesHubView .stock-status-pill,
   #storesHubView .store-desc-text,
-  #storesHubView .store-stat-val {
+  #storesHubView .store-stat-val,
+  #storesHubView .btn-open-store,
+  #storesHubView .btn-open-store span,
+  #openAddStoreBtn,
+  #openAddStoreBtn span,
+  .btn-open-store,
+  .btn-open-store span {
     font-size: 1.1rem !important;
   }
 
