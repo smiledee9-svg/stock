@@ -3103,3 +3103,235 @@ body {
     font-size: 0.82rem !important;
   }
 }
+
+/* ==========================================================================
+   Scan Bill / Import Products From Image (สแกนบิลนำเข้ารายการสินค้า)
+   ========================================================================== */
+.scan-bill-modal-card {
+  max-width: 620px;
+  width: 95%;
+}
+
+.scan-key-box {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  transition: var(--transition);
+}
+
+.scan-key-box.key-saved {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: var(--success-light);
+}
+
+.link-get-key {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 0.82rem;
+}
+
+.link-get-key:hover {
+  color: var(--primary-hover);
+}
+
+.key-status-msg {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.scan-upload-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.scan-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.scan-btn-lg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  min-height: 104px;
+  text-align: center;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.scan-btn-lg:hover {
+  transform: translateY(-2px);
+}
+
+.scan-btn-icon {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.scan-btn-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.scan-btn-sub {
+  font-size: 0.78rem;
+  opacity: 0.82;
+  margin-top: 4px;
+}
+
+.scan-image-preview-wrap {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+}
+
+.preview-img-box {
+  max-height: 240px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#scanImagePreview {
+  max-height: 240px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.preview-actions-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.scan-loading-wrap {
+  text-align: center;
+  padding: 28px 16px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--primary);
+  margin-bottom: 16px;
+}
+
+.scan-result-section {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.result-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--card-border);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.extracted-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.extracted-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+}
+
+.extracted-item-num {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 20px;
+}
+
+.extracted-item-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+  padding: 4px 6px;
+}
+
+.extracted-item-input:focus {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.badge-item-status {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.badge-item-new {
+  background: var(--success-light);
+  color: var(--success-text);
+}
+
+.badge-item-exists {
+  background: var(--warning-light);
+  color: var(--warning-text);
+}
+
+.btn-remove-extracted {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: var(--transition);
+}
+
+.btn-remove-extracted:hover {
+  background: var(--danger-light);
+}
+
+@media (max-width: 640px) {
+  .scan-action-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+

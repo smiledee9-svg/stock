@@ -632,6 +632,9 @@ class MultiStoreStockApp {
 
     // Voice Input System Initialization
     this.initVoiceSystem();
+
+    // Scan Bill / Image Import System Initialization
+    this.initScanBillSystem();
   }
 
   // View Navigation
@@ -2586,6 +2589,528 @@ class MultiStoreStockApp {
       recognition.start();
     } catch (err) {
       this.stopAnyActiveVoice();
+    }
+  }
+
+  // ================= SCAN BILL & IMAGE IMPORT SYSTEM (AI VISION) =================
+  initScanBillSystem() {
+    this.currentBillImage = null;
+    this.extractedBillItems = [];
+
+    const openBtn = document.getElementById('openScanBillModalBtn');
+    const closeBtn = document.getElementById('closeScanBillModalBtn');
+    const cancelBtn = document.getElementById('cancelScanBillBtn');
+    const modal = document.getElementById('scanBillModal');
+
+    if (openBtn) openBtn.addEventListener('click', () => this.openScanBillModal());
+    if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal(modal));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeModal(modal));
+
+    // API Key Save Button
+    const saveKeyBtn = document.getElementById('saveGeminiApiKeyBtn');
+    if (saveKeyBtn) {
+      saveKeyBtn.addEventListener('click', () => this.saveGeminiApiKey());
+    }
+
+    // Camera & Gallery Trigger Buttons
+    const triggerCamBtn = document.getElementById('triggerCameraBtn');
+    const triggerGalBtn = document.getElementById('triggerGalleryBtn');
+    const cameraInput = document.getElementById('billCameraInput');
+    const galleryInput = document.getElementById('billGalleryInput');
+
+    if (triggerCamBtn && cameraInput) {
+      triggerCamBtn.addEventListener('click', () => cameraInput.click());
+      cameraInput.addEventListener('change', (e) => this.handleBillFileSelect(e.target.files[0]));
+    }
+
+    if (triggerGalBtn && galleryInput) {
+      triggerGalBtn.addEventListener('click', () => galleryInput.click());
+      galleryInput.addEventListener('change', (e) => this.handleBillFileSelect(e.target.files[0]));
+    }
+
+    // Reselect Image Button
+    const reselectBtn = document.getElementById('reselectImageBtn');
+    if (reselectBtn) {
+      reselectBtn.addEventListener('click', () => this.resetScanImageState());
+    }
+
+    // Process AI Button
+    const processBtn = document.getElementById('processAiBtn');
+    if (processBtn) {
+      processBtn.addEventListener('click', () => this.processBillImageWithAi());
+    }
+
+    // Add New Extracted Row Button
+    const addRowBtn = document.getElementById('addNewExtractedRowBtn');
+    if (addRowBtn) {
+      addRowBtn.addEventListener('click', () => this.addNewExtractedRow(''));
+    }
+
+    // Confirm Import Scanned Button
+    const confirmBtn = document.getElementById('confirmImportScannedBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => this.confirmImportScannedItems());
+    }
+  }
+
+  openScanBillModal() {
+    const modal = document.getElementById('scanBillModal');
+    if (!modal) return;
+
+    this.resetScanImageState();
+    this.updateGeminiKeyStatusUI();
+    this.openModal(modal);
+  }
+
+  updateGeminiKeyStatusUI() {
+    const keyInput = document.getElementById('geminiApiKeyInput');
+    const keyBox = document.getElementById('geminiKeyConfigBox');
+    const statusMsg = document.getElementById('geminiKeyStatusMessage');
+    const savedKey = localStorage.getItem('smartstock_gemini_api_key') || '';
+
+    if (savedKey) {
+      if (keyInput) keyInput.value = savedKey;
+      if (keyBox) keyBox.classList.add('key-saved');
+      if (statusMsg) {
+        statusMsg.innerHTML = '✅ <strong style="color: var(--success-text);">เชื่อมต่อ Google Gemini AI เรียบร้อยแล้ว</strong> (หากต้องการเปลี่ยน Key สามารถพิมพ์ทับแล้วกดบันทึกได้)';
+      }
+    } else {
+      if (keyInput) keyInput.value = '';
+      if (keyBox) keyBox.classList.remove('key-saved');
+      if (statusMsg) {
+        statusMsg.innerHTML = '💡 ใส่รหัส API Key ครั้งแรกครั้งเดียว (ฟรี ไม่ต้องใส่บัตรเครดิต) แท็บเล็ตจะจำไว้ตลอดไป';
+      }
+    }
+  }
+
+  saveGeminiApiKey() {
+    const keyInput = document.getElementById('geminiApiKeyInput');
+    const key = keyInput ? keyInput.value.trim() : '';
+
+    if (!key) {
+      this.showToast('กรุณากรอกรหัส Google Gemini API Key', 'warning');
+      return;
+    }
+
+    localStorage.setItem('smartstock_gemini_api_key', key);
+    this.updateGeminiKeyStatusUI();
+    this.showToast('บันทึก Google Gemini API Key สำเร็จ 🎉', 'success');
+    this.playVoiceSound('success');
+  }
+
+  resetScanImageState() {
+    this.currentBillImage = null;
+    this.extractedBillItems = [];
+
+    const actionButtons = document.getElementById('scanActionButtons');
+    const previewWrap = document.getElementById('scanImagePreviewWrap');
+    const loadingWrap = document.getElementById('scanLoadingWrap');
+    const resultSection = document.getElementById('scanResultSection');
+    const confirmBtn = document.getElementById('confirmImportScannedBtn');
+    const cameraInput = document.getElementById('billCameraInput');
+    const galleryInput = document.getElementById('billGalleryInput');
+
+    if (cameraInput) cameraInput.value = '';
+    if (galleryInput) galleryInput.value = '';
+    if (actionButtons) actionButtons.style.display = 'grid';
+    if (previewWrap) previewWrap.style.display = 'none';
+    if (loadingWrap) loadingWrap.style.display = 'none';
+    if (resultSection) resultSection.style.display = 'none';
+    if (confirmBtn) confirmBtn.style.display = 'none';
+  }
+
+  async handleBillFileSelect(file) {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.showToast('กรุณาเลือกไฟล์รูปภาพเท่านั้นครับ', 'warning');
+      return;
+    }
+
+    try {
+      this.showToast('กำลังเตรียมรูปภาพ...', 'info', 1500);
+      const compressed = await this.compressImage(file, 1600, 0.85);
+      this.currentBillImage = compressed;
+
+      const previewImg = document.getElementById('scanImagePreview');
+      const previewWrap = document.getElementById('scanImagePreviewWrap');
+      const actionButtons = document.getElementById('scanActionButtons');
+
+      if (previewImg) previewImg.src = compressed.dataUrl;
+      if (previewWrap) previewWrap.style.display = 'block';
+      if (actionButtons) actionButtons.style.display = 'none';
+
+      // If API key is already configured, auto-trigger AI analysis for fast 1-click UX!
+      const apiKey = localStorage.getItem('smartstock_gemini_api_key');
+      if (apiKey) {
+        this.processBillImageWithAi();
+      } else {
+        this.showToast('รูปพร้อมแล้ว กรุณากรอก API Key ด้านบนเพื่อเริ่มวิเคราะห์', 'warning');
+      }
+    } catch (err) {
+      console.error(err);
+      this.showToast('ไม่สามารถประมวลผลรูปภาพได้ กรุณาลองใหม่อีกครั้ง', 'danger');
+    }
+  }
+
+  compressImage(file, maxDimension = 1600, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          const base64Data = dataUrl.split(',')[1];
+          resolve({ dataUrl, base64Data, mimeType: 'image/jpeg' });
+        };
+        img.onerror = () => reject(new Error('ไม่สามารถโหลดภาพ'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async processBillImageWithAi() {
+    if (!this.currentBillImage) {
+      this.showToast('กรุณาถ่ายรูปหรือเลือกรูปภาพก่อนครับ', 'warning');
+      return;
+    }
+
+    const apiKey = localStorage.getItem('smartstock_gemini_api_key');
+    if (!apiKey) {
+      this.showToast('กรุณากรอก Google Gemini API Key ด้านบนก่อนครับ (รับฟรีได้ทันที)', 'warning');
+      const input = document.getElementById('geminiApiKeyInput');
+      if (input) input.focus();
+      return;
+    }
+
+    const previewWrap = document.getElementById('scanImagePreviewWrap');
+    const loadingWrap = document.getElementById('scanLoadingWrap');
+    const resultSection = document.getElementById('scanResultSection');
+    const actionButtons = document.getElementById('scanActionButtons');
+
+    if (previewWrap) previewWrap.style.display = 'none';
+    if (actionButtons) actionButtons.style.display = 'none';
+    if (resultSection) resultSection.style.display = 'none';
+    if (loadingWrap) loadingWrap.style.display = 'block';
+
+    try {
+      const items = await this.callGeminiVisionApi(apiKey, this.currentBillImage.base64Data, this.currentBillImage.mimeType);
+
+      if (loadingWrap) loadingWrap.style.display = 'none';
+
+      if (!items || items.length === 0) {
+        this.showToast('ไม่พบรายการสินค้าในรูปภาพ กรุณาถ่ายให้เห็นตัวหนังสือชัดเจนขึ้นครับ', 'warning');
+        if (previewWrap) previewWrap.style.display = 'block';
+        return;
+      }
+
+      this.extractedBillItems = items;
+      this.renderExtractedItems(items);
+      this.playVoiceSound('success');
+      this.showToast(`✨ AI สแกนพบ ${items.length} รายการสินค้า ตรวจสอบแล้วกดนำเข้าได้เลย!`, 'success');
+    } catch (err) {
+      console.error(err);
+      if (loadingWrap) loadingWrap.style.display = 'none';
+      if (previewWrap) previewWrap.style.display = 'block';
+      this.playVoiceSound('error');
+
+      const msg = err.message || '';
+      if (msg.includes('API_KEY_INVALID') || msg.includes('400') || msg.includes('API key not valid')) {
+        this.showToast('รหัส Google Gemini API Key ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งครับ', 'danger');
+      } else {
+        this.showToast(`เกิดข้อผิดพลาด: ${msg || 'ไม่สามารถวิเคราะห์รูปภาพได้'}`, 'danger');
+      }
+    }
+  }
+
+  async callGeminiVisionApi(apiKey, base64Data, mimeType = 'image/jpeg') {
+    const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash'];
+    let lastError = null;
+
+    const promptText = `คุณคือผู้ช่วยจัดการสต็อกสินค้าที่มีความเชี่ยวชาญสูง
+วิเคราะห์รูปภาพนี้ซึ่งเป็นบิล, ใบเสร็จ, ใบส่งของ, หรือกระดาษจดสต็อก
+หน้าที่สำคัญที่สุดของคุณ: ค้นหาและดึงเอาเฉพาะ "ชื่อรุ่น หรือ ชื่อรายการสินค้า" เท่านั้น!
+
+กฎเหล็กที่ต้องปฏิบัติตามอย่างเคร่งครัด:
+1. กรองทิ้งข้อมูลอื่นทั้งหมด: ห้ามเอาชื่อร้านค้า, ห้ามเอาเลขที่บิล, ห้ามเอาวันที่, ห้ามเอาที่อยู่, ห้ามเอาเบอร์โทร, ห้ามเอาราคา, ห้ามเอายอดเงินรวม, ห้ามเอาภาษี, ห้ามเอาลายเซ็น
+2. แยกแต่ละรายการสินค้าออกมา ห้ามรวมเป็นก้อนเดียว
+3. ส่งคำตอบกลับมาเป็น JSON Array ของ String เท่านั้น ห้ามใส่คำอธิบายอื่น ห้ามใส่ข้อความเกริ่นนำ
+ตัวอย่างผลลัพธ์ที่ถูกต้อง:
+["แบตเตอรี่ GS MFX-60L", "3K ADX65L ขั้ว L", "FB S-650"]`;
+
+    for (const model of models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const payload = {
+          contents: [
+            {
+              parts: [
+                { text: promptText },
+                {
+                  inline_data: {
+                    mime_type: mimeType,
+                    data: base64Data
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            topP: 0.8
+          }
+        };
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          const errMsg = errData.error?.message || `HTTP ${res.status}`;
+          lastError = new Error(`Model ${model}: ${errMsg}`);
+          continue; // Try next model
+        }
+
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (text) {
+          return this.parseExtractedItemsText(text);
+        }
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error('ไม่สามารถเชื่อมต่อกับ Google Gemini AI ได้');
+  }
+
+  parseExtractedItemsText(rawText) {
+    let clean = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+    try {
+      const parsed = JSON.parse(clean);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item).trim()).filter(Boolean);
+      }
+    } catch (e) {}
+
+    // Fallback parser line-by-line
+    return clean
+      .split('\n')
+      .map(line => line.replace(/^[-*•\d+.)\s]+/, '').replace(/^["']|["'],?$/g, '').trim())
+      .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith(']'));
+  }
+
+  renderExtractedItems(items) {
+    const listContainer = document.getElementById('extractedItemsList');
+    const resultSection = document.getElementById('scanResultSection');
+    const countText = document.getElementById('scannedCountText');
+    const confirmBtn = document.getElementById('confirmImportScannedBtn');
+
+    if (!listContainer || !resultSection) return;
+
+    listContainer.innerHTML = '';
+    resultSection.style.display = 'block';
+    if (confirmBtn) confirmBtn.style.display = 'inline-flex';
+
+    items.forEach((itemText, idx) => {
+      this.createExtractedRowElement(listContainer, itemText, idx + 1);
+    });
+
+    this.updateExtractedCountBadge();
+  }
+
+  createExtractedRowElement(container, nameText, num) {
+    const row = document.createElement('div');
+    row.className = 'extracted-item-row';
+
+    // Check if store already has this product name (case-insensitive)
+    const exists = this.products.some(p => 
+      p.storeId === this.currentStoreId && 
+      p.name.trim().toLowerCase() === nameText.trim().toLowerCase()
+    );
+
+    row.innerHTML = `
+      <span class="extracted-item-num">${num}.</span>
+      <input type="text" class="extracted-item-input" value="${this.escapeHtml(nameText)}" placeholder="ชื่อรายการสินค้า" autocomplete="off">
+      <span class="badge-item-status ${exists ? 'badge-item-exists' : 'badge-item-new'}">
+        ${exists ? '✓ มีในร้านแล้ว' : '✨ สินค้าใหม่'}
+      </span>
+      <button type="button" class="btn-remove-extracted" title="ลบรายการนี้" aria-label="ลบ">&times;</button>
+    `;
+
+    const input = row.querySelector('.extracted-item-input');
+    const badge = row.querySelector('.badge-item-status');
+    const removeBtn = row.querySelector('.btn-remove-extracted');
+
+    if (input && badge) {
+      input.addEventListener('input', () => {
+        const currentName = input.value.trim().toLowerCase();
+        const nowExists = this.products.some(p => 
+          p.storeId === this.currentStoreId && 
+          p.name.trim().toLowerCase() === currentName
+        );
+        if (nowExists) {
+          badge.className = 'badge-item-status badge-item-exists';
+          badge.textContent = '✓ มีในร้านแล้ว';
+        } else {
+          badge.className = 'badge-item-status badge-item-new';
+          badge.textContent = '✨ สินค้าใหม่';
+        }
+      });
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', () => {
+        row.remove();
+        this.updateExtractedRowNumbers();
+        this.updateExtractedCountBadge();
+      });
+    }
+
+    container.appendChild(row);
+  }
+
+  addNewExtractedRow(initialName = '') {
+    const container = document.getElementById('extractedItemsList');
+    if (!container) return;
+    const count = container.querySelectorAll('.extracted-item-row').length;
+    this.createExtractedRowElement(container, initialName, count + 1);
+    this.updateExtractedCountBadge();
+
+    // Focus on new input
+    const inputs = container.querySelectorAll('.extracted-item-input');
+    if (inputs.length > 0) {
+      const lastInput = inputs[inputs.length - 1];
+      lastInput.focus();
+    }
+  }
+
+  updateExtractedRowNumbers() {
+    const rows = document.querySelectorAll('#extractedItemsList .extracted-item-row');
+    rows.forEach((row, idx) => {
+      const numEl = row.querySelector('.extracted-item-num');
+      if (numEl) numEl.textContent = `${idx + 1}.`;
+    });
+  }
+
+  updateExtractedCountBadge() {
+    const rows = document.querySelectorAll('#extractedItemsList .extracted-item-row');
+    const countText = document.getElementById('scannedCountText');
+    const confirmBtn = document.getElementById('confirmImportScannedBtn');
+
+    if (countText) {
+      countText.textContent = `พบ ${rows.length} รายการ`;
+    }
+
+    if (confirmBtn) {
+      confirmBtn.style.display = rows.length > 0 ? 'inline-flex' : 'none';
+    }
+  }
+
+  confirmImportScannedItems() {
+    if (!this.currentStoreId) {
+      this.showToast('กรุณาเลือกร้านค้าก่อนนำเข้าสต็อก', 'warning');
+      return;
+    }
+
+    const rows = document.querySelectorAll('#extractedItemsList .extracted-item-row');
+    const itemsToAdd = [];
+    rows.forEach(row => {
+      const input = row.querySelector('.extracted-item-input');
+      const name = input ? input.value.trim() : '';
+      if (name) itemsToAdd.push(name);
+    });
+
+    if (itemsToAdd.length === 0) {
+      this.showToast('ไม่พบรายการสินค้าที่จะนำเข้า', 'warning');
+      return;
+    }
+
+    const store = this.stores.find(s => s.id === this.currentStoreId);
+    const isBattery = store && store.name.includes('แบต');
+    const defaultCat = isBattery ? 'แบตเตอรี่' : 'ทั่วไป';
+
+    let addedCount = 0;
+    let existingCount = 0;
+
+    itemsToAdd.forEach(name => {
+      // Check if store already has this product name (case-insensitive)
+      const existing = this.products.find(p => 
+        p.storeId === this.currentStoreId && 
+        p.name.trim().toLowerCase() === name.toLowerCase()
+      );
+
+      if (existing) {
+        existingCount++;
+        return; // Don't duplicate if identical name already exists
+      }
+
+      // Smart category deduction
+      let category = defaultCat;
+      const lower = name.toLowerCase();
+      if (lower.includes('ขั้ว l') || lower.includes('b24l') || lower.includes('d23l') || lower.includes('d31l')) {
+        category = 'แบตเตอรี่ (ขั้ว L)';
+      } else if (lower.includes('ขั้ว r') || lower.includes('b24r') || lower.includes('d23r') || lower.includes('d31r')) {
+        category = 'แบตเตอรี่ (ขั้ว R)';
+      } else if (lower.includes('din') || lower.includes('ln')) {
+        category = 'แบตเตอรี่ (DIN ยุโรป)';
+      } else if (lower.includes('ดีเซล') || lower.includes('กระบะ') || lower.includes('d31')) {
+        category = 'แบตเตอรี่ (กระบะ/ดีเซล)';
+      } else if (lower.includes('efb') || lower.includes('iss') || lower.includes('agm')) {
+        category = 'แบตเตอรี่ (EFB/ISS)';
+      }
+
+      const newProduct = {
+        id: 'prod_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        storeId: this.currentStoreId,
+        name: name,
+        sku: name.replace(/\s+/g, '-').toUpperCase(),
+        category: category,
+        quantity: 0,
+        minAlert: 5,
+        costPrice: 0,
+        price: 0,
+        unit: isBattery ? 'ลูก' : 'ชิ้น',
+        updatedAt: new Date().toISOString()
+      };
+
+      this.products.unshift(newProduct);
+      addedCount++;
+    });
+
+    if (addedCount > 0) {
+      this.saveProducts();
+      this.renderStoreDetail();
+      this.closeModal(document.getElementById('scanBillModal'));
+      let msg = `นำเข้ารายการสินค้าใหม่ ${addedCount} รายการ สำเร็จ! 🎉`;
+      if (existingCount > 0) {
+        msg += ` (ข้ามรายการที่มีอยู่แล้ว ${existingCount} รายการ)`;
+      }
+      this.showToast(msg, 'success');
+      this.playVoiceSound('success');
+    } else {
+      this.showToast(`สินค้าทั้ง ${existingCount} รายการมีอยู่ในสต็อกร้านนี้เรียบร้อยแล้ว`, 'info');
     }
   }
 

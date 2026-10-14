@@ -118,6 +118,10 @@
             <button id="copyOrderListBtn" class="btn btn-primary" title="ส่งรายการสั่งของเข้า LINE (ตั้งค่า LINE ID เพิ่มเติมได้ที่ปุ่ม 💾 จัดการข้อมูล)">
               <span>📋 สั่งของเข้า LINE</span>
             </button>
+            <!-- ปุ่มสแกนบิล/นำเข้ารายการสินค้าจากรูปภาพ -->
+            <button id="openScanBillModalBtn" class="btn btn-primary" title="ถ่ายรูปบิลหรือนำเข้ารูปภาพเพื่อดึงเฉพาะรายการสินค้า">
+              <span>📷 สแกนบิลนำเข้ารายการ</span>
+            </button>
             <button id="openAddModalBtn" class="btn btn-primary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -490,6 +494,98 @@
           </div>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SCAN BILL / IMPORT PRODUCTS FROM IMAGE (สแกนบิลนำเข้ารายการสินค้า) -->
+  <div class="modal-overlay" id="scanBillModal" role="dialog" aria-modal="true">
+    <div class="modal-card scan-bill-modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.6rem;">📷</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.25rem;">สแกนบิลนำเข้ารายการสินค้า</h3>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">ดึงเฉพาะชื่อรายการสินค้าจากรูปภาพ/กล้องแท็บเล็ตเข้าสู่ร้านนี้</p>
+          </div>
+        </div>
+        <button class="close-btn" id="closeScanBillModalBtn" aria-label="ปิด">&times;</button>
+      </div>
+      
+      <div class="modal-body-content">
+        <!-- API KEY CONFIGURATION BOX -->
+        <div id="geminiKeyConfigBox" class="scan-key-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+            <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">🔑 Google Gemini AI Key (ใช้งานฟรี)</span>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key">กดรับ API Key ฟรีคลิกที่นี่ ↗</a>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="password" id="geminiApiKeyInput" placeholder="วางรหัส AIzaSy... ที่นี่" autocomplete="off" style="flex: 1;">
+            <button type="button" id="saveGeminiApiKeyBtn" class="btn btn-primary btn-sm" style="white-space: nowrap;">บันทึก Key</button>
+          </div>
+          <div id="geminiKeyStatusMessage" class="key-status-msg">
+            💡 ใส่ครั้งแรกครั้งเดียว แท็บเล็ตจะจำไว้ตลอดไป (โควตาฟรี 1,500 ครั้ง/วัน)
+          </div>
+        </div>
+
+        <!-- CAMERA / FILE UPLOAD CONTROLS -->
+        <div class="scan-upload-zone" id="scanUploadZone">
+          <input type="file" id="billCameraInput" accept="image/*" capture="environment" style="display: none;">
+          <input type="file" id="billGalleryInput" accept="image/*" style="display: none;">
+          
+          <div class="scan-action-buttons" id="scanActionButtons">
+            <button type="button" id="triggerCameraBtn" class="btn btn-primary scan-btn-lg">
+              <span class="scan-btn-icon">📸</span>
+              <span class="scan-btn-title">ถ่ายรูปสดด้วยกล้อง</span>
+              <span class="scan-btn-sub">เปิดกล้องแท็บเล็ตถ่ายบิลทันที</span>
+            </button>
+            <button type="button" id="triggerGalleryBtn" class="btn btn-secondary scan-btn-lg">
+              <span class="scan-btn-icon">🖼️</span>
+              <span class="scan-btn-title">เลือกรูปจากคลังภาพ</span>
+              <span class="scan-btn-sub">เลือกภาพจากอัลบั้มหรือไฟล์</span>
+            </button>
+          </div>
+
+          <!-- IMAGE PREVIEW CONTAINER -->
+          <div id="scanImagePreviewWrap" class="scan-image-preview-wrap" style="display: none;">
+            <div class="preview-img-box">
+              <img id="scanImagePreview" alt="ตัวอย่างรูปภาพบิล">
+            </div>
+            <div class="preview-actions-bar">
+              <button type="button" id="reselectImageBtn" class="btn btn-secondary btn-sm">🔄 ถ่ายใหม่ / เปลี่ยนรูป</button>
+              <button type="button" id="processAiBtn" class="btn btn-primary btn-sm">✨ เริ่มวิเคราะห์ดึงรายการสินค้า</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOADING SPINNER -->
+        <div id="scanLoadingWrap" class="scan-loading-wrap" style="display: none;">
+          <div class="loading-spinner"></div>
+          <h4 style="margin-top: 14px; font-size: 1.15rem; color: var(--text-main);">AI กำลังอ่านและกรองเฉพาะรายการสินค้า...</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">กรองทิ้งหัวบิล วันที่ ราคา และข้อมูลอื่นให้อัตโนมัติ (1-3 วินาที)</p>
+        </div>
+
+        <!-- SCAN RESULTS SECTION -->
+        <div id="scanResultSection" class="scan-result-section" style="display: none;">
+          <div class="result-header-row">
+            <div>
+              <span style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);" id="scannedCountText">พบ 0 รายการ</span>
+              <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">ตรวจเช็คความถูกต้อง สามารถแก้ไขชื่อหรือลบแถวที่ไม่ต้องการได้</p>
+            </div>
+            <button type="button" id="addNewExtractedRowBtn" class="btn btn-secondary btn-sm">+ เพิ่มรายการ</button>
+          </div>
+
+          <div class="extracted-items-list" id="extractedItemsList">
+            <!-- Dynamically populated rows -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn btn-secondary" id="cancelScanBillBtn">ปิดหน้าต่าง</button>
+        <button type="button" class="btn btn-primary" id="confirmImportScannedBtn" style="display: none;">
+          📥 นำเข้ารายการสินค้าลงสต็อก
+        </button>
+      </div>
     </div>
   </div>
 
