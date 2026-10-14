@@ -1407,10 +1407,17 @@ class MultiStoreStockApp {
               </div>
             </td>
 
-            <!-- 2. ราคาทุน/หน่วย -->
+            <!-- 2. ราคาทุน/หน่วย (คลิกพิมพ์ตัวเลข หรือกดไอคอนไมค์สั่งด้วยเสียง) -->
             <td class="text-center">
-              <div class="price-val-wrapper">
-                <span class="cost-price-val">฿${(item.costPrice || 0).toLocaleString()}</span>
+              <div class="stock-qty-cell cost-cell actual-count-stepper">
+                <span class="stock-qty-val val-cost actual-val" id="val-cost-${item.id}" title="คลิกเพื่อพิมพ์ราคาทุน" onclick="window.app.quickSetCost('${item.id}')">฿${(item.costPrice || 0).toLocaleString()}</span>
+                <button class="cell-mic-btn stepper-mic-btn mic-cost-btn" type="button" id="mic-cost-${item.id}" title="พูดราคาทุน (เช่น '1400', 'ทุน 1400')" onclick="window.app.toggleRowVoiceInput('${item.id}', 'cost')">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                  </svg>
+                </button>
               </div>
             </td>
 
@@ -1649,6 +1656,28 @@ class MultiStoreStockApp {
     this.showToast(`อัปเดต "${product.name}" เป็น ${newQty}${unitStr} เรียบร้อย`, 'success');
   }
 
+  quickSetCost(productId) {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return;
+
+    const input = prompt(`กรอกราคาทุนของ "${product.name}" (บาท):`, product.costPrice || 0);
+    if (input === null) return;
+
+    const cleanInput = String(input).replace(/,/g, '').trim();
+    const newCost = parseFloat(cleanInput);
+    if (isNaN(newCost) || newCost < 0) {
+      alert('กรุณากรอกราคาทุนที่ถูกต้อง (0 ขึ้นไป)');
+      return;
+    }
+
+    product.costPrice = newCost;
+    product.updatedAt = new Date().toISOString();
+
+    this.saveProducts();
+    this.renderStoreDetail();
+    this.showToast(`💰 ปรับราคาทุน "${product.name}" เป็น ฿${newCost.toLocaleString()} เรียบร้อย`, 'success');
+  }
+
   quickSetPrice(productId) {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
@@ -1770,7 +1799,7 @@ class MultiStoreStockApp {
 
     // 4. ตัดคำนำหน้าและคำลงท้าย
     let clean = text
-      .replace(/(?:ราคาขายจริง|ราคาขาย|ราคา|ขายจริง|ขายหน้าร้าน|ขาย|ตั้งขาย|บาท|ครับ|ค่ะ|คะ)/gi, '')
+      .replace(/(?:ราคาทุนจริง|ราคาทุน|ต้นทุน|ทุน|รับมา|ซื้อมา|ราคาขายจริง|ราคาขาย|ราคา|ขายจริง|ขายหน้าร้าน|ขาย|ตั้งขาย|บาท|ครับ|ค่ะ|คะ)/gi, '')
       .trim();
 
     // ตรวจสอบกับ parseQuantityFromVoice เผื่อเป็นเลขหลักสิบ/หลักร้อย
@@ -1864,12 +1893,12 @@ class MultiStoreStockApp {
 
     const fieldLabel = fieldType === 'target' 
       ? 'สต็อกเป้าหมาย' 
-      : (fieldType === 'price' ? 'ราคาขาย' : 'นับได้จริง');
+      : (fieldType === 'price' ? 'ราคาขาย' : (fieldType === 'cost' ? 'ราคาทุน' : 'นับได้จริง'));
     this.showToast(`🎙️ กำลังฟัง [${fieldLabel}] ของ "${product.name}"... พูดตัวเลขได้เลย`, 'info', 2500);
 
     recognition.onresult = (e) => {
       const transcript = e.results[0][0].transcript;
-      const parsedNumber = fieldType === 'price' 
+      const parsedNumber = (fieldType === 'price' || fieldType === 'cost')
         ? this.parsePriceFromVoice(transcript) 
         : this.parseQuantityFromVoice(transcript);
 
@@ -1882,6 +1911,13 @@ class MultiStoreStockApp {
           this.playVoiceSound('success');
           const unitStr = (product.unit && product.unit !== 'ลูก') ? ` ${product.unit}` : '';
           this.showToast(`🎯 ${product.name}: ปรับสต็อกเป้าหมายเป็น ${parsedNumber}${unitStr} 🎙️`, 'success');
+        } else if (fieldType === 'cost') {
+          product.costPrice = parsedNumber;
+          product.updatedAt = new Date().toISOString();
+          this.saveProducts();
+          this.renderStoreDetail();
+          this.playVoiceSound('success');
+          this.showToast(`💰 ${product.name}: ปรับราคาทุนเป็น ฿${parsedNumber.toLocaleString()} 🎙️`, 'success');
         } else if (fieldType === 'price') {
           product.price = parsedNumber;
           product.updatedAt = new Date().toISOString();

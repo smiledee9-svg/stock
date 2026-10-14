@@ -1214,6 +1214,26 @@ body {
   min-width: 130px;
 }
 
+.val-cost {
+  color: #94a3b8;
+  font-family: var(--font-code);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .val-cost {
+  color: #cbd5e1;
+}
+
+[data-theme="light"] .val-cost {
+  color: #475569;
+}
+
+.cost-cell {
+  min-width: 130px;
+}
+
 /* Stepper & Cell Mic Voice Buttons (ออกแบบใหม่เป็นรูปทรงผืนผ้า ใหญ่เต็มพื้นที่ กดง่าย) */
 .cell-mic-btn,
 .stepper-mic-btn {
@@ -1312,6 +1332,31 @@ body {
 }
 
 .stepper-mic-btn.mic-price-btn:hover svg {
+  transform: scale(1.12);
+}
+
+/* สีสำหรับไมค์ช่อง "ราคาทุน" (รูปทรงผืนผ้า โทนสีทอง/อำพัน โดดเด่น สวยงาม) */
+.stepper-mic-btn.mic-cost-btn {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-theme="dark"] .stepper-mic-btn.mic-cost-btn {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+.stepper-mic-btn.mic-cost-btn:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
+}
+
+.stepper-mic-btn.mic-cost-btn:hover svg {
   transform: scale(1.12);
 }
 
