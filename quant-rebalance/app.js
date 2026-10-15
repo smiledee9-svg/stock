@@ -420,7 +420,7 @@ function initRebalanceDashboard(data) {
       finalNav,
       totalProfitThb,
       totalReturnPct,
-      bnhFinalNav,
+      bnhFinalNav: finalBnhNav,
       bnhTotalProfitThb: bnhProfitThb,
       bnhReturnPct,
       maxDrawdownPct: maxDd,
