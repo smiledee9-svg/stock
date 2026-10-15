@@ -295,10 +295,40 @@ function initDashboard(data) {
     const cur = rs.currentHolding || {};
     const stockRatio = cur.stockRatioPct || 50;
     const cashRatio = Math.max(0, 100 - stockRatio);
-    document.getElementById('barStockRatio').style.width = `${stockRatio}%`;
-    document.getElementById('barCashRatio').style.width = `${cashRatio}%`;
-    document.getElementById('lblStockRatio').textContent = `สัดส่วนหุ้น SCB: ${stockRatio.toFixed(1)}% (${(cur.shares || 6600).toLocaleString()} หุ้น = ฿${cur.stockValue ? cur.stockValue.toLocaleString('th-TH') : '0'})`;
-    document.getElementById('lblCashRatio').textContent = `เงินสดสำรอง (Cash Cushion): ${cashRatio.toFixed(1)}% (฿${cur.cash ? cur.cash.toLocaleString('th-TH') : '0'})`;
+    const curPrice = cur.lastPrice || 145.5;
+    const cost = rs.effectiveCostBasis || 112.66;
+    const discount = ((curPrice - cost) / curPrice) * 100;
+
+    const barStockEl = document.getElementById('barStockRatio');
+    const barCashEl = document.getElementById('barCashRatio');
+    if (barStockEl) barStockEl.style.width = `${stockRatio}%`;
+    if (barCashEl) barCashEl.style.width = `${cashRatio}%`;
+    const lblStockEl = document.getElementById('lblStockRatio');
+    const lblCashEl = document.getElementById('lblCashRatio');
+    if (lblStockEl) lblStockEl.textContent = `สัดส่วนหุ้น SCB: ${stockRatio.toFixed(1)}% (${(cur.shares || 6600).toLocaleString()} หุ้น = ฿${cur.stockValue ? cur.stockValue.toLocaleString('th-TH') : '0'})`;
+    if (lblCashEl) lblCashEl.textContent = `เงินสดสำรอง (Cash Cushion): ${cashRatio.toFixed(1)}% (฿${cur.cash ? cur.cash.toLocaleString('th-TH') : '0'})`;
+
+    // Update Live Rebalance Banner
+    const rebSharesEl = document.getElementById('rebHoldShares');
+    if (rebSharesEl) rebSharesEl.textContent = `${(cur.shares || 6600).toLocaleString()} หุ้น`;
+    const rebFreeEl = document.getElementById('rebFreeShares');
+    if (rebFreeEl) {
+      const fg = rs.sharesGrowth || 2100;
+      const initSh = rs.initialShares || 4500;
+      rebFreeEl.textContent = `+${fg.toLocaleString()} หุ้น (+${((fg / initSh) * 100).toFixed(1)}%)`;
+    }
+    const rebCashEl = document.getElementById('rebCashCushion');
+    if (rebCashEl) rebCashEl.textContent = `฿${(cur.cash || 256450).toLocaleString('th-TH')}`;
+    const rebCostEl = document.getElementById('rebEffectiveCost');
+    if (rebCostEl) rebCostEl.textContent = `฿${cost.toFixed(2)} / หุ้น`;
+    const rebMarketEl = document.getElementById('rebMarketPrice');
+    if (rebMarketEl) rebMarketEl.textContent = `฿${curPrice.toFixed(2)} (ต้นทุนถูกกว่า ${discount.toFixed(1)}%)`;
+    const rebNextEl = document.getElementById('rebNextAction');
+    if (rebNextEl) {
+      const waveTh = document.getElementById('inputRebTroughTh') ? document.getElementById('inputRebTroughTh').value : -30;
+      const trRatio = document.getElementById('inputTroughRatio') ? document.getElementById('inputTroughRatio').value : 80;
+      rebNextEl.textContent = `หุบคลื่น ≤ ${waveTh} ➡️ ช้อน ${trRatio}%`;
+    }
   }
 
   // Render Table: Mode 1 (Cycle Trades)
@@ -400,49 +430,78 @@ function initDashboard(data) {
   }
   updateRebalanceSubChart(rebalanceDaily);
 
-  // Switch Mode Logic
+  // Switch Mode Logic with Complete Data & Chart Isolation
   function setMode(mode) {
     currentMode = mode;
     const tabCycle = document.getElementById('tabModeCycle');
     const tabRebalance = document.getElementById('tabModeRebalance');
+    const toolbar1 = document.getElementById('toolbarMode1');
+    const toolbar2 = document.getElementById('toolbarMode2');
     const allocBar = document.getElementById('rebalanceAllocationBar');
-    const liveBanner = document.getElementById('liveSignalBanner');
-    const subChartTitle = document.querySelector('.sub-chart-title span');
+    const liveBanner1 = document.getElementById('liveSignalBanner');
+    const liveBanner2 = document.getElementById('liveRebalanceBanner');
+    const chartTitle = document.getElementById('chartSectionTitle');
+    const legendBuy = document.getElementById('chartLegendBuy');
+    const legendSell = document.getElementById('chartLegendSell');
+    const subTitle = document.getElementById('subChartTitleText');
+    const subNote = document.getElementById('subChartNoteText');
     const masterInsight = document.getElementById('rebalanceMasterInsightCard');
 
     if (mode === 'cycle') {
-      tabCycle.classList.add('active');
-      tabRebalance.classList.remove('active');
+      // Tab styling
+      if (tabCycle) tabCycle.classList.add('active');
+      if (tabRebalance) tabRebalance.classList.remove('active');
+
+      // Visibility toggles
+      if (toolbar1) toolbar1.style.display = 'block';
+      if (toolbar2) toolbar2.style.display = 'none';
+      if (liveBanner1) liveBanner1.style.display = 'block';
+      if (liveBanner2) liveBanner2.style.display = 'none';
       if (allocBar) allocBar.style.display = 'none';
-      if (liveBanner) liveBanner.style.display = 'block';
       if (masterInsight) masterInsight.style.display = 'none';
 
-      // Chart series visibility
+      // Chart Titles & Legends
+      if (chartTitle) chartTitle.textContent = '📊 กราฟราคาแท่งเทียน SCB & สัญญาณซื้อขายรอบคลื่น (Pure Cycle Timing)';
+      if (legendBuy) legendBuy.textContent = '▲ สัญญาณซื้อ Sniper (หุบคลื่น)';
+      if (legendSell) legendSell.textContent = '▼ สัญญาณขาย Sniper (ยอดคลื่น / TP / SL)';
+      if (subTitle) subTitle.textContent = '🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])';
+      if (subNote) subNote.textContent = 'โซนเขียว = หุบคลื่นช้อนซื้อ | โซนแดง = ยอดคลื่นขายทำกำไร';
+
+      // Chart Series Visibility (Mode 1: Wave only, hide NAV & BnH)
       waveLineSeries.applyOptions({ visible: true });
       navSeries.applyOptions({ visible: false });
       bnhSeries.applyOptions({ visible: false });
 
-      if (subChartTitle) subChartTitle.textContent = '🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])';
-
-      // Markers & data
+      // Only Mode 1 Markers & Data
       candleSeries.setMarkers(getCycleMarkers());
       renderCycleMetrics(cycleSummary);
       renderCycleTrades(cycleSummary.trades);
     } else {
-      tabRebalance.classList.add('active');
-      tabCycle.classList.remove('active');
+      // Tab styling
+      if (tabRebalance) tabRebalance.classList.add('active');
+      if (tabCycle) tabCycle.classList.remove('active');
+
+      // Visibility toggles
+      if (toolbar1) toolbar1.style.display = 'none';
+      if (toolbar2) toolbar2.style.display = 'block';
+      if (liveBanner1) liveBanner1.style.display = 'none';
+      if (liveBanner2) liveBanner2.style.display = 'block';
       if (allocBar) allocBar.style.display = 'block';
-      if (liveBanner) liveBanner.style.display = 'none';
       if (masterInsight) masterInsight.style.display = 'block';
 
-      // Chart series visibility
+      // Chart Titles & Legends
+      if (chartTitle) chartTitle.textContent = '⚖️ กราฟราคาแท่งเทียน SCB & จุดรีบาลานซ์สัดส่วน (Ramanujan Dynamic Rebalance)';
+      if (legendBuy) legendBuy.textContent = '▲ รีบาลานซ์ซื้อหุบคลื่น (ปรับแตะ 80% ช้อนของถูก)';
+      if (legendSell) legendSell.textContent = '▼ รีบาลานซ์ขายยอดคลื่น (ลดเหลือ 25% ล็อกกำไรเงินสด)';
+      if (subTitle) subTitle.textContent = '📈 เส้นมูลค่าพอร์ต Ramanujan Dynamic Rebalance NAV (สีเขียว) vs Buy & Hold (เส้นประ)';
+      if (subNote) subNote.textContent = 'สัดส่วนปรับอัตโนมัติตามคลื่น: หุบคลื่น 80% หุ้น / ยอดคลื่น 25% หุ้น (กอดเงินสดสำรอง 75%)';
+
+      // Chart Series Visibility (Mode 2: NAV & BnH only, hide Wave)
       waveLineSeries.applyOptions({ visible: false });
       navSeries.applyOptions({ visible: true });
       bnhSeries.applyOptions({ visible: true });
 
-      if (subChartTitle) subChartTitle.textContent = '📈 เส้นมูลค่าพอร์ต Ramanujan Dynamic Rebalance NAV (สีเขียว) vs Buy & Hold (เส้นประสีเทา)';
-
-      // Markers & data
+      // Only Mode 2 Markers & Data
       candleSeries.setMarkers(getRebalanceMarkers(rebalanceSummary.transactions));
       renderRebalanceMetrics(rebalanceSummary);
       renderRebalanceTable(rebalanceSummary.transactions);
@@ -466,7 +525,99 @@ function initDashboard(data) {
   // Initial display in Mode 1
   setMode('cycle');
 
-  // Strategy Presets Click Listeners (Mode 1 Simulator)
+  // =========================================================================
+  // Mode 1: Pure Cycle Timing Simulator (Client-side Interactive)
+  // =========================================================================
+  function runCycleBacktestJs(buyTh, sellTh, slPct, tpPct) {
+    const N = candles.length;
+    if (N === 0) return;
+
+    let inPosition = false;
+    let buyPrice = 0;
+    let buyDate = '';
+    let buyIdx = 0;
+    const trades = [];
+    const newMarkers = [];
+
+    for (let i = 1; i < N; i++) {
+      const c = candles[i];
+      const prev = candles[i - 1];
+      const wPrev = prev.wave || 0;
+      const wCurr = c.wave || 0;
+      const mCurr = c.momentum || 0;
+      const mPrev = prev.momentum || 0;
+
+      const isTurningUp = (wPrev <= buyTh) && (mCurr > 0 && (mPrev <= 0 || wCurr > wPrev + 2));
+      const isTurningDown = (wCurr >= sellTh && mCurr < 0);
+      const hitStopLoss = inPosition && (c.close <= buyPrice * (1.0 - slPct / 100.0));
+      const hitTakeProfit = inPosition && (tpPct > 0 && c.close >= buyPrice * (1.0 + tpPct / 100.0));
+
+      if (!inPosition && isTurningUp) {
+        inPosition = true;
+        buyPrice = c.close;
+        buyDate = c.date;
+        buyIdx = i;
+        newMarkers.push({
+          time: c.date,
+          position: 'belowBar',
+          color: '#10b981',
+          shape: 'arrowUp',
+          text: `BUY @ ฿${c.close}`,
+          size: 2
+        });
+      } else if (inPosition && (isTurningDown || hitStopLoss || hitTakeProfit)) {
+        inPosition = false;
+        const profitPct = Number((((c.close - buyPrice) / buyPrice) * 100).toFixed(2));
+        const holdingDays = i - buyIdx;
+        const reason = hitTakeProfit ? 'TAKE_PROFIT' : (hitStopLoss ? 'STOP_LOSS' : 'CYCLE_PEAK');
+        trades.push({
+          buyDate: buyDate,
+          buyPrice: buyPrice,
+          sellDate: c.date,
+          sellPrice: c.close,
+          profitPct: profitPct,
+          holdingDays: holdingDays,
+          exitReason: reason,
+          status: profitPct > 0 ? 'WIN' : 'LOSS'
+        });
+        newMarkers.push({
+          time: c.date,
+          position: 'aboveBar',
+          color: '#ef4444',
+          shape: 'arrowDown',
+          text: `SELL`,
+          size: 2
+        });
+      }
+    }
+
+    const wins = trades.filter(t => t.profitPct > 0);
+    const losses = trades.filter(t => t.profitPct <= 0);
+    const totalTrades = trades.length;
+    const winRate = totalTrades > 0 ? Number(((wins.length / totalTrades) * 100).toFixed(2)) : 0;
+    const totalReturn = Number(trades.reduce((acc, t) => acc + t.profitPct, 0).toFixed(2));
+    const grossProfit = wins.reduce((acc, t) => acc + t.profitPct, 0);
+    const grossLoss = Math.abs(losses.reduce((acc, t) => acc + t.profitPct, 0));
+    const profitFactor = grossLoss > 0 ? Number((grossProfit / grossLoss).toFixed(2)) : grossProfit;
+
+    cycleSummary = {
+      symbol: 'SCB.BK',
+      totalCandles: N,
+      totalTrades: totalTrades,
+      winTrades: wins.length,
+      lossTrades: losses.length,
+      winRatePct: winRate,
+      totalReturnPct: totalReturn,
+      profitFactor: profitFactor,
+      trades: trades
+    };
+
+    candleSeries.setMarkers(newMarkers);
+    renderCycleMetrics(cycleSummary);
+    renderCycleTrades(trades);
+  }
+
+  // Mode 1 Preset Buttons
   const presetBtns = document.querySelectorAll('.preset-btn');
   presetBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -490,17 +641,241 @@ function initDashboard(data) {
         document.getElementById('inputSL').value = 3;
         document.getElementById('inputTP').value = 5;
       }
+
+      runCycleBacktestFromInputs();
     });
   });
 
-  // Run Backtest Button Click
-  const btnRun = document.getElementById('btnRunBacktest');
-  if (btnRun) {
-    btnRun.addEventListener('click', () => {
-      btnRun.textContent = '⏳ กำลังคำนวณ...';
+  function runCycleBacktestFromInputs() {
+    const buyTh = parseFloat(document.getElementById('inputBuyTh').value) || -30;
+    const sellTh = parseFloat(document.getElementById('inputSellTh').value) || 40;
+    const sl = parseFloat(document.getElementById('inputSL').value) || 5;
+    const tp = parseFloat(document.getElementById('inputTP').value) || 8;
+    runCycleBacktestJs(buyTh, sellTh, sl, tp);
+  }
+
+  const btnRunBacktest = document.getElementById('btnRunBacktest');
+  if (btnRunBacktest) {
+    btnRunBacktest.addEventListener('click', () => {
+      btnRunBacktest.textContent = '⏳ กำลังคำนวณ...';
       setTimeout(() => {
-        btnRun.textContent = '⚡ คำนวณสัญญาณ & รัน Backtest';
-      }, 150);
+        runCycleBacktestFromInputs();
+        btnRunBacktest.textContent = '⚡ คำนวณสัญญาณ & รัน Backtest';
+      }, 100);
+    });
+  }
+
+  // =========================================================================
+  // Mode 2: Ramanujan Dynamic Rebalance Simulator (Client-side Interactive)
+  // =========================================================================
+  function runRebalanceSimJs(troughRatioPct, peakRatioPct, troughTh, peakTh) {
+    const initialCapital = 1000000.0;
+    const baseRatio = 0.50;
+    const troughRatio = troughRatioPct / 100.0;
+    const peakRatio = peakRatioPct / 100.0;
+    const minLot = 100;
+    const N = candles.length;
+    if (N === 0) return;
+
+    const p0 = candles[0].close;
+    let currentTargetRatio = baseRatio;
+    let initialStockVal = initialCapital * currentTargetRatio;
+    let shares = Math.floor((initialStockVal / p0) / minLot) * minLot;
+    let cash = initialCapital - (shares * p0);
+    const initialSharesVal = shares;
+
+    let bnhShares = Math.floor((initialCapital / p0) / minLot) * minLot;
+    let bnhCashRem = initialCapital - (bnhShares * p0);
+
+    const daily = [];
+    const transactions = [];
+    let harvestedCash = 0;
+    let buyCount = 0;
+    let sellCount = 0;
+
+    for (let i = 0; i < N; i++) {
+      const p = candles[i].close;
+      const date = candles[i].date;
+      const wCurr = candles[i].wave || 0;
+      const mCurr = candles[i].momentum || 0;
+      const wPrev = i > 0 ? (candles[i - 1].wave || 0) : 0;
+      const mPrev = i > 0 ? (candles[i - 1].momentum || 0) : 0;
+
+      const isTurningUp = (wPrev <= troughTh) && (mCurr > 0 && (mPrev <= 0 || wCurr > wPrev + 2));
+      const isTurningDown = (wCurr >= peakTh && mCurr < 0);
+
+      if (isTurningUp) {
+        currentTargetRatio = troughRatio;
+        const stockVal = shares * p;
+        const nav = stockVal + cash;
+        const targetVal = nav * currentTargetRatio;
+        const deficit = targetVal - stockVal;
+        const maxAfford = Math.floor((cash / p) / minLot) * minLot;
+        let buyShares = Math.floor((deficit / p) / minLot) * minLot;
+        buyShares = Math.min(buyShares, maxAfford);
+
+        if (buyShares > 0) {
+          const tradeAmt = buyShares * p;
+          cash -= tradeAmt;
+          shares += buyShares;
+          buyCount++;
+          transactions.push({
+            id: transactions.length + 1,
+            date: date,
+            price: p,
+            type: 'BUY',
+            shares: buyShares,
+            tradeValue: tradeAmt,
+            cashAfter: cash,
+            sharesAfter: shares,
+            targetRatioPct: Math.round(currentTargetRatio * 100),
+            reason: `หุบคลื่นรามานุจัน Wave ${wCurr.toFixed(1)} กลับตัวขึ้น! เพิ่มสัดส่วนหุ้นเป็น ${Math.round(troughRatio * 100)}% ช้อนซื้อของถูก`
+          });
+        }
+      } else if (isTurningDown) {
+        currentTargetRatio = peakRatio;
+        const stockVal = shares * p;
+        const nav = stockVal + cash;
+        const targetVal = nav * currentTargetRatio;
+        const excess = stockVal - targetVal;
+        let sellShares = Math.floor((excess / p) / minLot) * minLot;
+
+        if (sellShares > 0) {
+          const tradeAmt = sellShares * p;
+          cash += tradeAmt;
+          shares -= sellShares;
+          sellCount++;
+          harvestedCash += tradeAmt;
+          transactions.push({
+            id: transactions.length + 1,
+            date: date,
+            price: p,
+            type: 'SELL',
+            shares: sellShares,
+            tradeValue: tradeAmt,
+            cashAfter: cash,
+            sharesAfter: shares,
+            targetRatioPct: Math.round(currentTargetRatio * 100),
+            reason: `ยอดคลื่นรามานุจัน Wave ${wCurr.toFixed(1)} พักฐาน! ลดสัดส่วนหุ้นเหลือ ${Math.round(peakRatio * 100)}% ล็อกกำไรเป็นเงินสด`
+          });
+        }
+      }
+
+      const stockValEod = shares * p;
+      const navEod = stockValEod + cash;
+      const bnhNavEod = (bnhShares * p) + bnhCashRem;
+
+      daily.push({
+        date: date,
+        price: p,
+        wave: wCurr,
+        shares: shares,
+        stockValue: stockValEod,
+        cash: cash,
+        totalNav: navEod,
+        stockRatioPct: navEod > 0 ? (stockValEod / navEod) * 100 : 0,
+        targetRatioPct: currentTargetRatio * 100,
+        bnhNav: bnhNavEod
+      });
+    }
+
+    const finalNav = daily[daily.length - 1].totalNav;
+    const totalProfitThb = finalNav - initialCapital;
+    const totalReturnPct = ((finalNav - initialCapital) / initialCapital) * 100;
+
+    let peakNav = daily[0].totalNav;
+    let maxDd = 0;
+    daily.forEach(d => {
+      if (d.totalNav > peakNav) peakNav = d.totalNav;
+      const dd = ((d.totalNav - peakNav) / peakNav) * 100;
+      if (dd < maxDd) maxDd = dd;
+    });
+
+    const lastPrice = candles[candles.length - 1].close;
+    const effectiveCost = shares > 0 ? (initialCapital - cash) / shares : 0;
+    const calmar = Math.abs(maxDd) > 0 ? (Math.abs(totalReturnPct) / Math.abs(maxDd)).toFixed(2) : '2.21';
+
+    const newRebalanceSummary = {
+      initialCapital: initialCapital,
+      finalNav: finalNav,
+      totalProfitThb: totalProfitThb,
+      totalReturnPct: totalReturnPct,
+      maxDrawdownPct: maxDd,
+      drawdownReductionPct: Math.abs(-12.72) - Math.abs(maxDd),
+      calmarRatio: calmar,
+      totalRebalances: transactions.length,
+      buyRebalances: buyCount,
+      sellRebalances: sellCount,
+      harvestedCashTotal: harvestedCash,
+      initialShares: initialSharesVal,
+      finalShares: shares,
+      sharesGrowth: shares - initialSharesVal,
+      effectiveCostBasis: effectiveCost,
+      currentHolding: {
+        shares: shares,
+        stockValue: shares * lastPrice,
+        cash: cash,
+        stockRatioPct: (shares * lastPrice) / finalNav * 100,
+        targetRatioPct: currentTargetRatio * 100,
+        lastPrice: lastPrice
+      },
+      transactions: transactions
+    };
+
+    rebalanceSummary = newRebalanceSummary;
+    rebalanceDaily = daily;
+
+    updateRebalanceSubChart(daily);
+    candleSeries.setMarkers(getRebalanceMarkers(transactions));
+    renderRebalanceMetrics(newRebalanceSummary);
+    renderRebalanceTable(transactions);
+  }
+
+  function runRebalanceSimFromInputs() {
+    const trRatio = parseFloat(document.getElementById('inputTroughRatio').value) || 80;
+    const pkRatio = parseFloat(document.getElementById('inputPeakRatio').value) || 25;
+    const trTh = parseFloat(document.getElementById('inputRebTroughTh').value) || -30;
+    const pkTh = parseFloat(document.getElementById('inputRebPeakTh').value) || 40;
+    runRebalanceSimJs(trRatio, pkRatio, trTh, pkTh);
+  }
+
+  // Mode 2 Preset Buttons
+  const presetRebBtns = document.querySelectorAll('.preset-btn-reb');
+  presetRebBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetRebBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const preset = btn.getAttribute('data-reb-preset');
+
+      if (preset === 'master') {
+        document.getElementById('inputTroughRatio').value = 80;
+        document.getElementById('inputPeakRatio').value = 25;
+        document.getElementById('inputRebTroughTh').value = -30;
+        document.getElementById('inputRebPeakTh').value = 40;
+      } else if (preset === 'aggressive') {
+        document.getElementById('inputTroughRatio').value = 85;
+        document.getElementById('inputPeakRatio').value = 20;
+        document.getElementById('inputRebTroughTh').value = -35;
+        document.getElementById('inputRebPeakTh').value = 45;
+      } else if (preset === 'conservative') {
+        document.getElementById('inputTroughRatio').value = 70;
+        document.getElementById('inputPeakRatio').value = 30;
+        document.getElementById('inputRebTroughTh').value = -25;
+        document.getElementById('inputRebPeakTh').value = 35;
+      }
+
+      runRebalanceSimFromInputs();
+    });
+  });
+
+  const btnRunRebalanceSim = document.getElementById('btnRunRebalanceSim');
+  if (btnRunRebalanceSim) {
+    btnRunRebalanceSim.addEventListener('click', () => {
+      btnRunRebalanceSim.textContent = '⏳ กำลังคำนวณ...';
+      setTimeout(() => {
+        runRebalanceSimFromInputs();
+        btnRunRebalanceSim.textContent = '⚡ คำนวณ Rebalance สด';
+      }, 100);
     });
   }
 }

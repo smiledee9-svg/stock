@@ -80,7 +80,7 @@
       </div>
     </div>
 
-    <!-- Live Active Signal Card -->
+    <!-- Live Active Signal Card (Mode 1: Pure Cycle Timing) -->
     <div class="live-signal-banner card-box" id="liveSignalBanner">
       <div class="signal-badge-wrap">
         <span class="pulse-indicator"></span>
@@ -114,13 +114,49 @@
       </div>
     </div>
 
-    <!-- Strategy Preset & Interactive Backtest Toolbar -->
-    <div class="card-box backtest-toolbar">
+    <!-- Live Active Rebalance Banner (Mode 2: Ramanujan Dynamic Rebalance) -->
+    <div class="live-signal-banner card-box" id="liveRebalanceBanner" style="display: none; border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(13, 19, 31, 0.95) 100%);">
+      <div class="signal-badge-wrap">
+        <span class="pulse-indicator" style="background:#10b981; box-shadow:0 0 10px #10b981;"></span>
+        <span class="signal-tag tag-buy" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);">
+          ⚖️ สถานะพอร์ต Rebalance: ถือครอง 6,600 หุ้น (78.9%) + เงินสดสำรอง ฿256,450 (21.1%)
+        </span>
+      </div>
+      <div class="signal-details-grid">
+        <div class="sig-col">
+          <span class="sig-label">หุ้น SCB ในพอร์ต:</span>
+          <strong class="sig-val text-brand" id="rebHoldShares">6,600 หุ้น</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">หุ้นฟรีสะสม (Free Shares):</span>
+          <strong class="sig-val text-green" id="rebFreeShares">+2,100 หุ้น (+46.7%)</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">เงินสดสำรอง (Cash Cushion):</span>
+          <strong class="sig-val text-amber" id="rebCashCushion">฿256,450</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">ต้นทุนแท้จริง (Cost Basis):</span>
+          <strong class="sig-val text-green" id="rebEffectiveCost">฿112.66 / หุ้น</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
+          <strong class="sig-val" id="rebMarketPrice">฿145.50 (ต้นทุนถูกกว่า 22.6%)</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">แผนรับมือคลื่นถัดไป:</span>
+          <strong class="sig-val text-brand" id="rebNextAction">หุบคลื่น ≤ -30 ➡️ ช้อน 80%</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strategy Preset & Interactive Backtest Toolbar (Mode 1: Sniper) -->
+    <div class="card-box backtest-toolbar" id="toolbarMode1">
       <div class="toolbar-title-row">
         <div class="toolbar-title">
-          <span class="toolbar-icon">⚡</span>
+          <span class="toolbar-icon">🎯</span>
           <div>
-            <h3>เครื่องมือคำนวณสัญญาณ & แบคเทสย้อนหลัง (Live Quant Simulator)</h3>
+            <h3>เครื่องมือคำนวณสัญญาณ Sniper & แบคเทสรอบคลื่น (Pure Cycle Timing Simulator)</h3>
             <p class="toolbar-desc">คลิกเลือกกลยุทธ์ หรือปรับพารามิเตอร์แล้วกดคำนวณ เพื่อทดสอบสัญญาณ BUY/SELL สดจากข้อมูลได้ทันที</p>
           </div>
         </div>
@@ -172,13 +208,71 @@
       </div>
     </div>
 
+    <!-- Strategy Preset & Interactive Rebalance Toolbar (Mode 2: Dynamic Rebalance) -->
+    <div class="card-box backtest-toolbar" id="toolbarMode2" style="display: none; border-color: rgba(16, 185, 129, 0.35);">
+      <div class="toolbar-title-row">
+        <div class="toolbar-title">
+          <span class="toolbar-icon">⚖️</span>
+          <div>
+            <h3>เครื่องมือจำลองการรีบาลานซ์สัดส่วนตามคลื่นรามานุจัน (Ramanujan Dynamic Rebalance Simulator)</h3>
+            <p class="toolbar-desc">ปรับสัดส่วนช้อนซื้อหุบคลื่น (Trough) หรือล็อกกำไรยอดคลื่น (Peak) แล้วทดสอบผลลัพธ์การสะสมหุ้นฟรีได้สดๆ</p>
+          </div>
+        </div>
+        <div class="strategy-presets">
+          <button type="button" class="preset-btn-reb active" data-reb-preset="master">🏆 Ramanujan Master (80% / 25%)</button>
+          <button type="button" class="preset-btn-reb" data-reb-preset="aggressive">🚀 Aggressive Growth (85% / 20%)</button>
+          <button type="button" class="preset-btn-reb" data-reb-preset="conservative">🛡️ Capital Shield (70% / 30%)</button>
+        </div>
+      </div>
+
+      <div class="param-controls-grid">
+        <div class="param-group">
+          <label for="inputTroughRatio">สัดส่วนหุ้นหุบคลื่น (Trough Target):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputTroughRatio" value="80" step="5" min="60" max="95">
+            <span>% หุ้น</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputPeakRatio">สัดส่วนหุ้นยอดคลื่น (Peak Target):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputPeakRatio" value="25" step="5" min="10" max="45">
+            <span>% หุ้น</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputRebTroughTh">ทริกเกอร์หุบคลื่น (Trough Wave):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputRebTroughTh" value="-30" step="5" min="-70" max="-10">
+            <span>Wave</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputRebPeakTh">ทริกเกอร์ยอดคลื่น (Peak Wave):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputRebPeakTh" value="40" step="5" min="15" max="80">
+            <span>Wave</span>
+          </div>
+        </div>
+
+        <div class="param-group param-action">
+          <button type="button" id="btnRunRebalanceSim" class="btn btn-primary btn-run" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            ⚡ คำนวณ Rebalance สด
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Chart Section -->
     <section class="chart-section card-box">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2>📊 กราฟราคาแท่งเทียน SCB & คลื่นรามานุจัน (Cycle Wave)</h2>
-          <span class="chart-legend-badge legend-buy">▲ สัญญาณซื้อ (หุบคลื่น)</span>
-          <span class="chart-legend-badge legend-sell">▼ สัญญาณขาย (ยอดคลื่น)</span>
+          <h2 id="chartSectionTitle">📊 กราฟราคาแท่งเทียน SCB & คลื่นรามานุจัน (Cycle Wave)</h2>
+          <span class="chart-legend-badge legend-buy" id="chartLegendBuy">▲ สัญญาณซื้อ (หุบคลื่น)</span>
+          <span class="chart-legend-badge legend-sell" id="chartLegendSell">▼ สัญญาณขาย (ยอดคลื่น)</span>
         </div>
         <div class="chart-controls">
           <button type="button" class="btn-time active" data-range="all">2 ปีเต็ม</button>
@@ -190,10 +284,10 @@
       <!-- Main Price Candlestick Chart -->
       <div id="priceChartContainer" class="chart-container"></div>
 
-      <!-- Ramanujan Cycle Wave Sub-Chart -->
+      <!-- Sub-Chart Container (Wave in Mode 1, NAV in Mode 2) -->
       <div class="sub-chart-title">
-        <span>🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])</span>
-        <span class="sub-note">โซนเขียว = หุบคลื่นเตรียมกลับตัวขึ้น | โซนแดง = ยอดคลื่นเตรียมพักฐาน</span>
+        <span id="subChartTitleText">🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])</span>
+        <span class="sub-note" id="subChartNoteText">โซนเขียว = หุบคลื่นเตรียมกลับตัวขึ้น | โซนแดง = ยอดคลื่นเตรียมพักฐาน</span>
       </div>
       <div id="waveChartContainer" class="sub-chart-container"></div>
     </section>
