@@ -3734,4 +3734,63 @@ body {
   }
 }
 
+/* ==========================================================================
+   Project 3: Ramanujan Quant Lab Bridge Card Styles
+   ========================================================================== */
+.project-bridge-card-ramanujan {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.03) 100%);
+  border-color: rgba(99, 102, 241, 0.28);
+}
+
+[data-theme="dark"] .project-bridge-card-ramanujan {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(17, 24, 39, 0.6) 100%);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.project-bridge-card-ramanujan:hover {
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.18);
+}
+
+.ramanujan-icon {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+}
+
+.ramanujan-badge {
+  color: #6366f1;
+}
+
+[data-theme="dark"] .ramanujan-badge {
+  color: #818cf8;
+}
+
+.ramanujan-dot {
+  background: #6366f1;
+}
+
+.ramanujan-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+}
+
+.ramanujan-btn:hover {
+  background: linear-gradient(135deg, #4338ca, #6d28d9);
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.45);
+}
+
+.btn-quant-link {
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  color: #6366f1 !important;
+}
+
+[data-theme="dark"] .btn-quant-link {
+  border-color: rgba(129, 140, 248, 0.4) !important;
+  color: #a5b4fc !important;
+}
+
+.btn-quant-link:hover {
+  background: rgba(99, 102, 241, 0.12) !important;
+}
+
 
