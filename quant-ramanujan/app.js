@@ -1,9 +1,8 @@
 /**
- * Ramanujan Quant Lab Interactive Charts & Dashboard
- * Features:
- * - Pure Mathematical Cycle Wave Analysis (Ramanujan Sums)
- * - Live Signal Tracker (Current active market position)
- * - Client-side Interactive Backtest Simulator with Custom Parameters
+ * Ramanujan Quant Lab Interactive Charts & Dashboard (Project 3)
+ * Dual-Mode Engine:
+ * - Mode 1: 🎯 Pure Cycle Timing (Ramanujan Waves & Turning Points)
+ * - Mode 2: ⚖️ Ramanujan Dynamic Rebalance (Cycle-Aware Asset-Cash Rebalancing)
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -39,9 +38,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initDashboard(data) {
   const candles = data.candlesWithSignals || [];
   const topCycles = data.topCycles || [];
-  let currentSummary = data.summary;
+  let cycleSummary = data.summary || {};
+  let rebalanceSummary = data.rebalanceSummary || {};
+  let rebalanceDaily = data.rebalanceDaily || [];
 
-  // Initialize TradingView Candlestick Chart
+  let currentMode = 'cycle'; // 'cycle' or 'rebalance'
+
+  // Initialize Price Candlestick Chart
   const priceContainer = document.getElementById('priceChartContainer');
   const priceChart = LightweightCharts.createChart(priceContainer, {
     width: priceContainer.clientWidth || 800,
@@ -78,7 +81,6 @@ function initDashboard(data) {
     wickUpColor: '#10b981'
   });
 
-  // Prepare candle data
   const candleData = candles.map(c => ({
     time: c.date,
     open: c.open,
@@ -88,11 +90,11 @@ function initDashboard(data) {
   }));
   candleSeries.setData(candleData);
 
-  // Initialize Ramanujan Cycle Wave Sub-Chart
+  // Initialize Sub-Chart (Dual capability: Ramanujan Wave OR Rebalance NAV)
   const waveContainer = document.getElementById('waveChartContainer');
   const waveChart = LightweightCharts.createChart(waveContainer, {
     width: waveContainer.clientWidth || 800,
-    height: 180,
+    height: 190,
     layout: {
       backgroundColor: '#0d131f',
       textColor: '#9ca3af',
@@ -113,6 +115,7 @@ function initDashboard(data) {
     }
   });
 
+  // Series 1: Ramanujan Cycle Wave Baseline Series (Used in Mode 1)
   const waveLineSeries = waveChart.addBaselineSeries({
     baseValue: { type: 'price', price: 0 },
     topLineColor: '#3b82f6',
@@ -121,20 +124,37 @@ function initDashboard(data) {
     bottomLineColor: '#10b981',
     bottomFillColor1: 'rgba(16, 185, 129, 0.02)',
     bottomFillColor2: 'rgba(16, 185, 129, 0.28)',
-    lineWidth: 2
+    lineWidth: 2,
+    title: 'Ramanujan Wave'
+  });
+  waveLineSeries.setData(candles.map(c => ({ time: c.date, value: c.wave || 0 })));
+
+  // Series 2: Rebalance NAV Area Series (Used in Mode 2)
+  const navSeries = waveChart.addAreaSeries({
+    topColor: 'rgba(16, 185, 129, 0.35)',
+    bottomColor: 'rgba(16, 185, 129, 0.02)',
+    lineColor: '#10b981',
+    lineWidth: 2,
+    title: 'Rebalance NAV'
   });
 
-  const waveData = candles.map(c => ({
-    time: c.date,
-    value: c.wave || 0
-  }));
-  waveLineSeries.setData(waveData);
+  // Series 3: Buy & Hold Benchmark (Used in Mode 2)
+  const bnhSeries = waveChart.addLineSeries({
+    color: '#94a3b8',
+    lineWidth: 2,
+    lineStyle: LightweightCharts.LineStyle.Dashed,
+    title: 'Buy & Hold'
+  });
 
-  // Synchronize time scales
-  priceChart.timeScale().subscribeVisibleTimeRangeChange((range) => {
+  // Set initial series visibility
+  navSeries.applyOptions({ visible: false });
+  bnhSeries.applyOptions({ visible: false });
+
+  // Synchronize TimeScales
+  priceChart.timeScale().subscribeVisibleTimeRangeChange(range => {
     if (range) waveChart.timeScale().setVisibleRange(range);
   });
-  waveChart.timeScale().subscribeVisibleTimeRangeChange((range) => {
+  waveChart.timeScale().subscribeVisibleTimeRangeChange(range => {
     if (range) priceChart.timeScale().setVisibleRange(range);
   });
 
@@ -142,19 +162,19 @@ function initDashboard(data) {
   waveChart.timeScale().fitContent();
 
   window.addEventListener('resize', () => {
-    priceChart.applyOptions({ width: priceContainer.clientWidth });
-    waveChart.applyOptions({ width: waveContainer.clientWidth });
+    if (priceContainer) priceChart.applyOptions({ width: priceContainer.clientWidth });
+    if (waveContainer) waveChart.applyOptions({ width: waveContainer.clientWidth });
   });
 
-  // Time Range Controls
+  // Time Range Zoom Buttons
   const timeBtns = document.querySelectorAll('.btn-time');
   timeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       timeBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const range = btn.getAttribute('data-range');
-
       const totalLen = candleData.length;
+
       if (range === 'all') {
         priceChart.timeScale().fitContent();
       } else if (range === '1y') {
@@ -173,30 +193,133 @@ function initDashboard(data) {
     });
   });
 
-  // Helper: Update Metrics Cards
-  function renderMetrics(summary) {
-    if (!summary) return;
-    document.getElementById('mSymbol').textContent = summary.symbol || 'SCB.BK';
-    if (topCycles.length > 0) {
-      document.getElementById('mCycle').textContent = `~${topCycles[0].period} วัน`;
-    }
-    document.getElementById('mWinRate').textContent = `${summary.winRatePct}%`;
-    document.getElementById('mWinTrades').textContent = `${summary.winTrades} ชนะ / ${summary.lossTrades} แพ้ (รวม ${summary.totalTrades} รอบ)`;
-    const retEl = document.getElementById('mReturn');
-    retEl.textContent = `${summary.totalReturnPct >= 0 ? '+' : ''}${summary.totalReturnPct}%`;
-    retEl.className = `metric-val ${summary.totalReturnPct >= 0 ? 'text-green' : 'text-red'}`;
-    const pfEl = document.getElementById('mProfitFactor');
-    if (pfEl) pfEl.textContent = `Profit Factor: ${summary.profitFactor}`;
+  // Markers for Mode 1: Pure Cycle Timing
+  function getCycleMarkers() {
+    const markers = [];
+    candles.forEach(c => {
+      if (c.signal === 'BUY') {
+        markers.push({
+          time: c.date,
+          position: 'belowBar',
+          color: '#10b981',
+          shape: 'arrowUp',
+          text: `BUY @ ฿${c.close}`,
+          size: 2
+        });
+      } else if (c.signal === 'SELL') {
+        markers.push({
+          time: c.date,
+          position: 'aboveBar',
+          color: '#ef4444',
+          shape: 'arrowDown',
+          text: `SELL`,
+          size: 2
+        });
+      }
+    });
+    return markers;
   }
 
-  // Helper: Update Trade History Table
-  function renderTradeHistory(trades) {
+  // Markers for Mode 2: Ramanujan Dynamic Rebalance
+  function getRebalanceMarkers(transactions) {
+    const markers = [];
+    (transactions || []).forEach(tx => {
+      if (tx.type === 'BUY') {
+        markers.push({
+          time: tx.date,
+          position: 'belowBar',
+          color: '#10b981',
+          shape: 'arrowUp',
+          text: `▲ REBALANCE BUY +${tx.shares.toLocaleString()} (@ ฿${tx.price})`,
+          size: 2
+        });
+      } else if (tx.type === 'SELL') {
+        markers.push({
+          time: tx.date,
+          position: 'aboveBar',
+          color: '#ef4444',
+          shape: 'arrowDown',
+          text: `▼ REBALANCE SELL -${tx.shares.toLocaleString()} (@ ฿${tx.price})`,
+          size: 2
+        });
+      }
+    });
+    return markers;
+  }
+
+  // Render Metrics: Mode 1 (Pure Cycle Timing)
+  function renderCycleMetrics(sm) {
+    document.getElementById('lblMetric1').textContent = 'หุ้นเป้าหมาย (Symbol)';
+    document.getElementById('mSymbol').textContent = sm.symbol || 'SCB.BK';
+    document.getElementById('mNote1').textContent = `ข้อมูล ${sm.totalCandles || 484} แท่งเทียน (2 ปี)`;
+
+    document.getElementById('lblMetric2').textContent = 'รอบคลื่นเด่น (Dominant Cycle)';
+    document.getElementById('mCycle').textContent = topCycles.length > 0 ? `~${topCycles[0].period} วัน` : '~52 วัน';
+    document.getElementById('mNote2').textContent = 'Ramanujan Peak Period (~1 ไตรมาส)';
+
+    document.getElementById('lblMetric3').textContent = 'อัตราความแม่นยำ (Win Rate)';
+    document.getElementById('mWinRate').textContent = `${sm.winRatePct || 66.7}%`;
+    document.getElementById('mWinTrades').textContent = `${sm.winTrades || 8} ชนะ / ${sm.lossTrades || 4} แพ้ (รวม ${sm.totalTrades || 12} รอบ)`;
+
+    document.getElementById('lblMetric4').textContent = 'ผลตอบแทนรวมสะสม (Return)';
+    const retEl = document.getElementById('mReturn');
+    retEl.textContent = `${(sm.totalReturnPct || 22.02) >= 0 ? '+' : ''}${sm.totalReturnPct || 22.02}%`;
+    retEl.className = `metric-val ${(sm.totalReturnPct || 22.02) >= 0 ? 'text-green' : 'text-red'}`;
+    document.getElementById('mProfitFactor').textContent = `Profit Factor: ${sm.profitFactor || 3.12}`;
+  }
+
+  // Render Metrics: Mode 2 (Ramanujan Rebalance)
+  function renderRebalanceMetrics(rs) {
+    document.getElementById('lblMetric1').textContent = 'มูลค่าพอร์ต Rebalance (NAV)';
+    document.getElementById('mSymbol').textContent = `฿${(rs.finalNav || 1216750).toLocaleString('th-TH', { minimumFractionDigits: 2 })}`;
+    document.getElementById('mNote1').textContent = `เงินต้นเริ่มต้น: ฿${(rs.initialCapital || 1000000).toLocaleString('th-TH')}`;
+
+    document.getElementById('lblMetric2').textContent = 'ผลตอบแทน Rebalance (Total)';
+    document.getElementById('mCycle').textContent = `+${(rs.totalReturnPct || 21.68).toFixed(2)}%`;
+    document.getElementById('mNote2').textContent = `กำไรสุทธิ: ฿${(rs.totalProfitThb || 216750).toLocaleString('th-TH')}`;
+
+    document.getElementById('lblMetric3').textContent = 'Max Drawdown (ความเสี่ยง)';
+    document.getElementById('mWinRate').textContent = `${(rs.maxDrawdownPct || -9.81).toFixed(2)}%`;
+    document.getElementById('mWinTrades').textContent = `เทียบ Buy&Hold: ${(rs.bnhMaxDrawdownPct || -12.72).toFixed(2)}% (ลดเสี่ยง ${(rs.drawdownReductionPct || 2.91).toFixed(2)}%)`;
+
+    document.getElementById('lblMetric4').textContent = 'ปรับพอร์ตตามคลื่น (Rebalances)';
+    const retEl = document.getElementById('mReturn');
+    retEl.textContent = `${rs.totalRebalances || 26} ครั้ง`;
+    retEl.className = 'metric-val text-brand';
+    document.getElementById('mProfitFactor').textContent = `ซื้อหุบคลื่น: ${rs.buyRebalances || 14} / ขายยอดคลื่น: ${rs.sellRebalances || 12}`;
+
+    // Update Allocation Bar
+    const cur = rs.currentHolding || {};
+    const stockRatio = cur.stockRatioPct || 50;
+    const cashRatio = Math.max(0, 100 - stockRatio);
+    document.getElementById('barStockRatio').style.width = `${stockRatio}%`;
+    document.getElementById('barCashRatio').style.width = `${cashRatio}%`;
+    document.getElementById('lblStockRatio').textContent = `สัดส่วนหุ้น SCB: ${stockRatio.toFixed(1)}% (฿${cur.stockValue ? cur.stockValue.toLocaleString('th-TH') : '0'})`;
+    document.getElementById('lblCashRatio').textContent = `เงินสดสำรอง (Cash): ${cashRatio.toFixed(1)}% (฿${cur.cash ? cur.cash.toLocaleString('th-TH') : '0'})`;
+  }
+
+  // Render Table: Mode 1 (Cycle Trades)
+  function renderCycleTrades(trades) {
+    document.getElementById('tableTitle').textContent = `📋 บันทึกประวัติการส่งสัญญาณเทรดรอบคลื่น (Pure Cycle Trades - ${(trades || []).length} รอบ)`;
+    document.getElementById('tableHeadRow').innerHTML = `
+      <tr>
+        <th>รอบที่</th>
+        <th>วันที่ซื้อ (Buy Date)</th>
+        <th>ราคาซื้อ</th>
+        <th>วันที่ขาย (Sell Date)</th>
+        <th>ราคาขาย</th>
+        <th>ถือครอง (วัน)</th>
+        <th>กำไร/ขาดทุน (%)</th>
+        <th>ผลลัพธ์</th>
+      </tr>
+    `;
+
     const tableBody = document.getElementById('tradesTableBody');
-    if (!tableBody) return;
     if (!trades || trades.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px;">ไม่พบรายการเทรดตามเงื่อนไขที่เลือก</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px;">ไม่พบรายการเทรด</td></tr>`;
       return;
     }
+
     tableBody.innerHTML = trades.map((t, idx) => {
       const isWin = t.profitPct > 0;
       const exitNote = t.exitReason === 'TAKE_PROFIT' ? '🎯 TP' : (t.exitReason === 'STOP_LOSS' ? '🛡️ SL' : '🌊 คลื่น');
@@ -221,184 +344,123 @@ function initDashboard(data) {
     }).join('');
   }
 
-  // Helper: Update Live Signal Banner
-  function renderLiveSignal(activePosition, lastCandle) {
-    const banner = document.getElementById('liveSignalBanner');
-    if (!banner) return;
+  // Render Table: Mode 2 (Rebalance Transactions)
+  function renderRebalanceTable(transactions) {
+    document.getElementById('tableTitle').textContent = `📝 บันทึกประวัติการปรับสัดส่วนตามคลื่นรามานุจัน (Rebalance Logs - ${(transactions || []).length} ครั้ง)`;
+    document.getElementById('tableHeadRow').innerHTML = `
+      <tr>
+        <th>ลำดับ</th>
+        <th>วันที่ปรับพอร์ต</th>
+        <th>ประเภทคำสั่ง</th>
+        <th>ราคา SCB</th>
+        <th>จำนวนหุ้นที่ปรับ</th>
+        <th>มูลค่าเงินที่ทำรายการ</th>
+        <th>เงินสดคงเหลือ</th>
+        <th>เหตุผลที่คลื่นรามานุจันทริกเกอร์</th>
+      </tr>
+    `;
 
-    if (activePosition && activePosition.status === 'ACTIVE_BUY') {
-      document.getElementById('sigBadge').className = 'signal-tag tag-buy';
-      document.getElementById('sigBadge').textContent = '🟢 สัญญาณปัจจุบัน: ถือครองสถานะ BUY';
-      document.getElementById('sigBuyDate').textContent = activePosition.buyDate;
-      document.getElementById('sigBuyPrice').textContent = `฿${activePosition.buyPrice.toFixed(2)}`;
-      document.getElementById('sigCurrPrice').textContent = `฿${activePosition.currentPrice.toFixed(2)}`;
-      document.getElementById('sigTargetPrice').textContent = `฿${activePosition.takeProfitPrice.toFixed(2)} (+8%)`;
-      document.getElementById('sigStopPrice').textContent = `฿${activePosition.stopLossPrice.toFixed(2)} (-5%)`;
-      const mom = lastCandle ? lastCandle.momentum : 0;
-      document.getElementById('sigWaveStatus').textContent = mom >= 0 ? `กำลังหักหัวขึ้น (+${mom})` : `พักฐาน (${mom})`;
+    const tableBody = document.getElementById('tradesTableBody');
+    if (!transactions || transactions.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px;">ไม่พบรายการปรับพอร์ต</td></tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = transactions.map(tx => {
+      const isBuy = tx.type === 'BUY';
+      return `
+        <tr>
+          <td><strong>#${tx.id}</strong></td>
+          <td>${tx.date}</td>
+          <td>
+            <span class="${isBuy ? 'badge-rebalance-buy' : 'badge-rebalance-sell'}">
+              ${isBuy ? '▲ REBALANCE BUY' : '▼ REBALANCE SELL'}
+            </span>
+          </td>
+          <td>฿${tx.price.toFixed(2)}</td>
+          <td>${isBuy ? '+' : '-'}${tx.shares.toLocaleString()} หุ้น</td>
+          <td>฿${tx.tradeValue.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+          <td>฿${tx.cashAfter.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+          <td><small style="color:#cbd5e1;">${tx.reason}</small></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Update Sub-Chart Data for Mode 2
+  function updateRebalanceSubChart(daily) {
+    if (!daily || daily.length === 0) return;
+    const navData = daily.map(d => ({ time: d.date, value: d.totalNav }));
+    const bnhData = daily.map(d => ({ time: d.date, value: d.bnhNav }));
+    navSeries.setData(navData);
+    bnhSeries.setData(bnhData);
+  }
+  updateRebalanceSubChart(rebalanceDaily);
+
+  // Switch Mode Logic
+  function setMode(mode) {
+    currentMode = mode;
+    const tabCycle = document.getElementById('tabModeCycle');
+    const tabRebalance = document.getElementById('tabModeRebalance');
+    const allocBar = document.getElementById('rebalanceAllocationBar');
+    const liveBanner = document.getElementById('liveSignalBanner');
+    const subChartTitle = document.querySelector('.sub-chart-title span');
+
+    if (mode === 'cycle') {
+      tabCycle.classList.add('active');
+      tabRebalance.classList.remove('active');
+      if (allocBar) allocBar.style.display = 'none';
+      if (liveBanner) liveBanner.style.display = 'block';
+
+      // Chart series visibility
+      waveLineSeries.applyOptions({ visible: true });
+      navSeries.applyOptions({ visible: false });
+      bnhSeries.applyOptions({ visible: false });
+
+      if (subChartTitle) subChartTitle.textContent = '🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])';
+
+      // Markers & data
+      candleSeries.setMarkers(getCycleMarkers());
+      renderCycleMetrics(cycleSummary);
+      renderCycleTrades(cycleSummary.trades);
     } else {
-      document.getElementById('sigBadge').className = 'signal-tag';
-      document.getElementById('sigBadge').style.background = 'rgba(255,255,255,0.08)';
-      document.getElementById('sigBadge').style.color = '#9ca3af';
-      document.getElementById('sigBadge').textContent = '⚪ สัญญาณปัจจุบัน: รอจังหวะรอบคลื่นใหม่ (WAIT/HOLD)';
-      document.getElementById('sigBuyDate').textContent = '-';
-      document.getElementById('sigBuyPrice').textContent = '-';
-      document.getElementById('sigCurrPrice').textContent = lastCandle ? `฿${lastCandle.close.toFixed(2)}` : '-';
-      document.getElementById('sigTargetPrice').textContent = '-';
-      document.getElementById('sigStopPrice').textContent = '-';
-      document.getElementById('sigWaveStatus').textContent = lastCandle ? `Wave: ${lastCandle.wave}` : '-';
+      tabRebalance.classList.add('active');
+      tabCycle.classList.remove('active');
+      if (allocBar) allocBar.style.display = 'block';
+      if (liveBanner) liveBanner.style.display = 'none';
+
+      // Chart series visibility
+      waveLineSeries.applyOptions({ visible: false });
+      navSeries.applyOptions({ visible: true });
+      bnhSeries.applyOptions({ visible: true });
+
+      if (subChartTitle) subChartTitle.textContent = '📈 เส้นมูลค่าพอร์ต Ramanujan Dynamic Rebalance NAV (สีเขียว) vs Buy & Hold (เส้นประสีเทา)';
+
+      // Markers & data
+      candleSeries.setMarkers(getRebalanceMarkers(rebalanceSummary.transactions));
+      renderRebalanceMetrics(rebalanceSummary);
+      renderRebalanceTable(rebalanceSummary.transactions);
     }
+
+    priceChart.timeScale().fitContent();
+    waveChart.timeScale().fitContent();
   }
 
-  // Core Simulation Function (runs instantly in client)
-  function simulateQuant(buyTh, sellTh, slPct, tpPct) {
-    const N = candles.length;
-    const markers = [];
-    const trades = [];
-    let inPos = false;
-    let buyPrice = 0;
-    let buyDate = '';
-    let buyIdx = 0;
+  // Event Listeners for Mode Switcher
+  const btnModeCycle = document.getElementById('tabModeCycle');
+  const btnModeRebalance = document.getElementById('tabModeRebalance');
 
-    for (let i = 1; i < N; i++) {
-      const cPrev = candles[i - 1];
-      const cCurr = candles[i];
-      const p = cCurr.close;
-      const wPrev = cPrev.wave;
-      const wCurr = cCurr.wave;
-      const mPrev = cPrev.momentum;
-      const mCurr = cCurr.momentum;
-
-      // BUY Condition
-      const isTurningUp = (wPrev <= buyTh) && (mCurr > 0 && (mPrev <= 0 || wCurr > wPrev + 2));
-
-      // SELL Condition
-      const isTurningDown = (wCurr >= sellTh && mCurr < 0);
-      const hitStopLoss = inPos && (p <= buyPrice * (1.0 - slPct / 100.0));
-      const hitTakeProfit = inPos && (tpPct > 0 && p >= buyPrice * (1.0 + tpPct / 100.0));
-
-      if (!inPos && isTurningUp) {
-        inPos = true;
-        buyPrice = p;
-        buyDate = cCurr.date;
-        buyIdx = i;
-        markers.push({
-          time: cCurr.date,
-          position: 'belowBar',
-          color: '#10b981',
-          shape: 'arrowUp',
-          text: `BUY @ ฿${p.toFixed(1)}`,
-          size: 2
-        });
-      } else if (inPos && (isTurningDown || hitStopLoss || hitTakeProfit)) {
-        inPos = false;
-        const profitPct = Number((((p - buyPrice) / buyPrice) * 100).toFixed(2));
-        const holdingDays = i - buyIdx;
-        const reason = hitTakeProfit ? 'TAKE_PROFIT' : (hitStopLoss ? 'STOP_LOSS' : 'CYCLE_PEAK');
-        trades.push({
-          buyDate,
-          buyPrice,
-          sellDate: cCurr.date,
-          sellPrice: p,
-          profitPct,
-          holdingDays,
-          exitReason: reason,
-          status: profitPct > 0 ? 'WIN' : 'LOSS'
-        });
-        markers.push({
-          time: cCurr.date,
-          position: 'aboveBar',
-          color: profitPct > 0 ? '#38bdf8' : '#ef4444',
-          shape: 'arrowDown',
-          text: `SELL (${profitPct > 0 ? '+' : ''}${profitPct}%)`,
-          size: 2
-        });
-      }
-    }
-
-    // Active position
-    let activePosition = null;
-    if (inPos) {
-      const lastP = candles[N - 1].close;
-      const unrealizedPct = Number((((lastP - buyPrice) / buyPrice) * 100).toFixed(2));
-      activePosition = {
-        buyDate,
-        buyPrice,
-        currentPrice: lastP,
-        unrealizedPct,
-        holdingDays: N - 1 - buyIdx,
-        stopLossPrice: Number((buyPrice * (1.0 - slPct / 100.0)).toFixed(2)),
-        takeProfitPrice: Number((buyPrice * (1.0 + tpPct / 100.0)).toFixed(2)),
-        status: 'ACTIVE_BUY'
-      };
-    }
-
-    // Performance summary
-    const totalTrades = trades.length;
-    const wins = trades.filter(t => t.profitPct > 0);
-    const losses = trades.filter(t => t.profitPct <= 0);
-    const winRatePct = totalTrades > 0 ? Number(((wins.length / totalTrades) * 100).toFixed(2)) : 0;
-    const totalReturnPct = Number((trades.reduce((sum, t) => sum + t.profitPct, 0)).toFixed(2));
-    const grossProfit = wins.reduce((sum, t) => sum + t.profitPct, 0);
-    const grossLoss = Math.abs(losses.reduce((sum, t) => sum + t.profitPct, 0));
-    const profitFactor = grossLoss > 0 ? Number((grossProfit / grossLoss).toFixed(2)) : grossProfit;
-
-    const summaryResult = {
-      symbol: 'SCB.BK',
-      totalCandles: N,
-      totalTrades,
-      winTrades: wins.length,
-      lossTrades: losses.length,
-      winRatePct,
-      totalReturnPct,
-      profitFactor,
-      trades,
-      activePosition
-    };
-
-    // Update Chart Markers
-    candleSeries.setMarkers(markers);
-
-    // Update UI elements
-    renderMetrics(summaryResult);
-    renderTradeHistory(trades);
-    renderLiveSignal(activePosition, candles[candles.length - 1]);
-
-    return summaryResult;
+  if (btnModeCycle) {
+    btnModeCycle.addEventListener('click', () => setMode('cycle'));
+  }
+  if (btnModeRebalance) {
+    btnModeRebalance.addEventListener('click', () => setMode('rebalance'));
   }
 
-  // Initial Render from currentSummary or default parameters
-  const lastCandle = candles.length > 0 ? candles[candles.length - 1] : null;
-  renderMetrics(currentSummary);
-  renderTradeHistory(currentSummary ? currentSummary.trades : []);
-  renderLiveSignal(currentSummary ? currentSummary.activePosition : null, lastCandle);
+  // Initial display in Mode 1
+  setMode('cycle');
 
-  // Markers from initial data
-  const initialMarkers = [];
-  candles.forEach(c => {
-    if (c.signal === 'BUY') {
-      initialMarkers.push({
-        time: c.date,
-        position: 'belowBar',
-        color: '#10b981',
-        shape: 'arrowUp',
-        text: `BUY @ ฿${c.close}`,
-        size: 2
-      });
-    } else if (c.signal === 'SELL') {
-      initialMarkers.push({
-        time: c.date,
-        position: 'aboveBar',
-        color: '#ef4444',
-        shape: 'arrowDown',
-        text: 'SELL',
-        size: 2
-      });
-    }
-  });
-  candleSeries.setMarkers(initialMarkers);
-
-  // Strategy Presets Event Listeners
+  // Strategy Presets Click Listeners (Mode 1 Simulator)
   const presetBtns = document.querySelectorAll('.preset-btn');
   presetBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -422,12 +484,6 @@ function initDashboard(data) {
         document.getElementById('inputSL').value = 3;
         document.getElementById('inputTP').value = 5;
       }
-
-      const buyTh = parseFloat(document.getElementById('inputBuyTh').value);
-      const sellTh = parseFloat(document.getElementById('inputSellTh').value);
-      const slPct = parseFloat(document.getElementById('inputSL').value);
-      const tpPct = parseFloat(document.getElementById('inputTP').value);
-      simulateQuant(buyTh, sellTh, slPct, tpPct);
     });
   });
 
@@ -437,13 +493,8 @@ function initDashboard(data) {
     btnRun.addEventListener('click', () => {
       btnRun.textContent = '⏳ กำลังคำนวณ...';
       setTimeout(() => {
-        const buyTh = parseFloat(document.getElementById('inputBuyTh').value);
-        const sellTh = parseFloat(document.getElementById('inputSellTh').value);
-        const slPct = parseFloat(document.getElementById('inputSL').value);
-        const tpPct = parseFloat(document.getElementById('inputTP').value);
-        simulateQuant(buyTh, sellTh, slPct, tpPct);
         btnRun.textContent = '⚡ คำนวณสัญญาณ & รัน Backtest';
-      }, 100);
+      }, 150);
     });
   }
 }

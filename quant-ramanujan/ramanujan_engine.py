@@ -279,13 +279,187 @@ class RamanujanQuantModel:
 
         return signals, backtest_summary
 
+    def simulate_ramanujan_rebalance(self, initial_capital=1000000.0, base_ratio=0.50, trough_ratio=0.80, peak_ratio=0.25, buy_threshold=-30, sell_threshold=40, min_lot=100):
+        """
+        Ramanujan Dynamic Cycle-Aware Rebalance Strategy:
+        - In Troughs (<= buy_threshold & turning up): Target = trough_ratio (80% Stock) -> Buy Low!
+        - In Peaks (>= sell_threshold & turning down): Target = peak_ratio (25% Stock) -> Lock Cash!
+        - Otherwise: Base ratio = base_ratio (50% Stock)
+        """
+        wave, mom = self.calculate_cycle_wave()
+        N = len(self.prices)
+        p0 = float(self.prices[0])
+
+        current_target_ratio = base_ratio
+        initial_stock_val = initial_capital * current_target_ratio
+        shares = int((initial_stock_val / p0) // min_lot) * min_lot
+        cash = initial_capital - (shares * p0)
+
+        bnh_shares = int((initial_capital / p0) // min_lot) * min_lot
+        bnh_cash_rem = initial_capital - (bnh_shares * p0)
+
+        daily = []
+        transactions = []
+        harvested_cash = 0.0
+        rebalance_buy_count = 0
+        rebalance_sell_count = 0
+
+        for i in range(N):
+            p = float(self.prices[i])
+            date = self.dates[i]
+            ts = int(self.df["timestamp"].values[i])
+            w_curr = wave[i]
+            m_curr = mom[i]
+            w_prev = wave[i - 1] if i > 0 else 0
+            m_prev = mom[i - 1] if i > 0 else 0
+
+            # Signal Detection
+            is_turning_up = (w_prev <= buy_threshold) and (m_curr > 0 and (m_prev <= 0 or w_curr > w_prev + 2))
+            is_turning_down = (w_curr >= sell_threshold and m_curr < 0)
+
+            action = "HOLD"
+            shares_diff = 0
+            trade_amt = 0.0
+
+            if is_turning_up:
+                current_target_ratio = trough_ratio
+                # Trigger Aggressive Rebalance Buy
+                stock_val = shares * p
+                nav = stock_val + cash
+                target_val = nav * current_target_ratio
+                deficit = target_val - stock_val
+                max_afford = int((cash / p) // min_lot) * min_lot
+                buy_shares = int((deficit / p) // min_lot) * min_lot
+                buy_shares = min(buy_shares, max_afford)
+
+                if buy_shares > 0:
+                    trade_amt = buy_shares * p
+                    cash -= trade_amt
+                    shares += buy_shares
+                    action = "RAMANUJAN_BUY"
+                    shares_diff = buy_shares
+                    rebalance_buy_count += 1
+                    transactions.append({
+                        "id": len(transactions) + 1,
+                        "date": date,
+                        "price": p,
+                        "type": "BUY",
+                        "shares": buy_shares,
+                        "tradeValue": round(trade_amt, 2),
+                        "cashAfter": round(cash, 2),
+                        "sharesAfter": shares,
+                        "targetRatioPct": round(current_target_ratio * 100, 1),
+                        "reason": f"หุบคลื่นรามานุจัน Wave {round(w_curr, 1)} กลับตัวขึ้น! เพิ่มสัดส่วนหุ้นเป็น {round(trough_ratio*100)}% ช้อนซื้อของถูก"
+                    })
+
+            elif is_turning_down:
+                current_target_ratio = peak_ratio
+                # Trigger Defensive Rebalance Sell
+                stock_val = shares * p
+                nav = stock_val + cash
+                target_val = nav * current_target_ratio
+                excess = stock_val - target_val
+                sell_shares = int((excess / p) // min_lot) * min_lot
+
+                if sell_shares > 0:
+                    trade_amt = sell_shares * p
+                    cash += trade_amt
+                    shares -= sell_shares
+                    action = "RAMANUJAN_SELL"
+                    shares_diff = -sell_shares
+                    rebalance_sell_count += 1
+                    harvested_cash += trade_amt
+                    transactions.append({
+                        "id": len(transactions) + 1,
+                        "date": date,
+                        "price": p,
+                        "type": "SELL",
+                        "shares": sell_shares,
+                        "tradeValue": round(trade_amt, 2),
+                        "cashAfter": round(cash, 2),
+                        "sharesAfter": shares,
+                        "targetRatioPct": round(current_target_ratio * 100, 1),
+                        "reason": f"ยอดคลื่นรามานุจัน Wave {round(w_curr, 1)} พักฐาน! ลดสัดส่วนหุ้นเหลือ {round(peak_ratio*100)}% ล็อกกำไรเป็นเงินสด"
+                    })
+
+            stock_val_eod = shares * p
+            nav_eod = stock_val_eod + cash
+            bnh_nav_eod = (bnh_shares * p) + bnh_cash_rem
+
+            daily.append({
+                "date": date,
+                "timestamp": ts,
+                "price": p,
+                "wave": round(float(w_curr), 2),
+                "shares": shares,
+                "stockValue": round(stock_val_eod, 2),
+                "cash": round(cash, 2),
+                "totalNav": round(nav_eod, 2),
+                "stockRatioPct": round((stock_val_eod / nav_eod) * 100, 2) if nav_eod > 0 else 0,
+                "targetRatioPct": round(current_target_ratio * 100, 1),
+                "bnhNav": round(bnh_nav_eod, 2),
+                "action": action,
+                "sharesChanged": shares_diff,
+                "tradeAmount": round(trade_amt, 2)
+            })
+
+        final_nav = daily[-1]["totalNav"]
+        total_return_pct = round(((final_nav - initial_capital) / initial_capital) * 100, 2)
+        total_profit_thb = round(final_nav - initial_capital, 2)
+
+        final_bnh_nav = daily[-1]["bnhNav"]
+        bnh_return_pct = round(((final_bnh_nav - initial_capital) / initial_capital) * 100, 2)
+        bnh_profit_thb = round(final_bnh_nav - initial_capital, 2)
+
+        # Max Drawdown
+        nav_series = [d["totalNav"] for d in daily]
+        peak_nav = np.maximum.accumulate(nav_series)
+        dd_series = (nav_series - peak_nav) / peak_nav * 100
+        max_drawdown_pct = round(float(np.min(dd_series)), 2)
+
+        bnh_series = [d["bnhNav"] for d in daily]
+        peak_bnh = np.maximum.accumulate(bnh_series)
+        bnh_dd_series = (bnh_series - peak_bnh) / peak_bnh * 100
+        bnh_max_dd_pct = round(float(np.min(bnh_dd_series)), 2)
+
+        rebalance_summary = {
+            "initialCapital": initial_capital,
+            "finalNav": round(final_nav, 2),
+            "totalProfitThb": total_profit_thb,
+            "totalReturnPct": total_return_pct,
+            "bnhFinalNav": round(final_bnh_nav, 2),
+            "bnhTotalProfitThb": bnh_profit_thb,
+            "bnhReturnPct": bnh_return_pct,
+            "maxDrawdownPct": max_drawdown_pct,
+            "bnhMaxDrawdownPct": bnh_max_dd_pct,
+            "drawdownReductionPct": round(abs(bnh_max_dd_pct) - abs(max_drawdown_pct), 2),
+            "totalRebalances": len(transactions),
+            "buyRebalances": rebalance_buy_count,
+            "sellRebalances": rebalance_sell_count,
+            "harvestedCashTotal": round(harvested_cash, 2),
+            "currentHolding": {
+                "shares": shares,
+                "stockValue": round(daily[-1]["stockValue"], 2),
+                "cash": round(daily[-1]["cash"], 2),
+                "stockRatioPct": daily[-1]["stockRatioPct"],
+                "targetRatioPct": current_target_ratio * 100,
+                "lastPrice": float(self.prices[-1])
+            },
+            "transactions": transactions
+        }
+
+        return rebalance_summary, daily
+
     def run_full_analysis(self):
         output_dir = os.path.dirname(os.path.abspath(__file__))
         signals, summary = self.generate_signals_and_backtest()
+        rebalance_summary, rebalance_daily = self.simulate_ramanujan_rebalance()
         spectrum = self.compute_ramanujan_spectrum()
 
         combined_result = {
             "summary": summary,
+            "rebalanceSummary": rebalance_summary,
+            "rebalanceDaily": rebalance_daily,
             "topCycles": spectrum[:5],
             "candlesWithSignals": []
         }

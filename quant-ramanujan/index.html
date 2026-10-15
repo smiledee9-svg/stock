@@ -31,28 +31,50 @@
       </div>
     </header>
 
+    <!-- Strategy Mode Switcher Tabs (Cycle Timing vs Ramanujan Rebalance) -->
+    <div class="strategy-mode-selector" id="strategyModeSelector">
+      <button type="button" class="mode-tab-btn active" id="tabModeCycle" data-mode="cycle">
+        🎯 โหมด 1: Pure Cycle Timing (สัญญาณซื้อ-ขายตามรอบคลื่น 100%)
+      </button>
+      <button type="button" class="mode-tab-btn tab-rebalance" id="tabModeRebalance" data-mode="rebalance">
+        ⚖️ โหมด 2: Ramanujan Dynamic Rebalance (รีบาลานซ์สัดส่วนตามคลื่นวัฏจักร)
+      </button>
+    </div>
+
+    <!-- Allocation Bar (Only visible in Rebalance Mode) -->
+    <div class="allocation-bar-container" id="rebalanceAllocationBar" style="display: none;">
+      <div class="allocation-labels">
+        <span id="lblStockRatio" style="color: #34d399;">หุ้น SCB: 50.0%</span>
+        <span id="lblCashRatio" style="color: #60a5fa;">เงินสดสำรอง (Cash Cushion): 50.0%</span>
+      </div>
+      <div class="allocation-bar">
+        <div id="barStockRatio" class="bar-stock" style="width: 50%;"></div>
+        <div id="barCashRatio" class="bar-cash" style="width: 50%;"></div>
+      </div>
+    </div>
+
     <!-- Metrics Cards Grid -->
     <div class="metrics-grid">
       <div class="metric-card">
-        <div class="metric-label">หุ้นเป้าหมาย (Symbol)</div>
+        <div class="metric-label" id="lblMetric1">หุ้นเป้าหมาย (Symbol)</div>
         <div class="metric-val text-brand" id="mSymbol">SCB.BK</div>
-        <div class="metric-note">ข้อมูล 484 แท่งเทียน (2 ปี)</div>
+        <div class="metric-note" id="mNote1">ข้อมูล 484 แท่งเทียน (2 ปี)</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label">รอบคลื่นเด่น (Dominant Cycle)</div>
+        <div class="metric-label" id="lblMetric2">รอบคลื่นเด่น (Dominant Cycle)</div>
         <div class="metric-val text-amber" id="mCycle">~52 วัน</div>
-        <div class="metric-note">Ramanujan Peak Period (~1 ไตรมาส)</div>
+        <div class="metric-note" id="mNote2">Ramanujan Peak Period (~1 ไตรมาส)</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label">อัตราความแม่นยำ (Win Rate)</div>
-        <div class="metric-val text-green" id="mWinRate">52.6%</div>
-        <div class="metric-note" id="mWinTrades">10 ชนะ / 9 แพ้ (รวม 19 รอบ)</div>
+        <div class="metric-label" id="lblMetric3">อัตราความแม่นยำ (Win Rate)</div>
+        <div class="metric-val text-green" id="mWinRate">66.7%</div>
+        <div class="metric-note" id="mWinTrades">8 ชนะ / 4 แพ้ (รวม 12 รอบ)</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label">ผลตอบแทนรวมสะสม (Return)</div>
+        <div class="metric-label" id="lblMetric4">ผลตอบแทนรวมสะสม (Return)</div>
         <div class="metric-val text-green" id="mReturn">+22.02%</div>
         <div class="metric-note" id="mProfitFactor">Profit Factor: 3.12</div>
       </div>
@@ -233,14 +255,14 @@
       </div>
     </div>
 
-    <!-- Trade History Table -->
+    <!-- Trade / Rebalance History Table -->
     <section class="card-box" style="margin-top: 24px;">
       <div class="card-box-header">
-        <h3>📋 บันทึกประวัติการส่งสัญญาณเทรด (Backtest Trades History - 19 รอบ)</h3>
+        <h3 id="tableTitle">📋 บันทึกประวัติการส่งสัญญาณเทรดรอบคลื่น (Pure Cycle Trades)</h3>
       </div>
       <div class="table-responsive">
         <table class="quant-table">
-          <thead>
+          <thead id="tableHeadRow">
             <tr>
               <th>รอบที่</th>
               <th>วันที่ซื้อ (Buy Date)</th>
