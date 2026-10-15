@@ -991,3 +991,25 @@ body {
 .toast.success { border-color: var(--buy-green-border); border-left: 4px solid var(--buy-green); }
 .toast.danger { border-color: var(--sell-red-border); border-left: 4px solid var(--sell-red); }
 .toast.info { border-color: rgba(59, 130, 246, 0.4); border-left: 4px solid #3b82f6; }
+
+/* TRI-SYNERGY BADGES & MCP STYLES */
+.tri-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tri-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px currentColor;
+}
+

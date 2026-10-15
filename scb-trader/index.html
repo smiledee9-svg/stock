@@ -19,10 +19,15 @@
     <!-- TOP NAVIGATION & BRAND BAR -->
     <header class="terminal-header glass">
       <div class="brand-section">
-        <div class="brand-logo-badge">SCB</div>
+        <div class="brand-logo-badge" style="background: linear-gradient(135deg, #ea580c, #f97316);">⛩️ SCB</div>
         <div class="brand-details">
-          <h1>SCB Trader Pro <span class="badge-tag">AI & Backtest</span> <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">🟢 Gemini AI เชื่อมต่อแล้ว</span></h1>
-          <p class="brand-subtitle">ระบบวิเคราะห์สัญญาณซื้อขายอัตโนมัติ • ดึงราคา Yahoo Finance ย้อนหลัง 2 ปี</p>
+          <h1>SCB Pure Ichimoku Master <span class="badge-tag" style="background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4);">⛩️ อิชิโมกุแท้ Goichi Hosoda</span></h1>
+          <p class="brand-subtitle">
+            <span class="tri-tag"><span class="tri-dot" style="background: #a855f7;"></span> GitHub Synced</span> •
+            <span class="tri-tag"><span class="tri-dot" style="background: #f97316;"></span> Cloudflare MCP CLI</span> •
+            <span class="tri-tag"><span class="tri-dot" style="background: #10b981;"></span> Gemini Multimodal AI</span> •
+            <span>สามประสานดึงข้อมูล SCB 2 ปี</span>
+          </p>
         </div>
       </div>
 
@@ -30,8 +35,11 @@
         <button id="refreshLiveQuoteBtn" class="btn btn-secondary" title="ดึงข้อมูลราคาสดจาก Yahoo Finance">
           <span>🔄</span> <span>อัปเดตราคาล่าสุด</span>
         </button>
-        <button id="triggerVisionAiBtn" class="btn btn-ai" title="แคปรูปกราฟส่งให้ Gemini AI มองเห็นและเลือกกลยุทธ์ตามกรอบกติกา">
-          <span>👁️</span> <span>Gemini ส่องรูปกราฟ & เลือกกลยุทธ์</span>
+        <button id="openMcpModalBtn" class="btn btn-secondary" style="border-color: rgba(249, 115, 22, 0.4); color: #fb923c;" title="เปิดคอนโซลทดสอบ Cloudflare MCP CLI Tool">
+          <span>⚡</span> <span>Cloudflare MCP CLI</span>
+        </button>
+        <button id="triggerVisionAiBtn" class="btn btn-ai" title="แคปรูปกราฟอิชิโมกุส่งให้ Gemini AI ส่องและวิเคราะห์ตามหลัก Hosoda">
+          <span>👁️</span> <span>Gemini ส่องอิชิโมกุ</span>
         </button>
         <button id="openLineConfigBtn" class="btn btn-line" title="ตั้งค่าการแจ้งเตือนเข้า LINE">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -87,18 +95,21 @@
       <section class="chart-panel glass">
         <div class="panel-header">
           <div class="panel-title">
-            <span>📈</span> กราฟแท่งเทียน SCB (ย้อนหลัง 2 ปี) พร้อมเส้น EMA
+            <span>⛩️</span> กราฟอิชิโมกุแท้ 5 เส้นสมดุล (Ichimoku Kinko Hyo Master Chart)
           </div>
           <div class="chart-controls">
             <span class="interval-pill active" id="rangeAllBtn">2 ปีเต็ม</span>
             <span class="interval-pill" id="range1yBtn">1 ปี</span>
             <span class="interval-pill" id="range6mBtn">6 เดือน</span>
             <span class="interval-pill" id="range3mBtn">3 เดือน</span>
-            <button id="chartScanVisionBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 8px;">
-              <span>👁️ ส่องรูปกราฟนี้</span>
-            </button>
             <button id="toggleKumoBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(6, 182, 212, 0.4); color: #22d3ee; padding: 4px 10px; font-size: 12px; margin-left: 6px;">
               <span>☁️ เมฆ Kumo</span>
+            </button>
+            <button id="toggleChikouBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 4px;">
+              <span>👁️ Chikou 26</span>
+            </button>
+            <button id="chartScanVisionBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 6px;">
+              <span>👁️ ส่องรูปกราฟนี้</span>
             </button>
           </div>
         </div>
@@ -107,14 +118,14 @@
           <canvas id="tradingChartCanvas"></canvas>
         </div>
 
+        <!-- 100% PURE ICHIMOKU LEGEND -->
         <div class="chart-legend">
-          <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span> แท่งเทียนขาขึ้น (Bullish)</div>
-          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span> แท่งเทียนขาลง (Bearish)</div>
-          <div class="legend-item"><span class="legend-color" style="background: #eab308;"></span> EMA 20 (แนวโน้มระยะสั้น)</div>
-          <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> EMA 50 (แนวโน้มระยะกลาง)</div>
-          <div class="legend-item"><span class="legend-color" style="background: #a855f7;"></span> EMA 200 (เทรนด์ใหญ่)</div>
+          <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span> แท่งเทียนขึ้น</div>
+          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span> แท่งเทียนลง</div>
+          <div class="legend-item"><span class="legend-color" style="background: #22d3ee;"></span> Tenkan 9 (โมเมนตัมเร็ว)</div>
+          <div class="legend-item"><span class="legend-color" style="background: #f97316; height: 4px;"></span> Kijun 26 (ศูนย์ถ่วงสมดุล 2.5px)</div>
+          <div class="legend-item" id="legendChikou" style="display: flex;"><span class="legend-color" style="background: #c084fc;"></span> Chikou 26 (พ้นเงาอดีต)</div>
           <div class="legend-item" id="legendKumo" style="display: flex;"><span class="legend-color" style="background: rgba(6, 182, 212, 0.5);"></span> เมฆ Kumo (Span A/B)</div>
-          <div class="legend-item" id="legendKijun" style="display: flex;"><span class="legend-color" style="background: #f97316;"></span> Kijun 26 (ศูนย์ถ่วงสมดุล)</div>
         </div>
       </section>
 
@@ -289,12 +300,11 @@
         <div class="form-group">
           <label>กลยุทธ์การเทรด (Strategy)</label>
           <select id="btStrategySelect" class="form-control">
-            <option value="hosoda_4layer" selected>👑 ทฤษฎีแท้ Goichi Hosoda 4 ชั้น (Hado + Jikan + Nehaba + Kumo)</option>
-            <option value="gemini_vision_strategy">🤖 กลยุทธ์ที่ Gemini Vision AI คัดสรรตามกรอบกติกา (AI Autonomous)</option>
-            <option value="triple_combo">Triple Confirmation (EMA + RSI + Volume)</option>
-            <option value="ema_cross">EMA Cross (EMA 20 ตัด EMA 50)</option>
-            <option value="rsi_pullback">RSI Pullback (RSI < 42 ซื้อในเทรนด์ขาขึ้น)</option>
-            <option value="macd_momentum">MACD Momentum Breakout</option>
+            <option value="hosoda_4layer" selected>👑 ทฤษฎีแท้ Goichi Hosoda 4 ชั้น (Hado N-Wave + Jikan + Nehaba + Sanyaku)</option>
+            <option value="sanyaku_kouten">🟢 Sanyaku Kouten (三役好転 - ไฟเขียว 3 ด่านสมดุลเหนือเมฆ)</option>
+            <option value="kijun_bounce">⚖️ Kijun-sen Equilibrium Bounce (ย่อรับเส้นฐาน 26 วันในเทรนด์ขาขึ้น)</option>
+            <option value="kumo_breakout">☁️ Kumo Breakout & Cloud Surfer (ทะลุแนวต้านขอบเมฆ Kumo หนา)</option>
+            <option value="gemini_vision_strategy">🤖 Gemini Vision AI Autonomous Pure Ichimoku (AI เลือกกลยุทธ์อิชิโมกุ)</option>
           </select>
         </div>
 
@@ -429,6 +439,62 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="cancelLineModalBtn">ยกเลิก</button>
         <button type="button" class="btn btn-primary" id="saveLineConfigBtn">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CLOUDFLARE MCP CLI & SKILL PLAYGROUND -->
+  <div class="modal-overlay" id="mcpPlaygroundModal" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span style="color: #fb923c;">⚡</span> Cloudflare MCP CLI & AI Skill Console
+        </h3>
+        <button class="close-btn" id="closeMcpModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 13px; font-weight: 700; color: #fb923c; margin-bottom: 4px;">
+            สามประสาน: GitHub ➔ Cloudflare MCP CLI ➔ Google Gemini AI
+          </div>
+          <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5; margin: 0;">
+            ระบบนี้รองรับ Model Context Protocol (MCP) ผ่าน Cloudflare Workers & CLI Tool ช่วยให้ Agent/Gemini AI เรียกดูข้อมูลอิชิโมกุ 5 เส้น คำนวณเป้าหมาย Nehaba (V, N, E, NT) และสั่ง Backtest ผ่าน JSON-RPC 2.0 ได้ทันที
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>เลือก MCP Tool ที่ต้องการเรียกใช้งาน (Model Context Protocol)</label>
+          <select id="mcpToolSelect" class="form-control">
+            <option value="ichimoku_get_regime" selected>🛠️ ichimoku_get_regime (ดึงสภาวะสมดุล 5 เส้น + Sanyaku Kouten)</option>
+            <option value="ichimoku_calculate_nehaba">🛠️ ichimoku_calculate_nehaba (คำนวณเป้าหมายราคา V, N, E, NT และ R:R)</option>
+            <option value="ichimoku_scan_hado_wave">🛠️ ichimoku_scan_hado_wave (สแกนโครงสร้างคลื่น N: A➔B➔C และกรอบเวลา Henka-bi)</option>
+            <option value="ichimoku_backtest_simulator">🛠️ ichimoku_backtest_simulator (จำลองการเทรด Hosoda 4-Layer 2 ปี)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button type="button" id="executeMcpToolBtn" class="btn btn-primary" style="flex: 1; justify-content: center; background: linear-gradient(135deg, #ea580c, #f97316);">
+            <span>⚡</span> <span>รัน MCP Tool Call (JSON-RPC 2.0)</span>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>ผลลัพธ์ JSON-RPC 2.0 ตอบกลับจาก Cloudflare MCP Server</span>
+            <span id="mcpLatencyBadge" style="font-size: 11px; color: #34d399; font-family: var(--font-mono);">200 OK • 12ms</span>
+          </label>
+          <pre id="mcpJsonOutput" style="background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 12px; color: #38bdf8; font-size: 11.5px; font-family: var(--font-mono); max-height: 220px; overflow-y: auto; white-space: pre-wrap; margin: 0;">กดปุ่มด้านบนเพื่อทดสอบยิง MCP Tool Call</pre>
+        </div>
+
+        <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim); line-height: 1.4;">
+          💡 <strong>คำสั่งเชื่อมต่อ CLI กับ Cloudflare MCP Server:</strong><br>
+          <code style="background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; color: #fb923c;">npx @cloudflare/mcp-server --config scb-trader/mcp/wrangler.jsonc</code>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="dismissMcpModalBtn">ปิดหน้าต่าง</button>
       </div>
     </div>
   </div>

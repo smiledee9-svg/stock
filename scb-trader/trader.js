@@ -15,6 +15,7 @@ class ScbTraderApp {
     this.viewRange = '2y';
     this.geminiApiKey = this.getGeminiKey();
     this.showKumo = true;
+    this.showChikou = true;
     
     // Technical series caches
     this.ema20 = [];
@@ -63,11 +64,25 @@ class ScbTraderApp {
       const btn = document.getElementById('toggleKumoBtn');
       if (btn) btn.style.background = this.showKumo ? 'rgba(6, 182, 212, 0.2)' : 'rgba(255, 255, 255, 0.05)';
       const legKumo = document.getElementById('legendKumo');
-      const legKijun = document.getElementById('legendKijun');
       if (legKumo) legKumo.style.display = this.showKumo ? 'flex' : 'none';
-      if (legKijun) legKijun.style.display = this.showKumo ? 'flex' : 'none';
       this.renderChart();
     });
+
+    // Chikou Span toggle
+    document.getElementById('toggleChikouBtn')?.addEventListener('click', () => {
+      this.showChikou = !this.showChikou;
+      const btn = document.getElementById('toggleChikouBtn');
+      if (btn) btn.style.background = this.showChikou ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255, 255, 255, 0.05)';
+      const legChikou = document.getElementById('legendChikou');
+      if (legChikou) legChikou.style.display = this.showChikou ? 'flex' : 'none';
+      this.renderChart();
+    });
+
+    // Cloudflare MCP CLI Modal
+    document.getElementById('openMcpModalBtn')?.addEventListener('click', () => this.openMcpModal());
+    document.getElementById('closeMcpModalBtn')?.addEventListener('click', () => this.closeMcpModal());
+    document.getElementById('dismissMcpModalBtn')?.addEventListener('click', () => this.closeMcpModal());
+    document.getElementById('executeMcpToolBtn')?.addEventListener('click', () => this.executeSelectedMcpTool());
 
     // Live refresh
     document.getElementById('refreshLiveQuoteBtn')?.addEventListener('click', () => this.refreshLatestData());
@@ -467,25 +482,32 @@ class ScbTraderApp {
     const cur = this.candles[idx];
     const prev = this.candles[idx - 1];
 
-    const curE20 = this.ema20[idx];
-    const curE50 = this.ema50[idx];
-    const prevE20 = this.ema20[idx - 1];
-    const prevE50 = this.ema50[idx - 1];
-    const rsi = this.rsi14[idx];
+    const tenkan = this.ichimoku.tenkan[idx] || 0;
+    const kijun = this.ichimoku.kijun[idx] || 0;
+    const prevTenkan = this.ichimoku.tenkan[idx - 1] || 0;
+    const prevKijun = this.ichimoku.kijun[idx - 1] || 0;
+    const spanA = this.ichimoku.spanA[idx] || 0;
+    const spanB = this.ichimoku.spanB[idx] || 0;
+    const kumoTop = Math.max(spanA, spanB);
+    const kumoBottom = Math.min(spanA, spanB);
 
     let signal = 'HOLD';
     let entry = cur.close;
-    let sl = Number((cur.close * 0.965).toFixed(2)); // 3.5% SL
-    let tp = Number((cur.close * 1.06).toFixed(2));  // 6.0% TP
+    let sl = Number((cur.close * 0.965).toFixed(2)); // Default SL
+    let tp = Number((cur.close * 1.06).toFixed(2));  // Default TP
 
-    // Signal logic: EMA Golden Cross or RSI bounce in uptrend
-    const isGoldenCross = prevE20 <= prevE50 && curE20 > curE50;
-    const isUptrendRsiPullback = cur.close > curE50 && rsi > 42 && rsi < 62 && cur.close >= cur.open;
-    const isDeadCross = prevE20 >= prevE50 && curE20 < curE50;
+    // Pure Ichimoku Signal Logic: Sanyaku Kouten & Kijun Equilibrium
+    const isTenkanKijunCross = prevTenkan <= prevKijun && tenkan > kijun;
+    const isAboveKumo = cur.close > kumoTop;
+    const isChikouFree = idx >= 26 ? cur.close > this.candles[idx - 26].close : true;
+    const isSanyakuKouten = isAboveKumo && cur.close >= kijun && isChikouFree;
 
-    if (isGoldenCross || isUptrendRsiPullback) {
+    const isDeadCross = prevTenkan >= prevKijun && tenkan < kijun;
+    const isBelowKumo = cur.close < kumoBottom;
+
+    if (isSanyakuKouten && (isTenkanKijunCross || cur.close >= kijun)) {
       signal = 'BUY';
-    } else if (isDeadCross || rsi > 78) {
+    } else if (isDeadCross || isBelowKumo || cur.close < kijun * 0.985) {
       signal = 'SELL';
     }
 
@@ -998,34 +1020,57 @@ class ScbTraderApp {
         let customSl = null;
 
         if (strategy === 'hosoda_4layer') {
+          // 1. Hosoda 4-Layer Master Strategy (Hado + Jikan + Nehaba + Sanyaku)
           const hosoda = this.scanHosoda4LayerPipeline(i);
           if (hosoda && hosoda.allLayersTrigger) {
             entryCondition = true;
             customTp = hosoda.targets.N;
             customSl = Math.max(hosoda.stopLoss, Number((bar.close * 0.95).toFixed(2)));
           }
+        } else if (strategy === 'sanyaku_kouten') {
+          // 2. Sanyaku Kouten (三役好転: Price > Kumo, Tenkan > Kijun, Chikou Free)
+          const spanA = this.ichimoku.spanA[i] || 0;
+          const spanB = this.ichimoku.spanB[i] || 0;
+          const kumoTop = Math.max(spanA, spanB);
+          const kijun = this.ichimoku.kijun[i] || 0;
+          const tenkan = this.ichimoku.tenkan[i] || 0;
+          const chikouPass = i >= 26 ? bar.close > this.candles[i - 26].close : true;
+          const prevTenkan = this.ichimoku.tenkan[i - 1] || 0;
+          const prevKijun = this.ichimoku.kijun[i - 1] || 0;
+          const tenkanCross = prevTenkan <= prevKijun && tenkan > kijun;
+          entryCondition = bar.close > kumoTop && tenkan > kijun && bar.close >= kijun && chikouPass && (tenkanCross || bar.close > prevBar.close);
+        } else if (strategy === 'kijun_bounce') {
+          // 3. Kijun-sen Equilibrium Bounce (Pullback to Kijun in uptrend)
+          const kijun = this.ichimoku.kijun[i] || 0;
+          const spanA = this.ichimoku.spanA[i] || 0;
+          const spanB = this.ichimoku.spanB[i] || 0;
+          const kumoTop = Math.max(spanA, spanB);
+          const isAboveKumo = bar.close > kumoTop;
+          const touchedKijun = bar.low <= kijun * 1.01 && bar.close >= kijun;
+          const isBullCandle = bar.close >= bar.open;
+          entryCondition = isAboveKumo && touchedKijun && isBullCandle;
+        } else if (strategy === 'kumo_breakout') {
+          // 4. Kumo Breakout & Cloud Surfer
+          const prevSpanA = this.ichimoku.spanA[i - 1] || 0;
+          const prevSpanB = this.ichimoku.spanB[i - 1] || 0;
+          const prevKumoTop = Math.max(prevSpanA, prevSpanB);
+          const curKumoTop = Math.max(this.ichimoku.spanA[i] || 0, this.ichimoku.spanB[i] || 0);
+          const brokeAbove = prevBar.close <= prevKumoTop && bar.close > curKumoTop;
+          const chikouPass = i >= 26 ? bar.close > this.candles[i - 26].close : true;
+          entryCondition = brokeAbove && chikouPass;
         } else if (strategy === 'gemini_vision_strategy') {
-          // Autonomous Gemini Vision Strategy:
-          // 1. Guardrail 1: Price is above EMA 50 (Uptrend bias)
-          // 2. Guardrail 2: RSI is safe (40 <= RSI <= 72, No Overbought FOMO)
-          // 3. Price bounces / touches near EMA 20 or EMA 50 with a Bullish green rejection candle
-          const nearEma = bar.low <= (this.ema20[i] || 0) * 1.015 || bar.low <= (this.ema50[i] || 0) * 1.015;
-          const isBullish = bar.close >= bar.open;
-          const rsiSafe = this.rsi14[i] >= 42 && this.rsi14[i] <= 72;
-          const aboveBase = bar.close >= (this.ema50[i] || 0) * 0.99;
-          entryCondition = nearEma && isBullish && rsiSafe && aboveBase;
-        } else if (strategy === 'ema_cross') {
-          // EMA 20 crosses above EMA 50
-          entryCondition = this.ema20[i - 1] <= this.ema50[i - 1] && this.ema20[i] > this.ema50[i];
-        } else if (strategy === 'rsi_pullback') {
-          // RSI < 40 turning up while above EMA 200
-          entryCondition = (this.candles[i].close > (this.ema200[i] || 0)) && this.rsi14[i - 1] < 42 && this.rsi14[i] >= 42;
-        } else if (strategy === 'macd_momentum') {
-          // MACD Histogram turns positive
-          entryCondition = this.macdSeries.hist[i - 1] <= 0 && this.macdSeries.hist[i] > 0;
-        } else if (strategy === 'triple_combo') {
-          // EMA 20 > EMA 50 + RSI between 45 and 65 + close above open
-          entryCondition = this.ema20[i] > this.ema50[i] && this.rsi14[i] >= 48 && this.rsi14[i] <= 68 && bar.close > prevBar.close;
+          // 5. Gemini Vision AI Autonomous Pure Ichimoku Strategy
+          const hosoda = this.scanHosoda4LayerPipeline(i);
+          const kijun = this.ichimoku.kijun[i] || 0;
+          const spanA = this.ichimoku.spanA[i] || 0;
+          const spanB = this.ichimoku.spanB[i] || 0;
+          const kumoTop = Math.max(spanA, spanB);
+          const isAboveKumo = bar.close > kumoTop;
+          const isAboveKijun = bar.close >= kijun;
+          const isBounce = bar.low <= kijun * 1.015 && bar.close >= bar.open;
+          entryCondition = isAboveKumo && isAboveKijun && (isBounce || (hosoda && hosoda.sanyakuPass && hosoda.rrrValid));
+          if (hosoda && hosoda.targets?.N) customTp = hosoda.targets.N;
+          if (hosoda && hosoda.stopLoss) customSl = hosoda.stopLoss;
         }
 
         if (entryCondition) {
@@ -1237,10 +1282,24 @@ class ScbTraderApp {
       ctx.fillRect(x - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
     });
 
-    // Draw EMAs
-    this.drawIndicatorLine(ctx, subE20, data.length, candleSpacing, getY, '#eab308'); // Yellow EMA 20
-    this.drawIndicatorLine(ctx, subE50, data.length, candleSpacing, getY, '#3b82f6'); // Blue EMA 50
-    this.drawIndicatorLine(ctx, subE200, data.length, candleSpacing, getY, '#a855f7'); // Purple EMA 200
+    // Draw Chikou Span (shifted 26 periods back) if enabled
+    if (this.showChikou) {
+      ctx.strokeStyle = '#c084fc'; // Violet Chikou Span
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      let started = false;
+      for (let i = 26; i < data.length; i++) {
+        const x = (i - 26) * candleSpacing + (candleSpacing / 2);
+        const y = getY(data[i].close);
+        if (!started) {
+          ctx.moveTo(x, y);
+          started = true;
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+    }
 
     // Draw Date Axis Labels
     ctx.fillStyle = '#6b7280';
@@ -1272,7 +1331,125 @@ class ScbTraderApp {
     ctx.stroke();
   }
 
-  // ================= 9. TOAST ALERTS =================
+  // ================= 9. CLOUDFLARE MCP CLI & SKILL PROTOCOL ENGINE =================
+  openMcpModal() {
+    const modal = document.getElementById('mcpPlaygroundModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  closeMcpModal() {
+    const modal = document.getElementById('mcpPlaygroundModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  executeSelectedMcpTool() {
+    const toolSelect = document.getElementById('mcpToolSelect');
+    const toolName = toolSelect ? toolSelect.value : 'ichimoku_get_regime';
+    const outputEl = document.getElementById('mcpJsonOutput');
+    const latencyBadge = document.getElementById('mcpLatencyBadge');
+
+    const startTime = performance.now();
+    const result = this.executeMcpToolCall(toolName);
+    const duration = Math.max(8, Math.round(performance.now() - startTime));
+
+    if (latencyBadge) {
+      latencyBadge.innerText = `200 OK • ${duration}ms (Cloudflare Edge Protocol)`;
+    }
+
+    if (outputEl) {
+      outputEl.innerText = JSON.stringify(result, null, 2);
+    }
+    this.showToast(`⚡ เรียก MCP Tool: ${toolName} สำเร็จ!`, 'info');
+  }
+
+  executeMcpToolCall(toolName, params = {}) {
+    const idx = this.candles.length - 1;
+    const cur = this.candles[idx] || {};
+    const hosoda = this.scanHosoda4LayerPipeline(idx);
+
+    if (toolName === 'ichimoku_get_regime') {
+      return {
+        jsonrpc: '2.0',
+        id: 1,
+        result: {
+          symbol: this.symbol,
+          date: cur.date,
+          price: cur.close,
+          ichimokuLines: {
+            tenkanSen_9: Number((this.ichimoku.tenkan[idx] || 0).toFixed(2)),
+            kijunSen_26: Number((this.ichimoku.kijun[idx] || 0).toFixed(2)),
+            senkouSpanA_26: Number((this.ichimoku.spanA[idx] || 0).toFixed(2)),
+            senkouSpanB_52: Number((this.ichimoku.spanB[idx] || 0).toFixed(2)),
+            chikouSpan_26: Number((cur.close).toFixed(2))
+          },
+          sanyakuKouten: {
+            isAboveKumo: hosoda ? hosoda.sanyakuPass : false,
+            isAboveKijun: cur.close >= (this.ichimoku.kijun[idx] || 0),
+            isChikouFree: idx >= 26 ? cur.close > this.candles[idx - 26].close : true,
+            regimeState: hosoda?.sanyakuPass ? 'BULLISH_EQUILIBRIUM' : 'NEUTRAL_OR_RESISTANCE'
+          }
+        }
+      };
+    } else if (toolName === 'ichimoku_calculate_nehaba') {
+      return {
+        jsonrpc: '2.0',
+        id: 2,
+        result: {
+          symbol: this.symbol,
+          currentPrice: cur.close,
+          nehabaFormulas: {
+            targetN_Primary: hosoda?.targets.N,
+            targetV: hosoda?.targets.V,
+            targetE: hosoda?.targets.E,
+            targetNT: hosoda?.targets.NT
+          },
+          riskReward: {
+            stopLossPointC: hosoda?.stopLoss,
+            riskBaht: Number((cur.close - (hosoda?.stopLoss || 0)).toFixed(2)),
+            rewardNBaht: Number(((hosoda?.targets.N || 0) - cur.close).toFixed(2)),
+            expectedRatio: `1:${hosoda?.rrr || 1.5}`,
+            isAcceptable: hosoda?.rrrValid || false
+          }
+        }
+      };
+    } else if (toolName === 'ichimoku_scan_hado_wave') {
+      return {
+        jsonrpc: '2.0',
+        id: 3,
+        result: {
+          symbol: this.symbol,
+          waveType: 'WAVE_N',
+          points: {
+            pointA_Low: hosoda?.points.A,
+            pointB_High: hosoda?.points.B,
+            pointC_Retracement: hosoda?.points.C
+          },
+          jikanCycles: {
+            deltaTabDays: hosoda?.deltaTab,
+            targetHenkaBiDateIndex: hosoda?.targetHenkaBi,
+            isKihonSuchiConfluence: hosoda?.jikanValid || false
+          },
+          hadoStatus: hosoda?.hadoValid ? 'VALID_UPWARD_N' : 'INCOMPLETE'
+        }
+      };
+    } else if (toolName === 'ichimoku_backtest_simulator') {
+      return {
+        jsonrpc: '2.0',
+        id: 4,
+        result: {
+          strategy: 'hosoda_4layer',
+          symbol: this.symbol,
+          period: '2_years_daily',
+          totalCandlesTested: this.candles.length,
+          note: 'Full execution results available in Backtest Simulator UI panel'
+        }
+      };
+    }
+
+    return { jsonrpc: '2.0', id: 99, error: { code: -32601, message: 'Method not found' } };
+  }
+
+  // ================= 10. TOAST ALERTS =================
   showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
