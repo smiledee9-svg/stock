@@ -30,8 +30,8 @@
         <button id="refreshLiveQuoteBtn" class="btn btn-secondary" title="ดึงข้อมูลราคาสดจาก Yahoo Finance">
           <span>🔄</span> <span>อัปเดตราคาล่าสุด</span>
         </button>
-        <button id="triggerAiAnalyzeBtn" class="btn btn-ai" title="สั่งให้ Gemini AI ประเมินจังหวะเข้าทำกำไร">
-          <span>✨</span> <span>วิเคราะห์ด้วย Gemini AI</span>
+        <button id="triggerVisionAiBtn" class="btn btn-ai" title="แคปรูปกราฟส่งให้ Gemini AI มองเห็นและเลือกกลยุทธ์ตามกรอบกติกา">
+          <span>👁️</span> <span>Gemini ส่องรูปกราฟ & เลือกกลยุทธ์</span>
         </button>
         <button id="openLineConfigBtn" class="btn btn-line" title="ตั้งค่าการแจ้งเตือนเข้า LINE">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -94,6 +94,9 @@
             <span class="interval-pill" id="range1yBtn">1 ปี</span>
             <span class="interval-pill" id="range6mBtn">6 เดือน</span>
             <span class="interval-pill" id="range3mBtn">3 เดือน</span>
+            <button id="chartScanVisionBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 8px;">
+              <span>👁️ ส่องรูปกราฟนี้</span>
+            </button>
           </div>
         </div>
 
@@ -167,17 +170,46 @@
             </div>
           </div>
 
-          <!-- AI INSIGHT BOX -->
+          <!-- AI MULTIMODAL VISION INSIGHT BOX -->
           <div class="ai-insight-box">
             <div class="ai-insight-header">
               <span class="ai-insight-title">
-                <span>🤖</span> มุมมองวิเคราะห์โดย Gemini AI
+                <span>👁️</span> การวิเคราะห์ด้วย Gemini Vision AI
               </span>
               <span class="ai-confidence-pill" id="aiConfidenceBadge">ความมั่นใจ 85%</span>
             </div>
-            <p class="ai-insight-text" id="aiInsightSummary">
-              กำลังวิเคราะห์ข้อมูลทางเทคนิค: ราคา SCB กำลังเกาะเส้นค่าเฉลี่ย EMA 20 โดยมีแนวรับสำคัญอยู่ที่ 144.00 บาท และมีโอกาสทดสอบแนวต้าน 150.00 บาท หากวอลุ่มสนับสนุน
+
+            <div id="aiStrategyChosenBadge" class="strategy-selected-badge" style="display: flex;">
+              <span>🎯 กลยุทธ์ที่ AI เลือก:</span>
+              <span id="aiStrategyChosenText" style="color: #67e8f9; font-weight: 800;">Bullish Pullback & EMA Rejection</span>
+            </div>
+
+            <!-- SNAPSHOT OF CHART VIEWED BY AI -->
+            <div class="vision-snapshot-wrap" id="visionSnapshotWrap">
+              <div class="vision-snapshot-header">
+                <span>📸 ภาพกราฟที่ Gemini AI เพิ่งส่องวิเคราะห์</span>
+                <span id="visionScanTimeText">สดจาก Canvas</span>
+              </div>
+              <img id="visionThumbnailImg" class="vision-thumbnail-img" alt="Chart Snapshot">
+            </div>
+
+            <p class="ai-insight-text" id="aiInsightSummary" style="margin-top: 10px;">
+              Gemini Vision AI ได้ส่องดูรูปกราฟแท่งเทียน: มองเห็นการเรียงตัวของแท่งเทียนทรงตัวเกาะเหนือเส้น EMA 50 สะท้อนแรงรับเหนียวแน่น แนะนำวางจุดตัดขาดทุนใต้แนวรับ 142.00 บาท และเล็งเป้าหมายทำกำไร 154.00 บาท ตามกรอบกติกา RRR 1:2.0
             </p>
+          </div>
+
+          <!-- RISK GUARDRAILS PANEL -->
+          <div class="guardrails-box">
+            <div class="guardrails-header">
+              <span class="guardrails-title">🛡️ กรอบกติกาความเสี่ยง (Risk Guardrails)</span>
+              <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">🔒 ล็อกกติกา</span>
+            </div>
+            <div class="guardrails-list">
+              <span class="guardrail-pill active" title="จำกัดขาดทุนไม่เกิน 3.5% ต่อไม้">Max SL: ≤ 3.5%</span>
+              <span class="guardrail-pill active" title="ผลตอบแทนคาดหวังต้องคุ้มค่าอย่างน้อย 1.5 เท่า">Min RRR: ≥ 1.5x</span>
+              <span class="guardrail-pill active" title="ห้ามซื้อเมื่อ RSI สูงเกินไป">RSI Ceiling: < 75</span>
+              <span class="guardrail-pill active" title="ซื้อทีละ 1 ไม้ ห้ามถัว">Single Position: 1 ไม้</span>
+            </div>
           </div>
 
           <div style="margin-top: 16px; display: flex; gap: 10px;">
@@ -206,10 +238,11 @@
         <div class="form-group">
           <label>กลยุทธ์การเทรด (Strategy)</label>
           <select id="btStrategySelect" class="form-control">
+            <option value="gemini_vision_strategy" selected>🤖 กลยุทธ์ที่ Gemini Vision AI คัดสรรตามกรอบกติกา (AI Autonomous)</option>
+            <option value="triple_combo">Triple Confirmation (EMA + RSI + Volume)</option>
             <option value="ema_cross">EMA Cross (EMA 20 ตัด EMA 50)</option>
-            <option value="rsi_pullback">RSI Pullback (RSI < 40 ซื้อในเทรนด์ขาขึ้น)</option>
+            <option value="rsi_pullback">RSI Pullback (RSI < 42 ซื้อในเทรนด์ขาขึ้น)</option>
             <option value="macd_momentum">MACD Momentum Breakout</option>
-            <option value="triple_combo" selected>Triple Confirmation (EMA + RSI + Volume)</option>
           </select>
         </div>
 

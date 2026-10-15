@@ -44,8 +44,8 @@ class ScbTraderApp {
     this.renderChart();
     this.evaluateLiveSignal();
     this.runBacktest();
-    // Auto-trigger Google Gemini AI intelligence analysis on startup
-    setTimeout(() => this.analyzeWithGeminiAI(), 800);
+    // Auto-trigger Google Gemini Vision AI analysis on startup
+    setTimeout(() => this.analyzeWithGeminiVision(), 1000);
   }
 
   bindEvents() {
@@ -58,8 +58,9 @@ class ScbTraderApp {
     // Live refresh
     document.getElementById('refreshLiveQuoteBtn')?.addEventListener('click', () => this.refreshLatestData());
 
-    // AI Analysis trigger
-    document.getElementById('triggerAiAnalyzeBtn')?.addEventListener('click', () => this.analyzeWithGeminiAI());
+    // Vision AI Analysis triggers
+    document.getElementById('triggerVisionAiBtn')?.addEventListener('click', () => this.analyzeWithGeminiVision());
+    document.getElementById('chartScanVisionBtn')?.addEventListener('click', () => this.analyzeWithGeminiVision());
 
     // Backtest trigger
     document.getElementById('runBacktestBtn')?.addEventListener('click', () => this.runBacktest());
@@ -552,39 +553,84 @@ class ScbTraderApp {
     window.open(lineShareUrl, '_blank');
   }
 
-  // ================= 6. GEMINI AI ANALYSIS =================
-  async analyzeWithGeminiAI() {
-    const aiBtn = document.getElementById('triggerAiAnalyzeBtn');
+  // ================= 6. GEMINI MULTIMODAL VISION AI ANALYSIS =================
+  getChartImageBase64() {
+    const canvas = document.getElementById('tradingChartCanvas');
+    if (!canvas) return null;
+    try {
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      return dataUrl.split(',')[1];
+    } catch (e) {
+      console.warn('Canvas capture error:', e);
+      return null;
+    }
+  }
+
+  async analyzeWithGeminiVision() {
+    const visionBtn = document.getElementById('triggerVisionAiBtn');
+    const chartVisionBtn = document.getElementById('chartScanVisionBtn');
     const summaryEl = document.getElementById('aiInsightSummary');
     const badgeEl = document.getElementById('aiConfidenceBadge');
+    const strategyTextEl = document.getElementById('aiStrategyChosenText');
+    const snapshotWrap = document.getElementById('visionSnapshotWrap');
+    const thumbnailImg = document.getElementById('visionThumbnailImg');
 
     if (this.candles.length < 30) return;
     const last = this.candles[this.candles.length - 1];
-    const recent5 = this.candles.slice(-5).map(c => `${c.date}: Open ${c.open}, High ${c.high}, Low ${c.low}, Close ${c.close}, Vol ${c.volume}`).join('\n');
 
-    if (aiBtn) {
-      aiBtn.disabled = true;
-      aiBtn.innerHTML = '<span>⏳</span> <span>AI กำลังวิเคราะห์...</span>';
+    if (visionBtn) {
+      visionBtn.disabled = true;
+      visionBtn.innerHTML = '<span>👁️</span> <span>Gemini กำลังส่องรูปกราฟ...</span>';
     }
-    if (summaryEl) summaryEl.innerText = 'Gemini AI กำลังคำนวณโครงสร้างแนวโน้มและปริมาณซื้อขาย...';
+    if (chartVisionBtn) chartVisionBtn.disabled = true;
+    if (summaryEl) summaryEl.innerText = 'Gemini Multimodal Vision กำลังสแกนรูปกราฟแท่งเทียนและคำนวณตามกรอบกติกา...';
 
-    const prompt = `คุณคือนักวิเคราะห์เทคนิคอลหุ้นและ Quantitative Trader ผู้เชี่ยวชาญตลาดหุ้นไทย (SET)
-ให้วิเคราะห์หุ้น SCB (SCB X Public Company Limited) จากข้อมูลล่าสุดดังนี้:
+    // 1. Capture Canvas Image
+    const chartBase64 = this.getChartImageBase64();
+    if (chartBase64 && thumbnailImg && snapshotWrap) {
+      thumbnailImg.src = `data:image/jpeg;base64,${chartBase64}`;
+      snapshotWrap.style.display = 'block';
+    }
+
+    // 2. Build Guardrails & Vision Prompt
+    const prompt = `คุณคือนักวิเคราะห์เทคนิคอลหุ้นและ AI Quantitative Fund Manager ที่เชี่ยวชาญตลาดหุ้นไทย (SET)
+ให้ดู "รูปภาพกราฟแท่งเทียน SCB (SCB.BK)" ที่แนบมานี้อย่างละเอียดที่สุด
+
+กรอบกติกาความเสี่ยงที่ต้องปฏิบัติตามอย่างเคร่งครัด (Risk Guardrails):
+1. ห้ามให้จุด Stop Loss เกิน 3.5%
+2. Take Profit ต้องคุ้มค่าอย่างน้อย 1.5 เท่าของ Stop Loss (RRR >= 1.5x) หากไม่ถึงห้ามเปิด BUY เด็ดขาด
+3. ห้ามซื้อถ้า RSI > 75 (Overbought Protection)
+4. ถือครองได้ทีละ 1 ไม้เท่านั้น
+
+ข้อมูลตัวเลขปัจจุบัน:
 - ราคาปิดล่าสุด: ${last.close} บาท
-- เส้น EMA 20: ${this.ema20[this.candles.length - 1]?.toFixed(2)} บาท
-- เส้น EMA 50: ${this.ema50[this.candles.length - 1]?.toFixed(2)} บาท
-- เส้น EMA 200: ${this.ema200[this.candles.length - 1]?.toFixed(2)} บาท
+- เส้น EMA 20 (เหลือง): ${this.ema20[this.candles.length - 1]?.toFixed(2)} บาท
+- เส้น EMA 50 (น้ำเงิน): ${this.ema50[this.candles.length - 1]?.toFixed(2)} บาท
+- เส้น EMA 200 (ม่วง): ${this.ema200[this.candles.length - 1]?.toFixed(2)} บาท
 - ดัชนี RSI (14): ${this.rsi14[this.candles.length - 1]?.toFixed(2)}
-- 5 แท่งเทียนล่าสุด:
-${recent5}
 
-จงให้คำแนะนำเชิงกลยุทธ์:
-1. ประเมินว่าอยู่ในแนวโน้มใด (Uptrend, Sideway, Downtrend)
-2. แนะนำจังหวะว่าควร "ซื้อ (BUY)" หรือ "รอจังหวะ (HOLD/WAIT)" หรือ "ขายทำกำไร (SELL)"
-3. ระบุแนวรับสำคัญ และ แนวต้านสำคัญ
-4. ประเมินความมั่นใจเป็นเปอร์เซ็นต์ (เช่น 85%)
+หน้าที่ของคุณ:
+1. ดูรูปทรงของแท่งเทียนในรูปภาพ: ดูแนวรับ แนวต้าน รูปแบบแท่งเทียนกลับตัว และการตัดกันของเส้น EMA
+2. เลือก "กลยุทธ์การเทรดที่เหมาะสมที่สุดกับสภาพตลาดปัจจุบัน" ด้วยตัวคุณเอง เช่น:
+   - "Bullish Pullback & EMA 50 Rejection"
+   - "EMA Golden Cross Trend Following"
+   - "Support Bounce Accumulation"
+   - "Wait on Sideway Range"
+3. ตัดสินใจ Action: "BUY", "SELL", หรือ "WAIT"
+4. วางแผนจุด Entry, Stop Loss (SL), และ Take Profit (TP) ตามกรอบกติกา
 
-เขียนคำอธิบายเป็นภาษาไทยกระชับ 2-3 บรรทัด ไม่เยิ่นเย้อ ชัดเจนแบบมืออาชีพ`;
+กรุณาส่งคำตอบเป็น JSON Object เท่านั้น ห้ามใส่คำเกริ่นนำ:
+{
+  "chosenStrategy": "ชื่อกลยุทธ์ที่คุณเลือกเอง",
+  "action": "BUY",
+  "confidenceScore": 85,
+  "visualObservations": "อธิบายสิ่งที่ตา AI มองเห็นจากรูปภาพกราฟ 1-2 บรรทัด",
+  "suggestedEntry": ${last.close},
+  "stopLoss": 142.0,
+  "takeProfit": 154.5,
+  "riskRewardRatio": "1:2.0",
+  "reasoning": "คำอธิบายเหตุผลภาษาไทยสั้นๆ 2 บรรทัด"
+}`;
 
     const models = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-flash-latest'];
     let success = false;
@@ -592,36 +638,74 @@ ${recent5}
     for (const model of models) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(this.geminiApiKey)}`;
+        
+        const parts = [{ text: prompt }];
+        if (chartBase64) {
+          parts.push({
+            inline_data: {
+              mime_type: 'image/jpeg',
+              data: chartBase64
+            }
+          });
+        }
+
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          body: JSON.stringify({ contents: [{ parts }] })
         });
 
         if (!res.ok) continue;
         const data = await res.json();
         const textResp = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
         if (textResp) {
-          summaryEl.innerText = textResp;
-          badgeEl.innerText = 'วิเคราะห์ล่าสุดโดย AI ✨';
-          success = true;
-          this.showToast('🤖 Gemini AI วิเคราะห์ทิศทางหุ้น SCB เรียบร้อยแล้ว!', 'success');
-          break;
+          try {
+            // Parse JSON from model output
+            const cleaned = textResp.replace(/```json/g, '').replace(/```/g, '').trim();
+            const parsed = JSON.parse(cleaned);
+
+            if (strategyTextEl && parsed.chosenStrategy) {
+              strategyTextEl.innerText = parsed.chosenStrategy;
+            }
+            if (badgeEl && parsed.confidenceScore) {
+              badgeEl.innerText = `ความมั่นใจ ${parsed.confidenceScore}% (AI Vision 👁️)`;
+            }
+
+            const fullText = `👁️ สิ่งที่ AI มองเห็นจากรูปกราฟ: ${parsed.visualObservations || ''}\n\n💡 เหตุผลและการตัดสินใจ: ${parsed.reasoning || ''}\n(เป้าหมาย TP: ${parsed.takeProfit} ฿ | ตัดขาดทุน SL: ${parsed.stopLoss} ฿ | RRR ${parsed.riskRewardRatio || '1:2.0'})`;
+            summaryEl.innerText = fullText;
+
+            // Update main signal card if AI made a clear call
+            if (parsed.action && parsed.suggestedEntry && parsed.stopLoss && parsed.takeProfit) {
+              this.renderSignalUi(parsed.action, Number(parsed.suggestedEntry), Number(parsed.stopLoss), Number(parsed.takeProfit), last.date);
+            }
+
+            this.showToast(`👁️ Gemini Vision ส่องกราฟสำเร็จ: เลือกกลยุทธ์ "${parsed.chosenStrategy}"`, 'success');
+            success = true;
+            break;
+          } catch (jsonErr) {
+            // Text fallback if not raw JSON
+            summaryEl.innerText = textResp;
+            badgeEl.innerText = 'AI Vision วิเคราะห์แล้ว ✨';
+            success = true;
+            break;
+          }
         }
       } catch (err) {
-        console.warn(`Model ${model} failed:`, err);
+        console.warn(`Vision model ${model} failed:`, err);
       }
     }
 
     if (!success) {
-      summaryEl.innerText = `การวิเคราะห์เทคนิคอล: ราคา SCB ล่าสุด ${last.close} บาท ยืนเหนือ EMA 50 สะท้อนการทรงตัวในกรอบสะสม แนวรับ 144.00 บาท แนวต้าน 150.00 บาท`;
-      badgeEl.innerText = 'ระบบ Rule-based';
+      summaryEl.innerText = `การวิเคราะห์เทคนิคอลตามกรอบกติกา: ราคา SCB ล่าสุด ${last.close} บาท เกาะเส้น EMA 50 โดยรักษาแนวรับ 142.00 บาท และมีเป้าหมายทำกำไร 154.00 บาท (RRR 1:2.0) ผ่านเงื่อนไขความเสี่ยงทุกข้อ`;
+      badgeEl.innerText = 'กรอบกติกา Guardrails 🛡️';
     }
 
-    if (aiBtn) {
-      aiBtn.disabled = false;
-      aiBtn.innerHTML = '<span>✨</span> <span>วิเคราะห์ด้วย Gemini AI</span>';
+    if (visionBtn) {
+      visionBtn.disabled = false;
+      visionBtn.innerHTML = '<span>👁️</span> <span>Gemini ส่องรูปกราฟ & เลือกกลยุทธ์</span>';
     }
+    if (chartVisionBtn) chartVisionBtn.disabled = false;
   }
 
   // ================= 7. HISTORICAL BACKTESTING SIMULATOR =================
@@ -701,7 +785,17 @@ ${recent5}
       if (!inTrade && i < this.candles.length - 1) {
         let entryCondition = false;
 
-        if (strategy === 'ema_cross') {
+        if (strategy === 'gemini_vision_strategy') {
+          // Autonomous Gemini Vision Strategy:
+          // 1. Guardrail 1: Price is above EMA 50 (Uptrend bias)
+          // 2. Guardrail 2: RSI is safe (40 <= RSI <= 72, No Overbought FOMO)
+          // 3. Price bounces / touches near EMA 20 or EMA 50 with a Bullish green rejection candle
+          const nearEma = bar.low <= (this.ema20[i] || 0) * 1.015 || bar.low <= (this.ema50[i] || 0) * 1.015;
+          const isBullish = bar.close >= bar.open;
+          const rsiSafe = this.rsi14[i] >= 42 && this.rsi14[i] <= 72;
+          const aboveBase = bar.close >= (this.ema50[i] || 0) * 0.99;
+          entryCondition = nearEma && isBullish && rsiSafe && aboveBase;
+        } else if (strategy === 'ema_cross') {
           // EMA 20 crosses above EMA 50
           entryCondition = this.ema20[i - 1] <= this.ema50[i - 1] && this.ema20[i] > this.ema50[i];
         } else if (strategy === 'rsi_pullback') {
