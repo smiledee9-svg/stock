@@ -268,25 +268,28 @@ function initDashboard(data) {
     document.getElementById('mProfitFactor').textContent = `Profit Factor: ${sm.profitFactor || 3.12}`;
   }
 
-  // Render Metrics: Mode 2 (Ramanujan Rebalance)
+  // Render Metrics: Mode 2 (Ramanujan Rebalance - Master Perspective)
   function renderRebalanceMetrics(rs) {
     document.getElementById('lblMetric1').textContent = 'มูลค่าพอร์ต Rebalance (NAV)';
     document.getElementById('mSymbol').textContent = `฿${(rs.finalNav || 1216750).toLocaleString('th-TH', { minimumFractionDigits: 2 })}`;
-    document.getElementById('mNote1').textContent = `เงินต้นเริ่มต้น: ฿${(rs.initialCapital || 1000000).toLocaleString('th-TH')}`;
+    document.getElementById('mNote1').textContent = `กำไรสุทธิ: +฿${(rs.totalProfitThb || 216750).toLocaleString('th-TH')} (+${(rs.totalReturnPct || 21.68).toFixed(2)}%)`;
 
-    document.getElementById('lblMetric2').textContent = 'ผลตอบแทน Rebalance (Total)';
-    document.getElementById('mCycle').textContent = `+${(rs.totalReturnPct || 21.68).toFixed(2)}%`;
-    document.getElementById('mNote2').textContent = `กำไรสุทธิ: ฿${(rs.totalProfitThb || 216750).toLocaleString('th-TH')}`;
+    document.getElementById('lblMetric2').textContent = 'หุ้น SCB สะสมฟรี (Free Shares)';
+    const sharesGrowth = rs.sharesGrowth || 2100;
+    document.getElementById('mCycle').textContent = `${(rs.finalShares || 6600).toLocaleString()} หุ้น`;
+    document.getElementById('mNote2').textContent = `เพิ่มขึ้น +${sharesGrowth.toLocaleString()} หุ้น (+${((sharesGrowth / (rs.initialShares || 4500)) * 100).toFixed(1)}%) โดยไม่ต้องเติมเงิน!`;
 
-    document.getElementById('lblMetric3').textContent = 'Max Drawdown (ความเสี่ยง)';
-    document.getElementById('mWinRate').textContent = `${(rs.maxDrawdownPct || -9.81).toFixed(2)}%`;
-    document.getElementById('mWinTrades').textContent = `เทียบ Buy&Hold: ${(rs.bnhMaxDrawdownPct || -12.72).toFixed(2)}% (ลดเสี่ยง ${(rs.drawdownReductionPct || 2.91).toFixed(2)}%)`;
+    document.getElementById('lblMetric3').textContent = 'ต้นทุนเฉลี่ยแท้จริง (Cost Basis)';
+    document.getElementById('mWinRate').textContent = `฿${(rs.effectiveCostBasis || 112.66).toFixed(2)}/หุ้น`;
+    const curP = (rs.currentHolding && rs.currentHolding.lastPrice) ? rs.currentHolding.lastPrice : 145.5;
+    const discount = ((curP - (rs.effectiveCostBasis || 112.66)) / curP) * 100;
+    document.getElementById('mWinTrades').textContent = `ราคาตลาด ฿${curP.toFixed(2)} (ต้นทุนได้เปรียบตลาด ${discount.toFixed(1)}%)`;
 
-    document.getElementById('lblMetric4').textContent = 'ปรับพอร์ตตามคลื่น (Rebalances)';
+    document.getElementById('lblMetric4').textContent = 'ความคุ้มค่าความเสี่ยง (Risk Shield)';
     const retEl = document.getElementById('mReturn');
-    retEl.textContent = `${rs.totalRebalances || 26} ครั้ง`;
-    retEl.className = 'metric-val text-brand';
-    document.getElementById('mProfitFactor').textContent = `ซื้อหุบคลื่น: ${rs.buyRebalances || 14} / ขายยอดคลื่น: ${rs.sellRebalances || 12}`;
+    retEl.textContent = `${(rs.maxDrawdownPct || -9.81).toFixed(2)}%`;
+    retEl.className = 'metric-val text-amber';
+    document.getElementById('mProfitFactor').textContent = `Calmar Ratio: ${rs.calmarRatio || 2.21} (ลดเสี่ยงกว่า B&H ${(rs.drawdownReductionPct || 2.91).toFixed(2)}%)`;
 
     // Update Allocation Bar
     const cur = rs.currentHolding || {};
@@ -294,8 +297,8 @@ function initDashboard(data) {
     const cashRatio = Math.max(0, 100 - stockRatio);
     document.getElementById('barStockRatio').style.width = `${stockRatio}%`;
     document.getElementById('barCashRatio').style.width = `${cashRatio}%`;
-    document.getElementById('lblStockRatio').textContent = `สัดส่วนหุ้น SCB: ${stockRatio.toFixed(1)}% (฿${cur.stockValue ? cur.stockValue.toLocaleString('th-TH') : '0'})`;
-    document.getElementById('lblCashRatio').textContent = `เงินสดสำรอง (Cash): ${cashRatio.toFixed(1)}% (฿${cur.cash ? cur.cash.toLocaleString('th-TH') : '0'})`;
+    document.getElementById('lblStockRatio').textContent = `สัดส่วนหุ้น SCB: ${stockRatio.toFixed(1)}% (${(cur.shares || 6600).toLocaleString()} หุ้น = ฿${cur.stockValue ? cur.stockValue.toLocaleString('th-TH') : '0'})`;
+    document.getElementById('lblCashRatio').textContent = `เงินสดสำรอง (Cash Cushion): ${cashRatio.toFixed(1)}% (฿${cur.cash ? cur.cash.toLocaleString('th-TH') : '0'})`;
   }
 
   // Render Table: Mode 1 (Cycle Trades)
@@ -405,12 +408,14 @@ function initDashboard(data) {
     const allocBar = document.getElementById('rebalanceAllocationBar');
     const liveBanner = document.getElementById('liveSignalBanner');
     const subChartTitle = document.querySelector('.sub-chart-title span');
+    const masterInsight = document.getElementById('rebalanceMasterInsightCard');
 
     if (mode === 'cycle') {
       tabCycle.classList.add('active');
       tabRebalance.classList.remove('active');
       if (allocBar) allocBar.style.display = 'none';
       if (liveBanner) liveBanner.style.display = 'block';
+      if (masterInsight) masterInsight.style.display = 'none';
 
       // Chart series visibility
       waveLineSeries.applyOptions({ visible: true });
@@ -428,6 +433,7 @@ function initDashboard(data) {
       tabCycle.classList.remove('active');
       if (allocBar) allocBar.style.display = 'block';
       if (liveBanner) liveBanner.style.display = 'none';
+      if (masterInsight) masterInsight.style.display = 'block';
 
       // Chart series visibility
       waveLineSeries.applyOptions({ visible: false });

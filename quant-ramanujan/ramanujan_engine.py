@@ -422,6 +422,11 @@ class RamanujanQuantModel:
         bnh_dd_series = (bnh_series - peak_bnh) / peak_bnh * 100
         bnh_max_dd_pct = round(float(np.min(bnh_dd_series)), 2)
 
+        initial_shares_val = int((initial_capital * base_ratio / p0) // min_lot) * min_lot
+        calmar = round(total_return_pct / abs(max_drawdown_pct), 2) if max_drawdown_pct != 0 else 0
+        last_wave = float(wave[-1])
+        current_phase = "🌊 หุบคลื่น (Trough - โซนช้อนซื้อหุ้น 80%)" if last_wave <= buy_threshold else ("⛰️ ยอดคลื่น (Peak - โซนล็อกเงินสด 75%)" if last_wave >= sell_threshold else "⚖️ โซนสมดุล (Neutral - 50:50)")
+
         rebalance_summary = {
             "initialCapital": initial_capital,
             "finalNav": round(final_nav, 2),
@@ -433,10 +438,16 @@ class RamanujanQuantModel:
             "maxDrawdownPct": max_drawdown_pct,
             "bnhMaxDrawdownPct": bnh_max_dd_pct,
             "drawdownReductionPct": round(abs(bnh_max_dd_pct) - abs(max_drawdown_pct), 2),
+            "calmarRatio": calmar,
+            "currentPhase": current_phase,
             "totalRebalances": len(transactions),
             "buyRebalances": rebalance_buy_count,
             "sellRebalances": rebalance_sell_count,
             "harvestedCashTotal": round(harvested_cash, 2),
+            "initialShares": initial_shares_val,
+            "finalShares": shares,
+            "sharesGrowth": shares - initial_shares_val,
+            "effectiveCostBasis": round((initial_capital - cash) / shares, 2) if shares > 0 else 0,
             "currentHolding": {
                 "shares": shares,
                 "stockValue": round(daily[-1]["stockValue"], 2),
