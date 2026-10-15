@@ -284,39 +284,41 @@ class ScbTraderApp {
     const sanyakuPass = isAboveKumo && isAboveKijun && isChikouFree;
 
     // LAYER 2: HADO-RON (WAVE N STRUCTURE A -> B -> C)
-    const scanWindow = 35;
-    const startScan = Math.max(0, idx - scanWindow);
-
-    let lowA = Infinity, idxA = -1;
-    let highB = -Infinity, idxB = -1;
-    let lowC = Infinity, idxC = -1;
-
-    // Point A: Swing Low
-    for (let i = startScan; i < startScan + 15; i++) {
-      if (this.candles[i].low < lowA) {
-        lowA = this.candles[i].low;
-        idxA = i;
+    // Find Point B (swing high in recent window [idx-16 .. idx-2])
+    let idxB = -1, highB = -Infinity;
+    const minLookbackB = Math.max(25, idx - 16);
+    for (let k = minLookbackB; k <= idx - 2; k++) {
+      if (this.candles[k].high > highB) {
+        highB = this.candles[k].high;
+        idxB = k;
       }
     }
 
-    // Point B: Impulse High
-    for (let i = idxA + 2; i < idxA + 18 && i < idx; i++) {
-      if (this.candles[i].high > highB) {
-        highB = this.candles[i].high;
-        idxB = i;
+    // Find Point A (swing low before B in window [idxB-16 .. idxB-1])
+    let idxA = -1, lowA = Infinity;
+    if (idxB > 10) {
+      const minLookbackA = Math.max(10, idxB - 16);
+      for (let k = minLookbackA; k <= idxB - 1; k++) {
+        if (this.candles[k].low < lowA) {
+          lowA = this.candles[k].low;
+          idxA = k;
+        }
       }
     }
 
-    // Point C: Retracement Low
-    for (let i = idxB + 1; i <= idx; i++) {
-      if (this.candles[i].low < lowC) {
-        lowC = this.candles[i].low;
-        idxC = i;
+    // Find Point C (retracement low between B and idx-1)
+    let idxC = -1, lowC = Infinity;
+    if (idxB > 0 && idxB < idx) {
+      for (let k = idxB + 1; k <= idx - 1; k++) {
+        if (this.candles[k].low < lowC) {
+          lowC = this.candles[k].low;
+          idxC = k;
+        }
       }
     }
 
     const hadoValid = (idxA !== -1 && idxB !== -1 && idxC !== -1) &&
-                      (lowC > lowA) && (highB > lowA) && (highB > lowC) &&
+                      (highB > lowA) && (lowC > lowA) && (highB > lowC) &&
                       (lowC >= (this.ichimoku.kijun[idxC] || 0) * 0.985);
 
     // LAYER 3: JIKAN-RON (TIME CONFLUENCE GATING)
@@ -339,13 +341,14 @@ class ScbTraderApp {
     const targetNT = Number(((2 * lowC) - lowA).toFixed(2));
 
     const stopLoss = lowC;
-    const risk = highB - lowC;
-    const rewardN = targetN - highB;
-    const rrr = risk > 0 ? Number((rewardN / risk).toFixed(2)) : 1.0;
-    const rrrValid = rrr >= 1.45;
+    const risk = cur.close - lowC;
+    const rewardN = targetN - cur.close;
+    const rrr = risk > 0 ? Number((rewardN / risk).toFixed(2)) : 0.0;
+    const rrrValid = rrr >= 1.25;
 
-    const isBreakingB = cur.close >= highB * 0.992;
-    const allLayersTrigger = sanyakuPass && hadoValid && jikanValid && rrrValid && isBreakingB;
+    // Fresh Breakout: Price is breaking highB right now and target N is still above current price
+    const freshBreakout = (prev.close <= highB * 1.005) && (cur.close >= highB * 0.995) && (cur.close < targetN);
+    const allLayersTrigger = sanyakuPass && hadoValid && jikanValid && rrrValid && freshBreakout && (targetN > cur.close);
 
     return {
       sanyakuPass,
@@ -972,14 +975,14 @@ class ScbTraderApp {
         let exitReason = null;
 
         // Check TP
-        if (bar.high >= buyBar.tpPrice) {
+        if (buyBar.tpPrice && bar.high >= buyBar.tpPrice) {
           exitReason = 'Take Profit (+TP Hit)';
-        } else if (bar.low <= buyBar.slPrice) {
+        } else if (buyBar.slPrice && bar.low <= buyBar.slPrice) {
           exitReason = 'Stop Loss (-SL Hit)';
+        } else if (bar.close < (this.ichimoku.kijun[i] || 0) * 0.988 && (i - buyBar.index) >= 3) {
+          exitReason = 'หลุดเส้นมาตรฐาน Kijun-sen (Equilibrium Breakdown)';
         } else if (i === this.candles.length - 1) {
           exitReason = 'ถือครองจนถึงวันปัจจุบัน';
-        } else if (strategy === 'ema_cross' && this.ema20[i] < this.ema50[i]) {
-          exitReason = 'EMA Dead Cross';
         }
 
         if (exitReason) {
@@ -1025,7 +1028,7 @@ class ScbTraderApp {
           if (hosoda && hosoda.allLayersTrigger) {
             entryCondition = true;
             customTp = hosoda.targets.N;
-            customSl = Math.max(hosoda.stopLoss, Number((bar.close * 0.95).toFixed(2)));
+            customSl = Math.max(hosoda.stopLoss, Number((bar.close * 0.955).toFixed(2)));
           }
         } else if (strategy === 'sanyaku_kouten') {
           // 2. Sanyaku Kouten (三役好転: Price > Kumo, Tenkan > Kijun, Chikou Free)
@@ -1037,8 +1040,13 @@ class ScbTraderApp {
           const chikouPass = i >= 26 ? bar.close > this.candles[i - 26].close : true;
           const prevTenkan = this.ichimoku.tenkan[i - 1] || 0;
           const prevKijun = this.ichimoku.kijun[i - 1] || 0;
-          const tenkanCross = prevTenkan <= prevKijun && tenkan > kijun;
-          entryCondition = bar.close > kumoTop && tenkan > kijun && bar.close >= kijun && chikouPass && (tenkanCross || bar.close > prevBar.close);
+          const tkCross = prevTenkan <= prevKijun && tenkan > kijun;
+          const regimePass = bar.close > kumoTop && bar.close >= kijun && chikouPass;
+          if (regimePass && (tkCross || (bar.close > prevBar.close && bar.close >= tenkan))) {
+            entryCondition = true;
+            customTp = Number((bar.close * (1 + (tpPct / 100))).toFixed(2));
+            customSl = Math.max(Number((kijun * 0.985).toFixed(2)), Number((bar.close * (1 - (slPct / 100))).toFixed(2)));
+          }
         } else if (strategy === 'kijun_bounce') {
           // 3. Kijun-sen Equilibrium Bounce (Pullback to Kijun in uptrend)
           const kijun = this.ichimoku.kijun[i] || 0;
@@ -1046,18 +1054,26 @@ class ScbTraderApp {
           const spanB = this.ichimoku.spanB[i] || 0;
           const kumoTop = Math.max(spanA, spanB);
           const isAboveKumo = bar.close > kumoTop;
-          const touchedKijun = bar.low <= kijun * 1.01 && bar.close >= kijun;
+          const nearKijun = bar.low <= kijun * 1.012 && bar.close >= kijun;
           const isBullCandle = bar.close >= bar.open;
-          entryCondition = isAboveKumo && touchedKijun && isBullCandle;
+          if (isAboveKumo && nearKijun && isBullCandle) {
+            entryCondition = true;
+            customTp = Number((bar.close * (1 + (tpPct / 100))).toFixed(2));
+            customSl = Number((kijun * 0.982).toFixed(2));
+          }
         } else if (strategy === 'kumo_breakout') {
           // 4. Kumo Breakout & Cloud Surfer
           const prevSpanA = this.ichimoku.spanA[i - 1] || 0;
           const prevSpanB = this.ichimoku.spanB[i - 1] || 0;
           const prevKumoTop = Math.max(prevSpanA, prevSpanB);
           const curKumoTop = Math.max(this.ichimoku.spanA[i] || 0, this.ichimoku.spanB[i] || 0);
-          const brokeAbove = prevBar.close <= prevKumoTop && bar.close > curKumoTop;
           const chikouPass = i >= 26 ? bar.close > this.candles[i - 26].close : true;
-          entryCondition = brokeAbove && chikouPass;
+          const brokeAbove = prevBar.close <= prevKumoTop && bar.close > curKumoTop;
+          if (brokeAbove && chikouPass && bar.close >= (this.ichimoku.kijun[i] || 0)) {
+            entryCondition = true;
+            customTp = Number((bar.close * (1 + (tpPct / 100))).toFixed(2));
+            customSl = Number((curKumoTop * 0.982).toFixed(2));
+          }
         } else if (strategy === 'gemini_vision_strategy') {
           // 5. Gemini Vision AI Autonomous Pure Ichimoku Strategy
           const hosoda = this.scanHosoda4LayerPipeline(i);
@@ -1065,12 +1081,15 @@ class ScbTraderApp {
           const spanA = this.ichimoku.spanA[i] || 0;
           const spanB = this.ichimoku.spanB[i] || 0;
           const kumoTop = Math.max(spanA, spanB);
-          const isAboveKumo = bar.close > kumoTop;
-          const isAboveKijun = bar.close >= kijun;
-          const isBounce = bar.low <= kijun * 1.015 && bar.close >= bar.open;
-          entryCondition = isAboveKumo && isAboveKijun && (isBounce || (hosoda && hosoda.sanyakuPass && hosoda.rrrValid));
-          if (hosoda && hosoda.targets?.N) customTp = hosoda.targets.N;
-          if (hosoda && hosoda.stopLoss) customSl = hosoda.stopLoss;
+          const chikouPass = i >= 26 ? bar.close > this.candles[i - 26].close : true;
+          const regimePass = bar.close > kumoTop && bar.close >= kijun && chikouPass;
+          const nearKijun = bar.low <= kijun * 1.015 && bar.close >= kijun;
+          const isBullish = bar.close >= bar.open;
+          if (regimePass && (nearKijun || bar.close > prevBar.close) && isBullish) {
+            entryCondition = true;
+            customTp = hosoda?.targets?.N && hosoda.targets.N > bar.close ? hosoda.targets.N : Number((bar.close * 1.075).toFixed(2));
+            customSl = Math.max(Number((kijun * 0.985).toFixed(2)), Number((bar.close * 0.96).toFixed(2)));
+          }
         }
 
         if (entryCondition) {
