@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCB Dynamic Rebalance Lab - ระบบรีบาลานซ์พอร์ตหุ้น SCB อัตโนมัติ (Project 4)</title>
+  <meta name="description" content="ระบบวิเคราะห์และจำลองกลยุทธ์รีบาลานซ์พอร์ตหุ้น SCB (Cash-Stock Rebalancing) ย้อนหลัง 2 ปี ซื้อถูก-ขายแพงอัตโนมัติ ลด Drawdown ความเสี่ยงอย่างยั่งยืน">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- TradingView Lightweight Charts (v4.1.3 local bundle) -->
+  <script src="lightweight-charts.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="quant-container">
+    <!-- Top Header -->
+    <header class="quant-header">
+      <div class="header-left">
+        <div class="logo-badge">⚖️ REBALANCE LAB</div>
+        <div>
+          <h1>SCB Dynamic Rebalance Engine (Project 4)</h1>
+          <p class="header-sub">กลยุทธ์รีบาลานซ์พอร์ตอัตโนมัติ (Asset-Cash Rebalancing) หุ้น SCB ย้อนหลัง 2 ปี ซื้อถูก-ขายแพงอัตโนมัติโดยไม่ต้องเดาทิศทางตลาด</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="status-chip live-chip">● จำลองเสร็จสมบูรณ์</span>
+        <a href="../quant-ramanujan/index.html" class="btn btn-outline" title="เปิดห้องทดลองคลื่นรามานุจัน (โปรเจกต์ 3)">📐 Ramanujan Lab</a>
+        <a href="../scb-trader/index.html" class="btn btn-outline" title="เปิดระบบวิเคราะห์หุ้น SCB Pure Ichimoku (โปรเจกต์ 2)">⛩️ ระบบหุ้น SCB</a>
+        <a href="../index.html" class="btn btn-outline" title="กลับไปหน้าร้านค้า SmartStock หลัก (โปรเจกต์ 1)">📦 หน้าสต็อกหลัก</a>
+      </div>
+    </header>
+
+    <!-- Metrics Cards Grid -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">มูลค่าพอร์ตปัจจุบัน (Portfolio NAV)</div>
+        <div class="metric-val text-brand" id="mFinalNav">฿1,161,650.00</div>
+        <div class="metric-note">เงินต้นเริ่มต้น: ฿1,000,000</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">ผลตอบแทน Rebalance (Total Return)</div>
+        <div class="metric-val text-green" id="mTotalReturn">+16.16%</div>
+        <div class="metric-note" id="mProfitThb">กำไร: ฿161,650.00</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">เปรียบเทียบ Buy & Hold (ถือเฉยๆ)</div>
+        <div class="metric-val text-blue" id="mBnhReturn">+33.22%</div>
+        <div class="metric-note" id="mBnhNav">NAV: ฿1,332,150.00</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Max Drawdown (ลดความเสี่ยงสูงสุด)</div>
+        <div class="metric-val text-amber" id="mMaxDrawdown">-6.64%</div>
+        <div class="metric-note" id="mBnhDrawdown">เทียบ Buy&Hold: -12.72% (ลดความเสี่ยง 6.08%)</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">จำนวนครั้งที่ปรับพอร์ต (Rebalances)</div>
+        <div class="metric-val text-brand" id="mRebalanceCount">1 ครั้ง</div>
+        <div class="metric-note" id="mRebalanceBreakdown">ซื้อถูก (BUY): 0 / ขายกำไร (SELL): 1</div>
+      </div>
+    </div>
+
+    <!-- Current Asset Allocation Visual Bar -->
+    <div class="allocation-bar-container">
+      <div class="allocation-labels">
+        <span id="lblStockRatio" style="color: #34d399;">หุ้น SCB: 50.0%</span>
+        <span id="lblCashRatio" style="color: #60a5fa;">เงินสดสำรอง (Cash Cushion): 50.0%</span>
+      </div>
+      <div class="allocation-bar">
+        <div id="barStockRatio" class="bar-stock" style="width: 50%;"></div>
+        <div id="barCashRatio" class="bar-cash" style="width: 50%;"></div>
+      </div>
+    </div>
+
+    <!-- Interactive Parameter Tuning & Strategy Presets -->
+    <div class="simulator-box">
+      <div class="sim-header">
+        <div>
+          <h3>⚙️ ตัวจำลองพอร์ต Rebalance แบบเรียลไทม์ (Interactive Simulator)</h3>
+          <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 2px;">ปรับสัดส่วนเป้าหมายและกรอบความคลาดเคลื่อน (Band) เพื่อดูผลตอบแทนและความปลอดภัยทันที</p>
+        </div>
+        <div class="preset-group">
+          <button type="button" class="preset-btn active" data-preset="balanced">⚖️ สมดุล 50:50 (Band ±5%)</button>
+          <button type="button" class="preset-btn" data-preset="conservative">🟢 อนุรักษ์นิยม 30:70 (Band ±4%)</button>
+          <button type="button" class="preset-btn" data-preset="aggressive">🚀 เชิงรุก 70:30 (Band ±5%)</button>
+          <button type="button" class="preset-btn" data-preset="grid">⚡ ซอยรอบถี่ Grid (Band ±2.5%)</button>
+        </div>
+      </div>
+
+      <div class="sim-params-grid">
+        <div class="param-group">
+          <label for="inputCapital">เงินลงทุนเริ่มต้น (Initial Capital):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputCapital" value="1000000" step="100000" min="50000" max="50000000">
+            <span>บาท</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputTargetRatio">สัดส่วนเป้าหมายหุ้น SCB (Target Stock %):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputTargetRatio" value="50" step="5" min="20" max="80">
+            <span>%</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputBand">กรอบกระตุ้นปรับพอร์ต (Rebalance Band):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputBand" value="5" step="0.5" min="1" max="15">
+            <span>±%</span>
+          </div>
+        </div>
+
+        <div class="param-group param-action">
+          <button type="button" id="btnRunSimulator" class="btn btn-primary btn-run">
+            ⚡ คำนวณจำลองพอร์ต Rebalance
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chart Section -->
+    <section class="chart-section card-box">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>📊 กราฟราคา SCB & จุดทริกเกอร์ Rebalance (ซื้อของถูก / ขายล็อกกำไร)</h2>
+          <span class="chart-legend-badge legend-buy">▲ ซื้อช้อนของถูก (REBALANCE BUY)</span>
+          <span class="chart-legend-badge legend-sell">▼ ขายทำกำไรเงินสด (REBALANCE SELL)</span>
+        </div>
+        <div class="chart-controls">
+          <button type="button" class="btn-time active" data-range="all">2 ปีเต็ม</button>
+          <button type="button" class="btn-time" data-range="1y">1 ปีล่าสุด</button>
+          <button type="button" class="btn-time" data-range="6m">6 เดือนล่าสุด</button>
+        </div>
+      </div>
+
+      <!-- Main Price Candlestick Chart -->
+      <div id="priceChartContainer" class="chart-container"></div>
+
+      <!-- Portfolio Equity Curve Sub-Chart -->
+      <div class="sub-chart-title">
+        <span>📈 เส้นมูลค่าพอร์ต Rebalance NAV (สีเขียว) vs Buy & Hold (เส้นประสีเทา) vs เงินสดสำรอง (เส้นประสีฟ้า)</span>
+        <span class="sub-note">สังเกต: พอร์ต Rebalance มีเงินสดคอยพยุง ทำให้ช่วงราคาหุ้นย่อตัว พอร์ตจะไม่ดิ่งลึก</span>
+      </div>
+      <div id="equityChartContainer" class="sub-chart-container"></div>
+    </section>
+
+    <!-- Strategy Comparison & Cloudflare Architecture Grid -->
+    <div class="two-col-grid">
+      <!-- Strategy Comparison Box -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <h3>⚖️ ทำไมกลยุทธ์ Rebalance ถึงชนะใจนักลงทุนสถาบันและกองทุน?</h3>
+        </div>
+        <div class="compare-box">
+          <div class="compare-row">
+            <span class="compare-title">1. จิตวิทยาการเทรด</span>
+            <span class="compare-val text-green">หมดปัญหาตกรถ / ติดดอย (มีระบบกลไกคุม)</span>
+          </div>
+          <div class="compare-row">
+            <span class="compare-title">2. ซื้อถูก-ขายแพง</span>
+            <span class="compare-val text-brand">อัตโนมัติ 100% (ราคาขึ้น = ทยอยขาย, ราคาลง = ทยอยซื้อ)</span>
+          </div>
+          <div class="compare-row">
+            <span class="compare-title">3. ความปลอดภัย (Max Drawdown)</span>
+            <span class="compare-val text-amber">ลดความเสี่ยงพอร์ตดิ่งลงเกือบ 50% ด้วย Cash Cushion</span>
+          </div>
+          <div class="compare-row">
+            <span class="compare-title">4. การสร้างกระแสเงินสด (Cash Flow)</span>
+            <span class="compare-val text-blue">เก็บเกี่ยวล็อกกำไรจริงเข้ากระเป๋าสม่ำเสมอ</span>
+          </div>
+        </div>
+        <p style="font-size: 0.84rem; color: #94a3b8; margin-top: 14px; line-height: 1.5;">
+          💡 <strong>หัวใจของ Rebalance:</strong> ในช่วงตลาด Sideway หรือมีความผันผวนสูง กลยุทธ์นี้จะทำรอบเก็บเกี่ยวเงินสดได้ต่อเนื่อง และในช่วงตลาดขาลง เงินสดที่ถือไว้จะกลายเป็นอาวุธสำคัญในการช้อนซื้อหุ้นพื้นฐานดีอย่าง SCB ในต้นทุนที่ต่ำลงเรื่อยๆ
+        </p>
+      </div>
+
+      <!-- Cloudflare Production Blueprint -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <h3>☁️ พิมพ์เขียวรันระบบ Rebalance บน Cloudflare แบบไร้เซิร์ฟเวอร์</h3>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Cloudflare D1 Database</h4>
+              <p>จัดเก็บพอร์ตจำลอง: บันทึกยอดเงินสด (Cash), จำนวนหุ้น SCB และประวัติการ Rebalance แต่ละรอบ</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Cron Worker (รันอัตโนมัติ 17:00 น.)</h4>
+              <p>ดึงราคาปิด SCB จาก Yahoo Finance ➡️ คำนวณสัดส่วนพอร์ต ณ สิ้นวัน ➡️ ตรวจสอบว่าหลุดกรอบ Band หรือไม่</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>LINE Messaging API Alert</h4>
+              <p>หากสัดส่วนเอียงเกินเกณฑ์ ระบบจะส่งคำสั่งแนะนำ "Rebalance BUY +X หุ้น" หรือ "Rebalance SELL -X หุ้น" เข้ามือถือทันที</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rebalance Transactions History Table -->
+    <div class="card-box">
+      <div class="card-box-header">
+        <h3>📝 ประวัติการปรับสัดส่วนพอร์ต (Rebalance Transaction Logs)</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="trades-table">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>วันที่ปรับพอร์ต</th>
+              <th>ประเภทคำสั่ง</th>
+              <th>ราคา SCB</th>
+              <th>จำนวนหุ้นที่ปรับ</th>
+              <th>มูลค่าเงินที่ทำรายการ</th>
+              <th>เงินสดคงเหลือ</th>
+              <th>เหตุผลกลไกที่กระตุ้น</th>
+            </tr>
+          </thead>
+          <tbody id="txTableBody">
+            <!-- Dynamically populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

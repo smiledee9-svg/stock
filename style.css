@@ -3793,4 +3793,63 @@ body {
   background: rgba(99, 102, 241, 0.12) !important;
 }
 
+/* ==========================================================================
+   Project 4: SCB Rebalancing Quant Lab Bridge Card Styles
+   ========================================================================== */
+.project-bridge-card-rebalance {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 184, 166, 0.03) 100%);
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+[data-theme="dark"] .project-bridge-card-rebalance {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0.6) 100%);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.project-bridge-card-rebalance:hover {
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.18);
+}
+
+.rebalance-icon {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.rebalance-badge {
+  color: #10b981;
+}
+
+[data-theme="dark"] .rebalance-badge {
+  color: #34d399;
+}
+
+.rebalance-dot {
+  background: #10b981;
+}
+
+.rebalance-btn {
+  background: linear-gradient(135deg, #059669, #10b981);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.rebalance-btn:hover {
+  background: linear-gradient(135deg, #047857, #059669);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+.btn-rebalance-link {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #10b981 !important;
+}
+
+[data-theme="dark"] .btn-rebalance-link {
+  border-color: rgba(52, 211, 153, 0.4) !important;
+  color: #6ee7b7 !important;
+}
+
+.btn-rebalance-link:hover {
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+
 
