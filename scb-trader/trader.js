@@ -44,6 +44,8 @@ class ScbTraderApp {
     this.renderChart();
     this.evaluateLiveSignal();
     this.runBacktest();
+    // Auto-trigger Google Gemini AI intelligence analysis on startup
+    setTimeout(() => this.analyzeWithGeminiAI(), 800);
   }
 
   bindEvents() {
@@ -484,12 +486,13 @@ class ScbTraderApp {
     if (!force && lastAlert === candle.date) return; // Prevent spam
 
     localStorage.setItem('scb_last_buy_alert', candle.date);
+    const aiText = document.getElementById('aiInsightSummary')?.innerText || 'วิเคราะห์ด้วยโมเมนตัมเทคนิคอล';
     const msg = `🟢 [SCB Signal Alert: BUY]\n` +
       `หุ้น: SCB (SCB X Public Company Limited)\n` +
       `ราคาเข้าซื้อ: ${entry.toFixed(2)} บาท\n` +
       `เป้าหมายทำกำไร (TP): ${tp.toFixed(2)} บาท (+6.0%)\n` +
       `จุดตัดขาดทุน (SL): ${sl.toFixed(2)} บาท (-3.5%)\n` +
-      `เหตุผล: สัญญาณเทคนิคอล EMA & RSI คอนเฟิร์มจังหวะเข้า\n` +
+      `🤖 มุมมอง Gemini AI: ${aiText.substring(0, 120)}...\n` +
       `วันที่: ${candle.date}`;
 
     await this.sendToLineWebhook(msg);
@@ -534,14 +537,15 @@ class ScbTraderApp {
     if (this.candles.length === 0) return;
     const cur = this.candles[this.candles.length - 1];
     const isHold = !!this.activePosition;
+    const aiText = document.getElementById('aiInsightSummary')?.innerText || 'วิเคราะห์ด้วยโมเมนตัมเทคนิคอล';
     
     let text;
     if (isHold) {
       const diff = cur.close - this.activePosition.buyPrice;
       const pnl = ((diff / this.activePosition.buyPrice) * 100).toFixed(2);
-      text = `📊 รายงานสถานะพอร์ต SCB:\nราคาปัจจุบัน: ${cur.close.toFixed(2)} บาท\nราคาซื้อ: ${this.activePosition.buyPrice.toFixed(2)} บาท\nP/L: ${diff >= 0 ? '+' : ''}${pnl}%\nเป้าขาย: ${this.activePosition.tp.toFixed(2)} บาท\nวันที่: ${cur.date}`;
+      text = `📊 รายงานสถานะพอร์ต SCB:\nราคาปัจจุบัน: ${cur.close.toFixed(2)} บาท\nราคาซื้อ: ${this.activePosition.buyPrice.toFixed(2)} บาท\nP/L: ${diff >= 0 ? '+' : ''}${pnl}%\nเป้าขาย: ${this.activePosition.tp.toFixed(2)} บาท\n🤖 Gemini AI: ${aiText.substring(0, 80)}...\nวันที่: ${cur.date}`;
     } else {
-      text = `📊 สัญญาณเทรดหุ้น SCB ล่าสุด:\nราคา: ${cur.close.toFixed(2)} บาท\nคำแนะนำ: วางแผนเข้าซื้อตามสัญญาณระบบ\nเป้าทำกำไร: ${(cur.close * 1.06).toFixed(2)} บาท\nวันที่: ${cur.date}`;
+      text = `📊 สัญญาณเทรดหุ้น SCB ล่าสุด:\nราคา: ${cur.close.toFixed(2)} บาท\nคำแนะนำ: วางแผนเข้าซื้อตามสัญญาณระบบ\nเป้าทำกำไร: ${(cur.close * 1.06).toFixed(2)} บาท\n🤖 Gemini AI: ${aiText.substring(0, 80)}...\nวันที่: ${cur.date}`;
     }
 
     const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
