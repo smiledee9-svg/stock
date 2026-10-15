@@ -97,6 +97,9 @@
             <button id="chartScanVisionBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 8px;">
               <span>👁️ ส่องรูปกราฟนี้</span>
             </button>
+            <button id="toggleKumoBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(6, 182, 212, 0.4); color: #22d3ee; padding: 4px 10px; font-size: 12px; margin-left: 6px;">
+              <span>☁️ เมฆ Kumo</span>
+            </button>
           </div>
         </div>
 
@@ -110,6 +113,8 @@
           <div class="legend-item"><span class="legend-color" style="background: #eab308;"></span> EMA 20 (แนวโน้มระยะสั้น)</div>
           <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span> EMA 50 (แนวโน้มระยะกลาง)</div>
           <div class="legend-item"><span class="legend-color" style="background: #a855f7;"></span> EMA 200 (เทรนด์ใหญ่)</div>
+          <div class="legend-item" id="legendKumo" style="display: flex;"><span class="legend-color" style="background: rgba(6, 182, 212, 0.5);"></span> เมฆ Kumo (Span A/B)</div>
+          <div class="legend-item" id="legendKijun" style="display: flex;"><span class="legend-color" style="background: #f97316;"></span> Kijun 26 (ศูนย์ถ่วงสมดุล)</div>
         </div>
       </section>
 
@@ -170,6 +175,52 @@
             </div>
           </div>
 
+          <!-- HOSODA 4-LAYER QUANT PIPELINE -->
+          <div class="hosoda-panel-box">
+            <div class="hosoda-header">
+              <span class="hosoda-title">👑 ทฤษฎีแท้ Goichi Hosoda (3 เสาหลัก)</span>
+              <span class="badge-tag" style="background: rgba(139, 92, 246, 0.2); color: #c084fc;">4-Layer Pipeline</span>
+            </div>
+            <div class="hosoda-steps-grid">
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L1: สภาวะสมดุล (Regime Filter)</span>
+                <span class="hosoda-step-val" id="hosodaL1Status" style="color: #34d399;">Sanyaku Kouten (ไฟเขียว)</span>
+              </div>
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L2: โครงสร้างคลื่น (Hado-ron)</span>
+                <span class="hosoda-step-val" id="hosodaL2Status" style="color: #60a5fa;">คลื่น N: A ➔ B ➔ C (ยืน Kijun)</span>
+              </div>
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L3: มิติเวลา (Jikan-ron)</span>
+                <span class="hosoda-step-val" id="hosodaL3Status" style="color: #facc15;">Henka-bi Window (เปิดรับคำสั่ง)</span>
+              </div>
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L4: ความคุ้มค่า (Nehaba R:R)</span>
+                <span class="hosoda-step-val" id="hosodaL4Status" style="color: #34d399;">Expected R:R ≥ 1.5x (คุ้มค่า)</span>
+              </div>
+            </div>
+
+            <!-- NEHABA TARGETS -->
+            <div class="nehaba-targets-row">
+              <div class="nehaba-target-item">
+                <div class="lbl">เป้าหมาย V</div>
+                <div class="val" id="targetVVal">150.50 ฿</div>
+              </div>
+              <div class="nehaba-target-item" style="border-color: rgba(16, 185, 129, 0.3);">
+                <div class="lbl">เป้าหมาย N (หลัก)</div>
+                <div class="val" id="targetNVal" style="color: #34d399;">152.00 ฿</div>
+              </div>
+              <div class="nehaba-target-item">
+                <div class="lbl">เป้าหมาย E</div>
+                <div class="val" id="targetEVal">154.50 ฿</div>
+              </div>
+              <div class="nehaba-target-item">
+                <div class="lbl">เป้าหมาย NT</div>
+                <div class="val" id="targetNtVal">148.50 ฿</div>
+              </div>
+            </div>
+          </div>
+
           <!-- AI MULTIMODAL VISION INSIGHT BOX -->
           <div class="ai-insight-box">
             <div class="ai-insight-header">
@@ -181,7 +232,7 @@
 
             <div id="aiStrategyChosenBadge" class="strategy-selected-badge" style="display: flex;">
               <span>🎯 กลยุทธ์ที่ AI เลือก:</span>
-              <span id="aiStrategyChosenText" style="color: #67e8f9; font-weight: 800;">Bullish Pullback & EMA Rejection</span>
+              <span id="aiStrategyChosenText" style="color: #67e8f9; font-weight: 800;">Hosoda 4-Layer N-Wave & Kumo Equilibrium</span>
             </div>
 
             <!-- SNAPSHOT OF CHART VIEWED BY AI -->
@@ -238,7 +289,8 @@
         <div class="form-group">
           <label>กลยุทธ์การเทรด (Strategy)</label>
           <select id="btStrategySelect" class="form-control">
-            <option value="gemini_vision_strategy" selected>🤖 กลยุทธ์ที่ Gemini Vision AI คัดสรรตามกรอบกติกา (AI Autonomous)</option>
+            <option value="hosoda_4layer" selected>👑 ทฤษฎีแท้ Goichi Hosoda 4 ชั้น (Hado + Jikan + Nehaba + Kumo)</option>
+            <option value="gemini_vision_strategy">🤖 กลยุทธ์ที่ Gemini Vision AI คัดสรรตามกรอบกติกา (AI Autonomous)</option>
             <option value="triple_combo">Triple Confirmation (EMA + RSI + Volume)</option>
             <option value="ema_cross">EMA Cross (EMA 20 ตัด EMA 50)</option>
             <option value="rsi_pullback">RSI Pullback (RSI < 42 ซื้อในเทรนด์ขาขึ้น)</option>

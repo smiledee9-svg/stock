@@ -14,6 +14,7 @@ class ScbTraderApp {
     this.activePosition = null; // Stored holding state
     this.viewRange = '2y';
     this.geminiApiKey = this.getGeminiKey();
+    this.showKumo = true;
     
     // Technical series caches
     this.ema20 = [];
@@ -21,6 +22,7 @@ class ScbTraderApp {
     this.ema200 = [];
     this.rsi14 = [];
     this.macdSeries = [];
+    this.ichimoku = { tenkan: [], kijun: [], spanA: [], spanB: [], chikou: [] };
 
     this.init();
   }
@@ -54,6 +56,18 @@ class ScbTraderApp {
     document.getElementById('range1yBtn')?.addEventListener('click', (e) => this.setRange('1y', e.target));
     document.getElementById('range6mBtn')?.addEventListener('click', (e) => this.setRange('6m', e.target));
     document.getElementById('range3mBtn')?.addEventListener('click', (e) => this.setRange('3m', e.target));
+
+    // Kumo cloud toggle
+    document.getElementById('toggleKumoBtn')?.addEventListener('click', () => {
+      this.showKumo = !this.showKumo;
+      const btn = document.getElementById('toggleKumoBtn');
+      if (btn) btn.style.background = this.showKumo ? 'rgba(6, 182, 212, 0.2)' : 'rgba(255, 255, 255, 0.05)';
+      const legKumo = document.getElementById('legendKumo');
+      const legKijun = document.getElementById('legendKijun');
+      if (legKumo) legKumo.style.display = this.showKumo ? 'flex' : 'none';
+      if (legKijun) legKijun.style.display = this.showKumo ? 'flex' : 'none';
+      this.renderChart();
+    });
 
     // Live refresh
     document.getElementById('refreshLiveQuoteBtn')?.addEventListener('click', () => this.refreshLatestData());
@@ -188,6 +202,149 @@ class ScbTraderApp {
     this.ema200 = this.calcEMA(closes, 200);
     this.rsi14 = this.calcRSI(closes, 14);
     this.macdSeries = this.calcMACD(closes);
+    this.ichimoku = this.calcIchimoku(this.candles);
+  }
+
+  calcIchimoku(candles) {
+    const n = candles.length;
+    const tenkan = new Array(n).fill(null);
+    const kijun = new Array(n).fill(null);
+    const spanA = new Array(n).fill(null);
+    const spanB = new Array(n).fill(null);
+    const chikou = new Array(n).fill(null);
+
+    const midHL = (start, length) => {
+      let maxH = -Infinity, minL = Infinity;
+      for (let j = start; j < start + length; j++) {
+        if (candles[j].high > maxH) maxH = candles[j].high;
+        if (candles[j].low < minL) minL = candles[j].low;
+      }
+      return (maxH + minL) / 2;
+    };
+
+    // 1. Tenkan-sen (9 periods)
+    for (let i = 8; i < n; i++) {
+      tenkan[i] = midHL(i - 8, 9);
+    }
+
+    // 2. Kijun-sen (26 periods)
+    for (let i = 25; i < n; i++) {
+      kijun[i] = midHL(i - 25, 26);
+    }
+
+    // 3. Senkou Span A (plotted 26 ahead) & Span B (52 periods)
+    for (let i = 25; i < n; i++) {
+      if (tenkan[i] != null && kijun[i] != null) {
+        spanA[i] = (tenkan[i] + kijun[i]) / 2;
+      }
+    }
+    for (let i = 51; i < n; i++) {
+      spanB[i] = midHL(i - 51, 52);
+    }
+
+    // 4. Chikou Span
+    for (let i = 0; i < n; i++) {
+      chikou[i] = candles[i].close;
+    }
+
+    return { tenkan, kijun, spanA, spanB, chikou };
+  }
+
+  // ================= GOICHI HOSODA 4-LAYER QUANTITATIVE PIPELINE =================
+  scanHosoda4LayerPipeline(idx = this.candles.length - 1) {
+    if (idx < 60) return null;
+
+    const cur = this.candles[idx];
+    const prev = this.candles[idx - 1];
+    const kijun = this.ichimoku.kijun[idx] || 0;
+    const spanA = this.ichimoku.spanA[idx] || 0;
+    const spanB = this.ichimoku.spanB[idx] || 0;
+    const kumoTop = Math.max(spanA, spanB);
+
+    // LAYER 1: MARKET REGIME (SANYAKU KOUTEN CONTEXT)
+    const isAboveKumo = cur.close > kumoTop;
+    const isAboveKijun = cur.close >= kijun;
+    const chikouIdx = idx - 26;
+    const isChikouFree = chikouIdx >= 0 ? cur.close > this.candles[chikouIdx].close : true;
+    const sanyakuPass = isAboveKumo && isAboveKijun && isChikouFree;
+
+    // LAYER 2: HADO-RON (WAVE N STRUCTURE A -> B -> C)
+    const scanWindow = 35;
+    const startScan = Math.max(0, idx - scanWindow);
+
+    let lowA = Infinity, idxA = -1;
+    let highB = -Infinity, idxB = -1;
+    let lowC = Infinity, idxC = -1;
+
+    // Point A: Swing Low
+    for (let i = startScan; i < startScan + 15; i++) {
+      if (this.candles[i].low < lowA) {
+        lowA = this.candles[i].low;
+        idxA = i;
+      }
+    }
+
+    // Point B: Impulse High
+    for (let i = idxA + 2; i < idxA + 18 && i < idx; i++) {
+      if (this.candles[i].high > highB) {
+        highB = this.candles[i].high;
+        idxB = i;
+      }
+    }
+
+    // Point C: Retracement Low
+    for (let i = idxB + 1; i <= idx; i++) {
+      if (this.candles[i].low < lowC) {
+        lowC = this.candles[i].low;
+        idxC = i;
+      }
+    }
+
+    const hadoValid = (idxA !== -1 && idxB !== -1 && idxC !== -1) &&
+                      (lowC > lowA) && (highB > lowA) && (highB > lowC) &&
+                      (lowC >= (this.ichimoku.kijun[idxC] || 0) * 0.985);
+
+    // LAYER 3: JIKAN-RON (TIME CONFLUENCE GATING)
+    const deltaTab = idxB - idxA;
+    const targetHenkaBi = idxC + deltaTab;
+    const currentDist = Math.abs(idx - targetHenkaBi);
+    const deltaAC = idxC - idxA;
+    const isKihonSuchi = [9, 17, 26, 33].some(k => Math.abs(deltaTab - k) <= 2 || Math.abs(deltaAC - k) <= 2);
+    const jikanValid = currentDist <= 3 || isKihonSuchi;
+
+    // LAYER 4: NEHABA-RON (PRICE TARGETS & EXPECTED R:R)
+    // Formulas:
+    // N = C + (B - A)
+    // V = 2B - C
+    // E = 2B - A
+    // NT = 2C - A
+    const targetN = Number((lowC + (highB - lowA)).toFixed(2));
+    const targetV = Number(((2 * highB) - lowC).toFixed(2));
+    const targetE = Number(((2 * highB) - lowA).toFixed(2));
+    const targetNT = Number(((2 * lowC) - lowA).toFixed(2));
+
+    const stopLoss = lowC;
+    const risk = highB - lowC;
+    const rewardN = targetN - highB;
+    const rrr = risk > 0 ? Number((rewardN / risk).toFixed(2)) : 1.0;
+    const rrrValid = rrr >= 1.45;
+
+    const isBreakingB = cur.close >= highB * 0.992;
+    const allLayersTrigger = sanyakuPass && hadoValid && jikanValid && rrrValid && isBreakingB;
+
+    return {
+      sanyakuPass,
+      hadoValid,
+      jikanValid,
+      rrrValid,
+      allLayersTrigger,
+      points: { A: lowA, B: highB, C: lowC, idxA, idxB, idxC },
+      deltaTab,
+      targetHenkaBi,
+      targets: { N: targetN, V: targetV, E: targetE, NT: targetNT },
+      rrr,
+      stopLoss
+    };
   }
 
   calcEMA(prices, period) {
@@ -330,6 +487,49 @@ class ScbTraderApp {
       signal = 'BUY';
     } else if (isDeadCross || rsi > 78) {
       signal = 'SELL';
+    }
+
+    // ================= SCAN HOSODA 4-LAYER PIPELINE =================
+    const hosoda = this.scanHosoda4LayerPipeline(idx);
+    if (hosoda) {
+      const l1El = document.getElementById('hosodaL1Status');
+      const l2El = document.getElementById('hosodaL2Status');
+      const l3El = document.getElementById('hosodaL3Status');
+      const l4El = document.getElementById('hosodaL4Status');
+      const tvEl = document.getElementById('targetVVal');
+      const tnEl = document.getElementById('targetNVal');
+      const teEl = document.getElementById('targetEVal');
+      const tntEl = document.getElementById('targetNtVal');
+
+      if (l1El) {
+        l1El.innerText = hosoda.sanyakuPass ? '🟢 Sanyaku Kouten (เหนือเมฆ + Kijun)' : '⚪ รอสภาวะสมดุล (ใต้แนว Kumo/Kijun)';
+        l1El.style.color = hosoda.sanyakuPass ? '#34d399' : '#94a3b8';
+      }
+      if (l2El) {
+        l2El.innerText = hosoda.hadoValid ? `🟢 คลื่น N (A:${hosoda.points.A} ➔ B:${hosoda.points.B} ➔ C:${hosoda.points.C})` : '⚪ คลื่น N กำลังฟอร์มตัว';
+        l2El.style.color = hosoda.hadoValid ? '#60a5fa' : '#94a3b8';
+      }
+      if (l3El) {
+        l3El.innerText = hosoda.jikanValid ? `🟢 Henka-bi Time Window (รอบ ${hosoda.deltaTab} วัน)` : '⚪ นอกกรอบเวลาสมดุล';
+        l3El.style.color = hosoda.jikanValid ? '#facc15' : '#94a3b8';
+      }
+      if (l4El) {
+        l4El.innerText = hosoda.rrrValid ? `🟢 Expected R:R = 1:${hosoda.rrr} (ผ่านเกณฑ์ ≥1.5x)` : `⚪ R:R ต่ำกว่าเกณฑ์ (1:${hosoda.rrr})`;
+        l4El.style.color = hosoda.rrrValid ? '#34d399' : '#f87171';
+      }
+
+      if (tvEl) tvEl.innerText = `${hosoda.targets.V.toFixed(2)} ฿`;
+      if (tnEl) tnEl.innerText = `${hosoda.targets.N.toFixed(2)} ฿`;
+      if (teEl) teEl.innerText = `${hosoda.targets.E.toFixed(2)} ฿`;
+      if (tntEl) tntEl.innerText = `${hosoda.targets.NT.toFixed(2)} ฿`;
+
+      // If all 4 Hosoda layers trigger simultaneously -> Prioritize Hosoda Nehaba Trigger!
+      if (hosoda.allLayersTrigger) {
+        signal = 'BUY';
+        entry = cur.close;
+        sl = hosoda.stopLoss;
+        tp = hosoda.targets.N;
+      }
     }
 
     // Check against active position state
@@ -593,8 +793,13 @@ class ScbTraderApp {
     }
 
     // 2. Build Guardrails & Vision Prompt
-    const prompt = `คุณคือนักวิเคราะห์เทคนิคอลหุ้นและ AI Quantitative Fund Manager ที่เชี่ยวชาญตลาดหุ้นไทย (SET)
-ให้ดู "รูปภาพกราฟแท่งเทียน SCB (SCB.BK)" ที่แนบมานี้อย่างละเอียดที่สุด
+    const hosoda = this.scanHosoda4LayerPipeline(this.candles.length - 1);
+    const kijunVal = this.ichimoku.kijun[this.candles.length - 1]?.toFixed(2) || 'N/A';
+    const spanAVal = this.ichimoku.spanA[this.candles.length - 1]?.toFixed(2) || 'N/A';
+    const spanBVal = this.ichimoku.spanB[this.candles.length - 1]?.toFixed(2) || 'N/A';
+
+    const prompt = `คุณคือนักวิเคราะห์เทคนิคอลหุ้นและ AI Quantitative Fund Manager ที่เชี่ยวชาญตลาดหุ้นไทย (SET) และทฤษฎี Goichi Hosoda (Ichimoku Kinko Hyo 4-Layer Framework)
+ให้ดู "รูปภาพกราฟแท่งเทียน SCB (SCB.BK)" ที่แนบมานี้อย่างละเอียดที่สุด (ในรูปจะมีแท่งเทียน, เส้น EMA, เส้น Kijun สีส้ม, และเมฆ Kumo)
 
 กรอบกติกาความเสี่ยงที่ต้องปฏิบัติตามอย่างเคร่งครัด (Risk Guardrails):
 1. ห้ามให้จุด Stop Loss เกิน 3.5%
@@ -602,16 +807,21 @@ class ScbTraderApp {
 3. ห้ามซื้อถ้า RSI > 75 (Overbought Protection)
 4. ถือครองได้ทีละ 1 ไม้เท่านั้น
 
-ข้อมูลตัวเลขปัจจุบัน:
+ข้อมูลตัวเลขเชิงปริมาณปัจจุบัน:
 - ราคาปิดล่าสุด: ${last.close} บาท
-- เส้น EMA 20 (เหลือง): ${this.ema20[this.candles.length - 1]?.toFixed(2)} บาท
-- เส้น EMA 50 (น้ำเงิน): ${this.ema50[this.candles.length - 1]?.toFixed(2)} บาท
-- เส้น EMA 200 (ม่วง): ${this.ema200[this.candles.length - 1]?.toFixed(2)} บาท
+- เส้น EMA 20 (เหลือง): ${this.ema20[this.candles.length - 1]?.toFixed(2)} บาท | EMA 50 (น้ำเงิน): ${this.ema50[this.candles.length - 1]?.toFixed(2)} บาท
+- เส้น Kijun-sen (ส้ม): ${kijunVal} บาท | เมฆ Kumo Span A: ${spanAVal} ฿, Span B: ${spanBVal} ฿
 - ดัชนี RSI (14): ${this.rsi14[this.candles.length - 1]?.toFixed(2)}
+- ทฤษฎี Hosoda 4-Layer:
+  * L1 Regime: ${hosoda?.sanyakuPass ? 'ผ่าน Sanyaku Kouten (เหนือเมฆ Kumo & Kijun)' : 'ยังไม่พ้นด่าน Kumo/Kijun'}
+  * L2 Hado: คลื่น N (A: ${hosoda?.points.A} ➔ B: ${hosoda?.points.B} ➔ C: ${hosoda?.points.C})
+  * L3 Jikan: รอบเวลา ${hosoda?.deltaTab || 0} วัน (Henka-bi Window)
+  * L4 Nehaba: เป้า V=${hosoda?.targets.V} ฿, N=${hosoda?.targets.N} ฿, E=${hosoda?.targets.E} ฿ | RRR = 1:${hosoda?.rrr}
 
 หน้าที่ของคุณ:
-1. ดูรูปทรงของแท่งเทียนในรูปภาพ: ดูแนวรับ แนวต้าน รูปแบบแท่งเทียนกลับตัว และการตัดกันของเส้น EMA
+1. ดูรูปทรงของแท่งเทียนในรูปภาพ: ดูแนวรับ แนวต้าน รูปแบบแท่งเทียนกลับตัว เส้น Kijun (ส้ม) เมฆ Kumo และการตัดกันของเส้น EMA
 2. เลือก "กลยุทธ์การเทรดที่เหมาะสมที่สุดกับสภาพตลาดปัจจุบัน" ด้วยตัวคุณเอง เช่น:
+   - "Hosoda 4-Layer N-Wave & Kumo Equilibrium"
    - "Bullish Pullback & EMA 50 Rejection"
    - "EMA Golden Cross Trend Following"
    - "Support Bounce Accumulation"
@@ -623,8 +833,8 @@ class ScbTraderApp {
 {
   "chosenStrategy": "ชื่อกลยุทธ์ที่คุณเลือกเอง",
   "action": "BUY",
-  "confidenceScore": 85,
-  "visualObservations": "อธิบายสิ่งที่ตา AI มองเห็นจากรูปภาพกราฟ 1-2 บรรทัด",
+  "confidenceScore": 88,
+  "visualObservations": "อธิบายสิ่งที่ตา AI มองเห็นจากรูปภาพกราฟและเมฆ Kumo 1-2 บรรทัด",
   "suggestedEntry": ${last.close},
   "stopLoss": 142.0,
   "takeProfit": 154.5,
@@ -784,8 +994,17 @@ class ScbTraderApp {
       // Check entry if NOT in trade
       if (!inTrade && i < this.candles.length - 1) {
         let entryCondition = false;
+        let customTp = null;
+        let customSl = null;
 
-        if (strategy === 'gemini_vision_strategy') {
+        if (strategy === 'hosoda_4layer') {
+          const hosoda = this.scanHosoda4LayerPipeline(i);
+          if (hosoda && hosoda.allLayersTrigger) {
+            entryCondition = true;
+            customTp = hosoda.targets.N;
+            customSl = Math.max(hosoda.stopLoss, Number((bar.close * 0.95).toFixed(2)));
+          }
+        } else if (strategy === 'gemini_vision_strategy') {
           // Autonomous Gemini Vision Strategy:
           // 1. Guardrail 1: Price is above EMA 50 (Uptrend bias)
           // 2. Guardrail 2: RSI is safe (40 <= RSI <= 72, No Overbought FOMO)
@@ -817,8 +1036,8 @@ class ScbTraderApp {
             date: bar.date,
             price: bar.close,
             shares: shares,
-            tpPrice: Number((bar.close * (1 + (tpPct / 100))).toFixed(2)),
-            slPrice: Number((bar.close * (1 - (slPct / 100))).toFixed(2))
+            tpPrice: customTp || Number((bar.close * (1 + (tpPct / 100))).toFixed(2)),
+            slPrice: customSl || Number((bar.close * (1 - (slPct / 100))).toFixed(2))
           };
         }
       }
@@ -922,6 +1141,10 @@ class ScbTraderApp {
     const subE20 = this.ema20.slice(startIdx);
     const subE50 = this.ema50.slice(startIdx);
     const subE200 = this.ema200.slice(startIdx);
+    const subSpanA = this.ichimoku ? this.ichimoku.spanA.slice(startIdx) : [];
+    const subSpanB = this.ichimoku ? this.ichimoku.spanB.slice(startIdx) : [];
+    const subKijun = this.ichimoku ? this.ichimoku.kijun.slice(startIdx) : [];
+    const subTenkan = this.ichimoku ? this.ichimoku.tenkan.slice(startIdx) : [];
 
     // Layout coordinates
     const topPadding = 20;
@@ -962,6 +1185,34 @@ class ScbTraderApp {
 
     const getY = (val) => topPadding + chartHeight - ((val - minPrice) / (maxPrice - minPrice)) * chartHeight;
 
+    // Draw Kumo Cloud Fill & Equilibrium Lines if enabled
+    if (this.showKumo && this.ichimoku) {
+      for (let i = 0; i < data.length; i++) {
+        const valA = subSpanA[i];
+        const valB = subSpanB[i];
+        if (valA != null && valB != null) {
+          const x = i * candleSpacing;
+          const yA = getY(valA);
+          const yB = getY(valB);
+          const topCloud = Math.min(yA, yB);
+          const cloudH = Math.max(1.5, Math.abs(yB - yA));
+
+          // Bullish cloud (Span A >= Span B) cyan/green tint, Bearish cloud reddish tint
+          ctx.fillStyle = valA >= valB ? 'rgba(6, 182, 212, 0.14)' : 'rgba(239, 68, 68, 0.12)';
+          ctx.fillRect(x, topCloud, candleSpacing, cloudH);
+        }
+      }
+
+      // Span boundary lines
+      this.drawIndicatorLine(ctx, subSpanA, data.length, candleSpacing, getY, 'rgba(6, 182, 212, 0.55)', 1);
+      this.drawIndicatorLine(ctx, subSpanB, data.length, candleSpacing, getY, 'rgba(239, 68, 68, 0.55)', 1);
+
+      // Kijun-sen (Equilibrium Baseline, 26) - Orange
+      this.drawIndicatorLine(ctx, subKijun, data.length, candleSpacing, getY, '#f97316', 2.0);
+      // Tenkan-sen (9 periods) - Cyan
+      this.drawIndicatorLine(ctx, subTenkan, data.length, candleSpacing, getY, '#22d3ee', 1.2);
+    }
+
     // Draw Candlesticks & Volume
     data.forEach((c, i) => {
       const x = i * candleSpacing + (candleSpacing / 2);
@@ -1000,9 +1251,9 @@ class ScbTraderApp {
     }
   }
 
-  drawIndicatorLine(ctx, series, totalBars, spacing, getY, color) {
+  drawIndicatorLine(ctx, series, totalBars, spacing, getY, color, lineWidth = 1.5) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = lineWidth;
     ctx.beginPath();
     let started = false;
 

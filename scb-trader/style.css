@@ -655,19 +655,86 @@ body {
   display: block;
 }
 
-.strategy-selected-badge {
-  display: inline-flex;
+/* HOSODA 4-LAYER PIPELINE DASHBOARD */
+.hosoda-panel-box {
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.4), rgba(15, 23, 42, 0.6));
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 14px;
+}
+
+.hosoda-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.hosoda-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #c084fc;
+  display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #e9d5ff;
+}
+
+.hosoda-steps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.hosoda-step-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  border-left: 3px solid #8b5cf6;
+}
+
+.hosoda-step-name {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.hosoda-step-val {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.nehaba-targets-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.nehaba-target-item {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 4px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nehaba-target-item .lbl {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.nehaba-target-item .val {
   font-size: 12px;
   font-weight: 700;
-  margin-top: 8px;
+  font-family: var(--font-mono);
+  color: #38bdf8;
 }
+
 
 
 .backtest-controls-row {
