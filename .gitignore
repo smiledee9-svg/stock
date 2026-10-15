@@ -3,4 +3,5 @@ Thumbs.db
 node_modules/
 .env
 *.local
-quant-ramanujan/
+.git_repo_backup
+quant-ramanujan/.git_repo_backup

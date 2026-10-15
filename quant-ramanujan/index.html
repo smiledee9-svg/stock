@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ramanujan Quant Lab - การวิเคราะห์คลื่นรอบวัฏจักร SCB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- TradingView Lightweight Charts (v4.1.3 local bundle) -->
+  <script src="lightweight-charts.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="quant-container">
+    <!-- Top Header -->
+    <header class="quant-header">
+      <div class="header-left">
+        <div class="logo-badge">📐 RAMANUJAN LAB</div>
+        <div>
+          <h1>SCB Ramanujan Cycle Engine</h1>
+          <p class="header-sub">โมเดลคณิตศาสตร์รามานุจัน (Ramanujan-Fourier Transform) วิเคราะห์จุดกลับตัวของคลื่นราคา SCB ย้อนหลัง 2 ปี</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="status-chip live-chip">● ผลทดสอบเสร็จสมบูรณ์</span>
+        <a href="../scb-trader/index.html" class="btn btn-outline" title="เปิดระบบวิเคราะห์หุ้น SCB Pure Ichimoku (โปรเจกต์ 2)">⛩️ ระบบหุ้น SCB</a>
+        <a href="../index.html" class="btn btn-outline" title="กลับไปหน้าร้านค้า SmartStock หลัก (โปรเจกต์ 1)">📦 หน้าสต็อกหลัก</a>
+        <a href="https://github.com/smiledee9-svg/quant-ramanujan" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="ดูซอร์สโค้ดบน GitHub">⭐ GitHub Repo</a>
+      </div>
+    </header>
+
+    <!-- Metrics Cards Grid -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">หุ้นเป้าหมาย (Symbol)</div>
+        <div class="metric-val text-brand" id="mSymbol">SCB.BK</div>
+        <div class="metric-note">ข้อมูล 484 แท่งเทียน (2 ปี)</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">รอบคลื่นเด่น (Dominant Cycle)</div>
+        <div class="metric-val text-amber" id="mCycle">~52 วัน</div>
+        <div class="metric-note">Ramanujan Peak Period (~1 ไตรมาส)</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">อัตราความแม่นยำ (Win Rate)</div>
+        <div class="metric-val text-green" id="mWinRate">52.6%</div>
+        <div class="metric-note" id="mWinTrades">10 ชนะ / 9 แพ้ (รวม 19 รอบ)</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">ผลตอบแทนรวมสะสม (Return)</div>
+        <div class="metric-val text-green" id="mReturn">+22.02%</div>
+        <div class="metric-note" id="mProfitFactor">Profit Factor: 3.12</div>
+      </div>
+    </div>
+
+    <!-- Live Active Signal Card -->
+    <div class="live-signal-banner card-box" id="liveSignalBanner">
+      <div class="signal-badge-wrap">
+        <span class="pulse-indicator"></span>
+        <span class="signal-tag tag-buy" id="sigBadge">🟢 สัญญาณปัจจุบัน: ถือครองสถานะ BUY</span>
+      </div>
+      <div class="signal-details-grid">
+        <div class="sig-col">
+          <span class="sig-label">วันที่เข้าซื้อ (Buy Date):</span>
+          <strong class="sig-val text-brand" id="sigBuyDate">2026-10-01</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">ราคาเข้าซื้อ (Entry Price):</span>
+          <strong class="sig-val" id="sigBuyPrice">฿149.00</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">ราคาตลาดล่าสุด:</span>
+          <strong class="sig-val" id="sigCurrPrice">฿145.50</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">เป้าทำกำไร (Take Profit):</span>
+          <strong class="sig-val text-green" id="sigTargetPrice">฿160.92 (+8%)</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">จุดตัดขาดทุน (Stop Loss):</span>
+          <strong class="sig-val text-red" id="sigStopPrice">฿141.55 (-5%)</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">ทิศทางคลื่นรามานุจัน:</span>
+          <strong class="sig-val text-amber" id="sigWaveStatus">กำลังหักหัวขึ้น (+58.36)</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strategy Preset & Interactive Backtest Toolbar -->
+    <div class="card-box backtest-toolbar">
+      <div class="toolbar-title-row">
+        <div class="toolbar-title">
+          <span class="toolbar-icon">⚡</span>
+          <div>
+            <h3>เครื่องมือคำนวณสัญญาณ & แบคเทสย้อนหลัง (Live Quant Simulator)</h3>
+            <p class="toolbar-desc">คลิกเลือกกลยุทธ์ หรือปรับพารามิเตอร์แล้วกดคำนวณ เพื่อทดสอบสัญญาณ BUY/SELL สดจากข้อมูลได้ทันที</p>
+          </div>
+        </div>
+        <div class="strategy-presets">
+          <button type="button" class="preset-btn active" data-preset="sniper">🎯 แนะนำ: Sniper Turnaround (+22.02%)</button>
+          <button type="button" class="preset-btn" data-preset="classic">🌊 Classic Wave (+8.71%)</button>
+          <button type="button" class="preset-btn" data-preset="defensive">🛡️ Quick Profit (+18.4%)</button>
+        </div>
+      </div>
+
+      <div class="param-controls-grid">
+        <div class="param-group">
+          <label for="inputBuyTh">โซนหุบคลื่นซื้อ (Buy Zone):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputBuyTh" value="-30" step="5" min="-80" max="-10">
+            <span>Wave</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputSellTh">โซนยอดคลื่นขาย (Sell Zone):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputSellTh" value="40" step="5" min="10" max="80">
+            <span>Wave</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputSL">จุดตัดขาดทุน (Stop Loss):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputSL" value="5" step="1" min="2" max="15">
+            <span>%</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <label for="inputTP">เป้าทำกำไร (Take Profit):</label>
+          <div class="input-with-unit">
+            <input type="number" id="inputTP" value="8" step="1" min="3" max="25">
+            <span>%</span>
+          </div>
+        </div>
+
+        <div class="param-group param-action">
+          <button type="button" id="btnRunBacktest" class="btn btn-primary btn-run">
+            ⚡ คำนวณสัญญาณ & รัน Backtest
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chart Section -->
+    <section class="chart-section card-box">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>📊 กราฟราคาแท่งเทียน SCB & คลื่นรามานุจัน (Cycle Wave)</h2>
+          <span class="chart-legend-badge legend-buy">▲ สัญญาณซื้อ (หุบคลื่น)</span>
+          <span class="chart-legend-badge legend-sell">▼ สัญญาณขาย (ยอดคลื่น)</span>
+        </div>
+        <div class="chart-controls">
+          <button type="button" class="btn-time active" data-range="all">2 ปีเต็ม</button>
+          <button type="button" class="btn-time" data-range="1y">1 ปีล่าสุด</button>
+          <button type="button" class="btn-time" data-range="6m">6 เดือนล่าสุด</button>
+        </div>
+      </div>
+
+      <!-- Main Price Candlestick Chart -->
+      <div id="priceChartContainer" class="chart-container"></div>
+
+      <!-- Ramanujan Cycle Wave Sub-Chart -->
+      <div class="sub-chart-title">
+        <span>🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])</span>
+        <span class="sub-note">โซนเขียว = หุบคลื่นเตรียมกลับตัวขึ้น | โซนแดง = ยอดคลื่นเตรียมพักฐาน</span>
+      </div>
+      <div id="waveChartContainer" class="sub-chart-container"></div>
+    </section>
+
+    <!-- Architecture & LINE Alert Section -->
+    <div class="two-col-grid">
+      <!-- LINE Alert Preview -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <h3>💬 ตัวอย่างข้อความแจ้งเตือนเข้า LINE (Automated Alert)</h3>
+        </div>
+        <div class="line-preview-box">
+          <div class="line-bubble">
+            <div class="line-bubble-header">🔔 Ramanujan Quant Signal Alert</div>
+            <div class="line-bubble-body">
+              <strong>หุ้น: SCB.BK (ราคา: ฿115.50)</strong><br>
+              🎯 <strong>สัญญาณ: BUY (คลื่นกลับตัวขึ้น)</strong><br>
+              🌊 ค่าคลื่นรามานุจัน: -48.2 (โซนหุบคลื่น Oversold)<br>
+              🔄 วัฏจักรปัจจุบัน: รอบ 52 วัน (ไตรมาส)<br>
+              ⏱️ วันที่ตรวจจับ: 2026-10-14 17:00 น. (หลังตลาดปิด)<br>
+              ---------------------------<br>
+              💡 <em>ส่งอัตโนมัติจาก Cloudflare Cron Worker</em>
+            </div>
+          </div>
+        </div>
+        <p class="help-desc">เมื่อเชื่อมต่อ Cloudflare Cron Worker ทุกวันเวลา 17:00 น. ระบบจะคำนวณสูตรนี้และยิงเข้า LINE ของคุณทันทีที่มีจุดกลับตัว</p>
+      </div>
+
+      <!-- Architecture Steps to Cloudflare D1 -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <h3>☁️ สรุปพิมพ์เขียวสถาปัตยกรรม (Cloudflare D1 + Worker)</h3>
+        </div>
+        <div class="steps-list">
+          <div class="step-item">
+            <span class="step-badge">1</span>
+            <div>
+              <strong>Cloudflare D1 Database (SQLite Edge):</strong>
+              <p>สร้างตาราง <code>scb_candles</code> เพื่อเก็บราคา Open, High, Low, Close, Volume รายวัน</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <span class="step-badge">2</span>
+            <div>
+              <strong>Cloudflare Cron Worker (ทำงานอัตโนมัติทุกวัน 17:00 น.):</strong>
+              <p>ดึงราคาปิด SCB วันล่าสุดจาก API ➡️ คำนวณสูตร Ramanujan Sums ➡️ ตรวจจับจุดกลับตัว</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <span class="step-badge">3</span>
+            <div>
+              <strong>LINE Notify / LINE Messaging API:</strong>
+              <p>หากพบจุดกลับตัว (คลื่นพุ่งขึ้นจากจุดต่ำสุด) ส่ง Alert เข้า LINE ทันทีโดยไม่ต้องเปิดคอมเฝ้าจอ</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trade History Table -->
+    <section class="card-box" style="margin-top: 24px;">
+      <div class="card-box-header">
+        <h3>📋 บันทึกประวัติการส่งสัญญาณเทรด (Backtest Trades History - 19 รอบ)</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="quant-table">
+          <thead>
+            <tr>
+              <th>รอบที่</th>
+              <th>วันที่ซื้อ (Buy Date)</th>
+              <th>ราคาซื้อ</th>
+              <th>วันที่ขาย (Sell Date)</th>
+              <th>ราคาขาย</th>
+              <th>ถือครอง (วัน)</th>
+              <th>กำไร/ขาดทุน (%)</th>
+              <th>ผลลัพธ์</th>
+            </tr>
+          </thead>
+          <tbody id="tradesTableBody">
+            <!-- Populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="quant-footer">
+      <p>Ramanujan Quant Lab Experiment &bull; แยกโฟลเดอร์ทำงานอิสระอย่างชัดเจน ไม่กระทบโปรเจกต์สต็อกเดิม &bull; ลบโฟลเดอร์นี้ออกได้ทุกเมื่อเมื่อทดลองเสร็จ</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
