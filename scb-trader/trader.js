@@ -119,6 +119,16 @@ class ScbTraderApp {
 
   // ================= 1. DATA LOADING =================
   async loadHistoricalData() {
+    if (window.SCB_HISTORICAL_DATA) {
+      try {
+        this.parseYahooFinanceJson(window.SCB_HISTORICAL_DATA);
+        this.showToast(`✅ โหลดข้อมูลหุ้น SCB ย้อนหลัง 2 ปีสำเร็จ (${this.candles.length} วันทำการ)`, 'success');
+        return;
+      } catch (e) {
+        console.warn('Error parsing window.SCB_HISTORICAL_DATA:', e);
+      }
+    }
+
     try {
       const res = await fetch('data/scb_2y.json');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -7,17 +7,22 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  let data;
-  try {
-    const res = await fetch('rebalance_results.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}: Cannot load rebalance_results.json`);
-    data = await res.json();
-  } catch (err) {
-    console.error('Error loading data:', err);
+  let data = window.REBALANCE_RESULTS;
+  if (!data) {
+    try {
+      const res = await fetch('rebalance_results.json');
+      if (res.ok) data = await res.json();
+    } catch (err) {
+      console.warn('Fetch rebalance_results.json failed, checking window global:', err);
+    }
+  }
+
+  if (!data) {
+    console.error('No rebalance data available.');
     document.getElementById('priceChartContainer').innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#ef4444;font-family:inherit;">
-        <div style="font-size:18px;margin-bottom:8px;">⚠️ ไม่พบไฟล์ rebalance_results.json</div>
-        <div style="font-size:13px;color:#9ca3af;">กรุณารันคำสั่ง: python quant-rebalance/rebalance_engine.py</div>
+        <div style="font-size:18px;margin-bottom:8px;">⚠️ ไม่พบไฟล์ rebalance_results.json หรือ rebalance_data.js</div>
+        <div style="font-size:13px;color:#9ca3af;">กรุณาเปิดผ่าน Web Server หรือตรวจสอบว่ามีไฟล์ rebalance_data.js</div>
       </div>
     `;
     return;
