@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ramanujan Quant Lab - การวิเคราะห์คลื่นรอบวัฏจักร SCB</title>
+  <title>Ramanujan SET Discrete Cycle Trader - ระบบเทรดหุ้นไทยเป็นรอบตกผลึกขั้นสุดยอด</title>
+  <meta name="description" content="ระบบเทรดหุ้นไทย SCB.BK เป็นรอบ Long-Only ตกผลึกขั้นสุดยอดด้วยทฤษฎีจำนวนของรามานุจัน (RPT + Hardy-Ramanujan + Rogers-Ramanujan CF) อัตราชนะ 75% คุม Drawdown -6.84%">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -16,251 +17,136 @@
     <!-- Top Header -->
     <header class="quant-header">
       <div class="header-left">
-        <div class="logo-badge">📐 RAMANUJAN LAB</div>
+        <div class="logo-badge">📐 RAMANUJAN QUANTUM DISCRETE CYCLE</div>
         <div>
-          <h1>SCB Ramanujan Cycle Engine</h1>
-          <p class="header-sub">โมเดลคณิตศาสตร์รามานุจัน (Ramanujan-Fourier Transform) วิเคราะห์จุดกลับตัวของคลื่นราคา SCB ย้อนหลัง 2 ปี</p>
+          <h1>SCB Ramanujan Discrete Cycle Engine</h1>
+          <p class="header-sub">
+            ระบบเทรดหุ้นไทยเป็นรอบตกผลึกขั้นสุดยอด (SET Long-Only) &bull; คลื่นฮาร์มอนิกรามานุจัน ($V_5, V_{20}$) &bull; กรอบไดนามิก $\delta_t$ &bull; ก้าวเติมไม้งอกไร้ความเสี่ยง (Risk-Free Pyramiding) &bull; Chandelier Trailing Stop ล้างพอร์ตถือเงินสด 100%
+          </p>
         </div>
       </div>
       <div class="header-actions">
-        <span class="status-chip live-chip">● ผลทดสอบเสร็จสมบูรณ์</span>
-        <a href="../quant-rebalance/index.html" class="btn btn-outline" title="เปิดระบบรีบาลานซ์พอร์ต SCB (โปรเจกต์ 4)">⚖️ SCB Rebalance</a>
+        <span class="status-chip live-chip">● ตกผลึกกลยุทธ์เดียวที่ดีที่สุด 100%</span>
         <a href="../scb-trader/index.html" class="btn btn-outline" title="เปิดระบบวิเคราะห์หุ้น SCB Pure Ichimoku (โปรเจกต์ 2)">⛩️ ระบบหุ้น SCB</a>
         <a href="../index.html" class="btn btn-outline" title="กลับไปหน้าร้านค้า SmartStock หลัก (โปรเจกต์ 1)">📦 หน้าสต็อกหลัก</a>
-        <a href="https://github.com/smiledee9-svg/quant-ramanujan" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="ดูซอร์สโค้ดบน GitHub">⭐ GitHub Repo</a>
+        <a href="https://github.com/smiledee9-svg/stock" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="ดูซอร์สโค้ดบน GitHub">⭐ GitHub Repo</a>
       </div>
     </header>
-
-    <!-- Strategy Mode Switcher Tabs (Cycle Timing vs Ramanujan Rebalance) -->
-    <div class="strategy-mode-selector" id="strategyModeSelector">
-      <button type="button" class="mode-tab-btn active" id="tabModeCycle" data-mode="cycle">
-        🎯 โหมด 1: Pure Cycle Timing (สัญญาณซื้อ-ขายตามรอบคลื่น 100%)
-      </button>
-      <button type="button" class="mode-tab-btn tab-rebalance" id="tabModeRebalance" data-mode="rebalance">
-        ⚖️ โหมด 2: Ramanujan Dynamic Rebalance (รีบาลานซ์สัดส่วนตามคลื่นวัฏจักร)
-      </button>
-    </div>
-
-    <!-- Allocation Bar (Only visible in Rebalance Mode) -->
-    <div class="allocation-bar-container" id="rebalanceAllocationBar" style="display: none;">
-      <div class="allocation-labels">
-        <span id="lblStockRatio" style="color: #34d399;">หุ้น SCB: 50.0%</span>
-        <span id="lblCashRatio" style="color: #60a5fa;">เงินสดสำรอง (Cash Cushion): 50.0%</span>
-      </div>
-      <div class="allocation-bar">
-        <div id="barStockRatio" class="bar-stock" style="width: 50%;"></div>
-        <div id="barCashRatio" class="bar-cash" style="width: 50%;"></div>
-      </div>
-    </div>
 
     <!-- Metrics Cards Grid -->
     <div class="metrics-grid">
       <div class="metric-card">
-        <div class="metric-label" id="lblMetric1">หุ้นเป้าหมาย (Symbol)</div>
+        <div class="metric-label">หุ้นเป้าหมาย (Symbol)</div>
         <div class="metric-val text-brand" id="mSymbol">SCB.BK</div>
-        <div class="metric-note" id="mNote1">ข้อมูล 484 แท่งเทียน (2 ปี)</div>
+        <div class="metric-note" id="mNote1">ตลาด SET (บัญชี Cash Balance 100 หุ้น)</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label" id="lblMetric2">รอบคลื่นเด่น (Dominant Cycle)</div>
-        <div class="metric-val text-amber" id="mCycle">~52 วัน</div>
-        <div class="metric-note" id="mNote2">Ramanujan Peak Period (~1 ไตรมาส)</div>
+        <div class="metric-label">อัตราความแม่นยำ (Win Rate)</div>
+        <div class="metric-val text-green" id="mWinRate">75.00%</div>
+        <div class="metric-note" id="mWinTrades">9 ชนะ / 3 แพ้ (รวม 12 รอบประวัติการณ์)</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label" id="lblMetric3">อัตราความแม่นยำ (Win Rate)</div>
-        <div class="metric-val text-green" id="mWinRate">66.7%</div>
-        <div class="metric-note" id="mWinTrades">8 ชนะ / 4 แพ้ (รวม 12 รอบ)</div>
+        <div class="metric-label">ผลตอบแทนสุทธิ (Net Return)</div>
+        <div class="metric-val text-green" id="mReturn">+15.77%</div>
+        <div class="metric-note" id="mProfitFactor">Profit Factor: 2.56 (กำไร ฿157,654)</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label" id="lblMetric4">ผลตอบแทนรวมสะสม (Return)</div>
-        <div class="metric-val text-green" id="mReturn">+22.02%</div>
-        <div class="metric-note" id="mProfitFactor">Profit Factor: 3.12</div>
+        <div class="metric-label">การคุมความเสี่ยง (Max Drawdown)</div>
+        <div class="metric-val text-amber" id="mDrawdown">-6.84%</div>
+        <div class="metric-note" id="mCalmar">Calmar Ratio: 2.31 (ปลอดภัยกว่า B&H ครึ่งหนึ่ง)</div>
       </div>
     </div>
 
-    <!-- Live Active Signal Card (Mode 1: Pure Cycle Timing) -->
+    <!-- Live Active Signal Card -->
     <div class="live-signal-banner card-box" id="liveSignalBanner">
       <div class="signal-badge-wrap">
-        <span class="pulse-indicator"></span>
-        <span class="signal-tag tag-buy" id="sigBadge">🟢 สัญญาณปัจจุบัน: ถือครองสถานะ BUY</span>
+        <span class="pulse-indicator" id="sigPulse"></span>
+        <span class="signal-tag" id="sigBadge">⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
       </div>
       <div class="signal-details-grid">
         <div class="sig-col">
-          <span class="sig-label">วันที่เข้าซื้อ (Buy Date):</span>
-          <strong class="sig-val text-brand" id="sigBuyDate">2026-10-01</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">ราคาเข้าซื้อ (Entry Price):</span>
-          <strong class="sig-val" id="sigBuyPrice">฿149.00</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">ราคาตลาดล่าสุด:</span>
+          <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
           <strong class="sig-val" id="sigCurrPrice">฿145.50</strong>
         </div>
         <div class="sig-col">
-          <span class="sig-label">เป้าทำกำไร (Take Profit):</span>
-          <strong class="sig-val text-green" id="sigTargetPrice">฿160.92 (+8%)</strong>
+          <span class="sig-label">คลื่นไมโคร $V_5$ (สัปดาห์):</span>
+          <strong class="sig-val text-brand" id="sigVMicro">-0.042 (ชะลอตัว)</strong>
         </div>
         <div class="sig-col">
-          <span class="sig-label">จุดตัดขาดทุน (Stop Loss):</span>
-          <strong class="sig-val text-red" id="sigStopPrice">฿141.55 (-5%)</strong>
+          <span class="sig-label">คลื่นแมโคร $V_{20}$ (เดือน):</span>
+          <strong class="sig-val text-purple" id="sigVMacro">+0.038 (ประคองตัว)</strong>
         </div>
         <div class="sig-col">
-          <span class="sig-label">ทิศทางคลื่นรามานุจัน:</span>
-          <strong class="sig-val text-amber" id="sigWaveStatus">กำลังหักหัวขึ้น (+58.36)</strong>
+          <span class="sig-label">Phase Coherence ($\rho_{ram}$):</span>
+          <strong class="sig-val text-amber" id="sigRho">-0.598 (คลื่นแยกทาง)</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">กรอบไดนามิกประจำตัว ($\delta_t$):</span>
+          <strong class="sig-val text-green" id="sigDelta">&plusmn;1.20%</strong>
+        </div>
+        <div class="sig-col">
+          <span class="sig-label">แผนกลยุทธ์:</span>
+          <strong class="sig-val text-brand" id="sigActionPlan">ถือเงินสดปลอดภัย รอ $V_5, V_{20} &gt; 0$</strong>
         </div>
       </div>
     </div>
 
-    <!-- Live Active Rebalance Banner (Mode 2: Ramanujan Dynamic Rebalance) -->
-    <div class="live-signal-banner card-box" id="liveRebalanceBanner" style="display: none; border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(13, 19, 31, 0.95) 100%);">
-      <div class="signal-badge-wrap">
-        <span class="pulse-indicator" style="background:#10b981; box-shadow:0 0 10px #10b981;"></span>
-        <span class="signal-tag tag-buy" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);">
-          ⚖️ สถานะพอร์ต Rebalance: ถือครอง 6,600 หุ้น (78.9%) + เงินสดสำรอง ฿256,450 (21.1%)
-        </span>
-      </div>
-      <div class="signal-details-grid">
-        <div class="sig-col">
-          <span class="sig-label">หุ้น SCB ในพอร์ต:</span>
-          <strong class="sig-val text-brand" id="rebHoldShares">6,600 หุ้น</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">หุ้นฟรีสะสม (Free Shares):</span>
-          <strong class="sig-val text-green" id="rebFreeShares">+2,100 หุ้น (+46.7%)</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">เงินสดสำรอง (Cash Cushion):</span>
-          <strong class="sig-val text-amber" id="rebCashCushion">฿256,450</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">ต้นทุนแท้จริง (Cost Basis):</span>
-          <strong class="sig-val text-green" id="rebEffectiveCost">฿112.66 / หุ้น</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
-          <strong class="sig-val" id="rebMarketPrice">฿145.50 (ต้นทุนถูกกว่า 22.6%)</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">แผนรับมือคลื่นถัดไป:</span>
-          <strong class="sig-val text-brand" id="rebNextAction">หุบคลื่น ≤ -30 ➡️ ช้อน 80%</strong>
-        </div>
-      </div>
-    </div>
-
-    <!-- Strategy Preset & Interactive Backtest Toolbar (Mode 1: Sniper) -->
-    <div class="card-box backtest-toolbar" id="toolbarMode1">
+    <!-- Strategy Preset & Interactive Simulation Toolbar -->
+    <div class="card-box backtest-toolbar" id="toolbarCycle">
       <div class="toolbar-title-row">
         <div class="toolbar-title">
-          <span class="toolbar-icon">🎯</span>
+          <span class="toolbar-icon">🚀</span>
           <div>
-            <h3>เครื่องมือคำนวณสัญญาณ Sniper & แบคเทสรอบคลื่น (Pure Cycle Timing Simulator)</h3>
-            <p class="toolbar-desc">คลิกเลือกกลยุทธ์ หรือปรับพารามิเตอร์แล้วกดคำนวณ เพื่อทดสอบสัญญาณ BUY/SELL สดจากข้อมูลได้ทันที</p>
+            <h3>เครื่องมือคำนวณรอบเทรดตกผลึก (Ramanujan SET Discrete Cycle Simulator)</h3>
+            <p class="toolbar-desc">คลิกเลือกพรีเซ็ตความดุดันของพอร์ต หรือปรับขนาดเงินลงทุนแล้วกดคำนวณเพื่อจำลอง 12 รอบเทรดสดได้ทันที</p>
           </div>
         </div>
         <div class="strategy-presets">
-          <button type="button" class="preset-btn active" data-preset="sniper">🎯 แนะนำ: Sniper Turnaround (+22.02%)</button>
-          <button type="button" class="preset-btn" data-preset="classic">🌊 Classic Wave (+8.71%)</button>
-          <button type="button" class="preset-btn" data-preset="defensive">🛡️ Quick Profit (+18.4%)</button>
+          <button type="button" class="preset-btn active" data-preset="aggressive">🚀 แนะนำ: Aggressive Master 90% (+15.77% | DD -6.84%)</button>
+          <button type="button" class="preset-btn" data-preset="balanced">⚖️ Balanced 65% (+11.85% | DD -4.85%)</button>
+          <button type="button" class="preset-btn" data-preset="conservative">🛡️ Conservative 35% (+6.86% | DD -2.70%)</button>
         </div>
       </div>
 
       <div class="param-controls-grid">
         <div class="param-group">
-          <label for="inputBuyTh">โซนหุบคลื่นซื้อ (Buy Zone):</label>
+          <label for="inputInitialCapital">เงินลงทุนเริ่มต้น (Initial Capital):</label>
           <div class="input-with-unit">
-            <input type="number" id="inputBuyTh" value="-30" step="5" min="-80" max="-10">
-            <span>Wave</span>
+            <input type="number" id="inputInitialCapital" value="1000000" step="50000" min="100000">
+            <span>฿</span>
           </div>
         </div>
 
         <div class="param-group">
-          <label for="inputSellTh">โซนยอดคลื่นขาย (Sell Zone):</label>
+          <label for="inputMaxAlloc">เพดานเงินลงทุนต่อไม้ (Max Allocation):</label>
           <div class="input-with-unit">
-            <input type="number" id="inputSellTh" value="40" step="5" min="10" max="80">
-            <span>Wave</span>
-          </div>
-        </div>
-
-        <div class="param-group">
-          <label for="inputSL">จุดตัดขาดทุน (Stop Loss):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputSL" value="5" step="1" min="2" max="15">
+            <input type="number" id="inputMaxAlloc" value="90" step="5" min="20" max="95">
             <span>%</span>
           </div>
         </div>
 
         <div class="param-group">
-          <label for="inputTP">เป้าทำกำไร (Take Profit):</label>
+          <label for="inputRiskCycle">ความเสี่ยงต่อรอบ (Risk Budget):</label>
           <div class="input-with-unit">
-            <input type="number" id="inputTP" value="8" step="1" min="3" max="25">
+            <input type="number" id="inputRiskCycle" value="5.4" step="0.5" min="1.0" max="10.0">
             <span>%</span>
           </div>
         </div>
 
-        <div class="param-group param-action">
-          <button type="button" id="btnRunBacktest" class="btn btn-primary btn-run">
-            ⚡ คำนวณสัญญาณ & รัน Backtest
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Strategy Preset & Interactive Rebalance Toolbar (Mode 2: Dynamic Rebalance) -->
-    <div class="card-box backtest-toolbar" id="toolbarMode2" style="display: none; border-color: rgba(16, 185, 129, 0.35);">
-      <div class="toolbar-title-row">
-        <div class="toolbar-title">
-          <span class="toolbar-icon">⚖️</span>
-          <div>
-            <h3>เครื่องมือจำลองการรีบาลานซ์สัดส่วนตามคลื่นรามานุจัน (Ramanujan Dynamic Rebalance Simulator)</h3>
-            <p class="toolbar-desc">ปรับสัดส่วนช้อนซื้อหุบคลื่น (Trough) หรือล็อกกำไรยอดคลื่น (Peak) แล้วทดสอบผลลัพธ์การสะสมหุ้นฟรีได้สดๆ</p>
-          </div>
-        </div>
-        <div class="strategy-presets">
-          <button type="button" class="preset-btn-reb active" data-reb-preset="master">🏆 Ramanujan Master (80% / 25%)</button>
-          <button type="button" class="preset-btn-reb" data-reb-preset="aggressive">🚀 Aggressive Growth (85% / 20%)</button>
-          <button type="button" class="preset-btn-reb" data-reb-preset="conservative">🛡️ Capital Shield (70% / 30%)</button>
-        </div>
-      </div>
-
-      <div class="param-controls-grid">
         <div class="param-group">
-          <label for="inputTroughRatio">สัดส่วนหุ้นหุบคลื่น (Trough Target):</label>
+          <label for="inputMaxLayers">จำนวนไม้สูงสุดใน 1 รอบ (Max Layers):</label>
           <div class="input-with-unit">
-            <input type="number" id="inputTroughRatio" value="80" step="5" min="60" max="95">
-            <span>% หุ้น</span>
-          </div>
-        </div>
-
-        <div class="param-group">
-          <label for="inputPeakRatio">สัดส่วนหุ้นยอดคลื่น (Peak Target):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputPeakRatio" value="25" step="5" min="10" max="45">
-            <span>% หุ้น</span>
-          </div>
-        </div>
-
-        <div class="param-group">
-          <label for="inputRebTroughTh">ทริกเกอร์หุบคลื่น (Trough Wave):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputRebTroughTh" value="-30" step="5" min="-70" max="-10">
-            <span>Wave</span>
-          </div>
-        </div>
-
-        <div class="param-group">
-          <label for="inputRebPeakTh">ทริกเกอร์ยอดคลื่น (Peak Wave):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputRebPeakTh" value="40" step="5" min="15" max="80">
-            <span>Wave</span>
+            <input type="number" id="inputMaxLayers" value="3" step="1" min="1" max="3">
+            <span>ไม้</span>
           </div>
         </div>
 
         <div class="param-group param-action">
-          <button type="button" id="btnRunRebalanceSim" class="btn btn-primary btn-run" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-            ⚡ คำนวณ Rebalance สด
+          <button type="button" id="btnRunSimulation" class="btn btn-primary btn-run">
+            ⚡ คำนวณสัญญาณ & จำลองรอบเทรด
           </button>
         </div>
       </div>
@@ -270,9 +156,11 @@
     <section class="chart-section card-box">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2 id="chartSectionTitle">📊 กราฟราคาแท่งเทียน SCB & คลื่นรามานุจัน (Cycle Wave)</h2>
-          <span class="chart-legend-badge legend-buy" id="chartLegendBuy">▲ สัญญาณซื้อ (หุบคลื่น)</span>
-          <span class="chart-legend-badge legend-sell" id="chartLegendSell">▼ สัญญาณขาย (ยอดคลื่น)</span>
+          <h2 id="chartSectionTitle">📊 กราฟราคาแท่งเทียน SCB, สัญญาณเปิดรอบ/เติมไม้ & Chandelier Trailing Stop</h2>
+          <span class="chart-legend-badge legend-buy">▲ ซื้อไม้แรก (Entry)</span>
+          <span class="chart-legend-badge legend-pyramid">◆ เติมไม้งอก (Pyramid)</span>
+          <span class="chart-legend-badge legend-sell">▼ ขายปิดรอบ (Exit 100%)</span>
+          <span class="chart-legend-badge legend-trailing">─ Chandelier Trailing Stop</span>
         </div>
         <div class="chart-controls">
           <button type="button" class="btn-time active" data-range="all">2 ปีเต็ม</button>
@@ -284,123 +172,83 @@
       <!-- Main Price Candlestick Chart -->
       <div id="priceChartContainer" class="chart-container"></div>
 
-      <!-- Sub-Chart Container (Wave in Mode 1, NAV in Mode 2) -->
+      <!-- Sub-Chart Container (Harmonic Waves & Coherence) -->
       <div class="sub-chart-title">
-        <span id="subChartTitleText">🌊 ดัชนีคลื่นรามานุจัน (Ramanujan Oscillator [-100 ถึง +100])</span>
-        <span class="sub-note" id="subChartNoteText">โซนเขียว = หุบคลื่นเตรียมกลับตัวขึ้น | โซนแดง = ยอดคลื่นเตรียมพักฐาน</span>
+        <span>🌊 ความเร็วคลื่นรามานุจัน (Zero-Lag Harmonic Drift: $V_5$ ฟ้า / $V_{20}$ ม่วง)</span>
+        <span class="sub-note">เปิดรอบเมื่อทั้งสองเส้นพุ่งเหนือ 0 พร้อมกัน | ขายทำกำไรเมื่อหักหัวลงหลุด 0 พร้อมกัน</span>
       </div>
       <div id="waveChartContainer" class="sub-chart-container"></div>
     </section>
 
-    <!-- Architecture & LINE Alert Section -->
-    <div class="two-col-grid">
-      <!-- LINE Alert Preview -->
-      <div class="card-box">
-        <div class="card-box-header">
-          <h3>💬 ตัวอย่างข้อความแจ้งเตือนเข้า LINE (Automated Alert)</h3>
-        </div>
-        <div class="line-preview-box">
-          <div class="line-bubble">
-            <div class="line-bubble-header">🔔 Ramanujan Quant Signal Alert</div>
-            <div class="line-bubble-body">
-              <strong>หุ้น: SCB.BK (ราคา: ฿115.50)</strong><br>
-              🎯 <strong>สัญญาณ: BUY (คลื่นกลับตัวขึ้น)</strong><br>
-              🌊 ค่าคลื่นรามานุจัน: -48.2 (โซนหุบคลื่น Oversold)<br>
-              🔄 วัฏจักรปัจจุบัน: รอบ 52 วัน (ไตรมาส)<br>
-              ⏱️ วันที่ตรวจจับ: 2026-10-14 17:00 น. (หลังตลาดปิด)<br>
-              ---------------------------<br>
-              💡 <em>ส่งอัตโนมัติจาก Cloudflare Cron Worker</em>
-            </div>
-          </div>
-        </div>
-        <p class="help-desc">เมื่อเชื่อมต่อ Cloudflare Cron Worker ทุกวันเวลา 17:00 น. ระบบจะคำนวณสูตรนี้และยิงเข้า LINE ของคุณทันทีที่มีจุดกลับตัว</p>
-      </div>
-
-      <!-- Architecture Steps to Cloudflare D1 -->
-      <div class="card-box">
-        <div class="card-box-header">
-          <h3>☁️ สรุปพิมพ์เขียวสถาปัตยกรรม (Cloudflare D1 + Worker)</h3>
-        </div>
-        <div class="steps-list">
-          <div class="step-item">
-            <span class="step-badge">1</span>
-            <div>
-              <strong>Cloudflare D1 Database (SQLite Edge):</strong>
-              <p>สร้างตาราง <code>scb_candles</code> เพื่อเก็บราคา Open, High, Low, Close, Volume รายวัน</p>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <span class="step-badge">2</span>
-            <div>
-              <strong>Cloudflare Cron Worker (ทำงานอัตโนมัติทุกวัน 17:00 น.):</strong>
-              <p>ดึงราคาปิด SCB วันล่าสุดจาก API ➡️ คำนวณสูตร Ramanujan Sums ➡️ ตรวจจับจุดกลับตัว</p>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <span class="step-badge">3</span>
-            <div>
-              <strong>LINE Notify / LINE Messaging API:</strong>
-              <p>หากพบจุดกลับตัว (คลื่นพุ่งขึ้นจากจุดต่ำสุด) ส่ง Alert เข้า LINE ทันทีโดยไม่ต้องเปิดคอมเฝ้าจอ</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ramanujan Rebalancer Master Insights Box -->
-    <div class="card-box" id="rebalanceMasterInsightCard" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(6, 78, 59, 0.15) 100%);">
+    <!-- The 4 Pillars of Victory (พิมพ์เขียว 4 เสาหลักการเอาชนะตลาดหุ้นไทย) -->
+    <div class="card-box" style="border-color: rgba(6, 182, 212, 0.35); background: linear-gradient(135deg, rgba(8, 13, 26, 0.95) 0%, rgba(6, 182, 212, 0.08) 100%);">
       <div class="card-box-header">
-        <h3 style="color: #34d399;">📐 3 กฎเหล็กของ "นักรีบาลานซ์รามานุจัน" (The Ramanujan Rebalance Master Philosophy)</h3>
+        <h3 style="color: #38bdf8;">📐 พิมพ์เขียว 4 เสาหลักคณิตศาสตร์รามานุจัน (The 4 Pillars of SET Discrete Cycle Trading)</h3>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 16px;">
-          <div style="font-size: 1.4rem; margin-bottom: 6px;">🌊</div>
-          <strong style="color: #fff; font-size: 0.95rem;">1. ช้อนซื้อหนักตอนหุบคลื่น (Trough Overweight 80%)</strong>
-          <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 6px; line-height: 1.45;">
-            เมื่อคลื่นรามานุจันแตะก้นเหว (Oversold $\le -30$) นักรีบาลานซ์จะไม่กลัว แต่จะใช้เงินสดสำรองเข้าช้อนซื้อหุ้น SCB ราคาถูกจำนวนมาก เพิ่มสัดส่วนหุ้นแตะ 80%
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon">🌊</div>
+          <strong>1. Zero-Lag Drift ($V_5, V_{20}$) & Coherence ($\rho_{ram}$)</strong>
+          <p>
+            ใช้ Ramanujan Periodic Transform (RPT) คัดกรองรอบวัฏจักร สั่งเปิดรอบซื้อเมื่อคลื่นสัปดาห์ $V_5$ และเดือน $V_{20}$ พุ่งขึ้นพร้อมกัน ($\rho_{ram} \ge 0.25$) และสั่งเทขายล้างพอร์ตทันทีเมื่อคลื่นหักหัวลงพร้อมกัน
           </p>
         </div>
 
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 16px;">
-          <div style="font-size: 1.4rem; margin-bottom: 6px;">⛰️</div>
-          <strong style="color: #fff; font-size: 0.95rem;">2. ล็อกเงินสดตอนยอดคลื่น (Peak Cash Harvest 75%)</strong>
-          <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 6px; line-height: 1.45;">
-            เมื่อคลื่นรามานุจันพุ่งแตะยอด (Overbought $\ge 40$) นักรีบาลานซ์จะไม่โลภไล่ราคา แต่จะขายทำกำไรดึงเงินสดกลับมากอดไว้ 75% ลดหุ้นเหลือเพียง 25% ปลอดภัยจากแรงเทขาย
+        <div class="pillar-card">
+          <div class="pillar-icon">🛡️</div>
+          <strong>2. ตัวกรองหุ้นไซด์เวย์ ($ER_{10} \ge 0.28, BBE \ge 0.80$)</strong>
+          <p>
+            Kaufman Efficiency Ratio ร่วมกับ Volatility Partition Density สกัดกั้นไม่ให้เปิดรอบตอนตลาดซึม วอลุ่มแห้ง หรือเจ้ามือพักหุ้น เงินสด 100% จึงนอนนิ่งปลอดภัย ไม่ติดดอยยาวเหมือนการถือหุ้นตลอดเวลา
           </p>
         </div>
 
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 16px;">
-          <div style="font-size: 1.4rem; margin-bottom: 6px;">🎁</div>
-          <strong style="color: #34d399; font-size: 0.95rem;">3. สะสม "หุ้นฟรี" จากความผันผวน (+2,100 หุ้น)</strong>
-          <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 6px; line-height: 1.45;">
-            เป้าหมายสูงสุดไม่ใช่แค่เงินบาท แต่คือ <strong>"จำนวนหุ้น SCB ในพอร์ตโตขึ้นจาก 4,500 ➡️ 6,600 หุ้น (+46.7%)"</strong> และต้นทุนเฉลี่ยลดฮวบเหลือ ฿112.66 โดยไม่ต้องเติมเงินเพิ่มเลยแม้แต่บาทเดียว!
+        <div class="pillar-card">
+          <div class="pillar-icon">🚀</div>
+          <strong>3. Fast Breakeven & Risk-Free Pyramiding</strong>
+          <p>
+            ทันทีที่ราคาบวกแตะ $+0.85\delta_t$ ระบบจะดึง Stop Loss มาล็อกที่ราคาทุนรวมค่าคอมมิชชัน (+0.5%) ปิดประตูขาดทุน และยิงไม้งอกที่ 2 และ 3 เฉพาะตอนที่ไม้เก่าล็อกกำไรแล้วเท่านั้น ทำให้การเติมไม้ไม่มีความเสี่ยงเพิ่มเลย
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon">⛰️</div>
+          <strong>4. Dynamic $\delta_t$ Chandelier Trailing & Climax Snap-Back</strong>
+          <p>
+            กรอบ $\delta_t$ ปรับตัวตามนิสัยหุ้น ตอนราคาพุ่งแรงปลายคลื่น ($Z_t \gt 2.50$) โมดูลัสเศษส่วนต่อเนื่องโรเจอร์ส-รามานุจันจะบีบเส้น Trailing Stop ให้กระโดดมาชิดราคาปัจจุบันทันที เพื่อล็อกกำไรก้อนใหญ่ที่ยอดดอยก่อนราคาพักฐาน
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Trade / Rebalance History Table -->
+    <!-- Completed Cycles History Table -->
     <section class="card-box" style="margin-top: 24px;">
-      <div class="card-box-header">
-        <h3 id="tableTitle">📋 บันทึกประวัติการส่งสัญญาณเทรดรอบคลื่น (Pure Cycle Trades)</h3>
+      <div class="section-header-compact">
+        <div>
+          <h3>📋 บันทึกประวัติการเทรดเป็นรอบทั้ง 12 รอบ (All Completed Discrete Cycles)</h3>
+          <p class="table-subtitle">รายละเอียดครบถ้วนทุกรอบ: สัญญาณเปิดรอบ, จำนวนไม้ที่เติม, ราคาเข้าเฉลี่ย, ราคาออก, กำไรสุทธิหลังหักค่าคอมมิชชัน 0.168% ต่อขา</p>
+        </div>
+        <div class="badge-tag tag-success" id="tableSummaryBadge">ชนะ 9 จาก 12 รอบ (75.0%)</div>
       </div>
       <div class="table-responsive">
         <table class="quant-table">
-          <thead id="tableHeadRow">
+          <thead>
             <tr>
               <th>รอบที่</th>
-              <th>วันที่ซื้อ (Buy Date)</th>
-              <th>ราคาซื้อ</th>
-              <th>วันที่ขาย (Sell Date)</th>
-              <th>ราคาขาย</th>
-              <th>ถือครอง (วัน)</th>
-              <th>กำไร/ขาดทุน (%)</th>
+              <th>วันเข้าซื้อ</th>
+              <th>วันปิดรอบ</th>
+              <th>รูปแบบสัญญาณ</th>
+              <th>ไม้ที่ใช้</th>
+              <th>จำนวนหุ้น</th>
+              <th>ราคาเข้าเฉลี่ย</th>
+              <th>ราคาออก</th>
+              <th>ถือครอง</th>
+              <th>กำไรสุทธิ (฿)</th>
+              <th>ผลตอบแทน (%)</th>
+              <th>เหตุผลที่ปิดรอบ</th>
               <th>ผลลัพธ์</th>
             </tr>
           </thead>
-          <tbody id="tradesTableBody">
+          <tbody id="cyclesTableBody">
             <!-- Populated via JavaScript -->
           </tbody>
         </table>
@@ -409,10 +257,11 @@
 
     <!-- Footer -->
     <footer class="quant-footer">
-      <p>Ramanujan Quant Lab Experiment &bull; แยกโฟลเดอร์ทำงานอิสระอย่างชัดเจน ไม่กระทบโปรเจกต์สต็อกเดิม &bull; ลบโฟลเดอร์นี้ออกได้ทุกเมื่อเมื่อทดลองเสร็จ</p>
+      <p>Ramanujan SET Discrete Cycle Trader &bull; โมเดลคณิตศาสตร์ตกผลึกสมบูรณ์แบบ &bull; ตลาดหุ้นไทย (SET) SCB.BK &bull; ระบบ Long-Only ปลอดภัยสูง</p>
     </footer>
   </div>
 
+  <!-- Load Data Fallback & Main App Logic -->
   <script src="ramanujan_data.js"></script>
   <script src="app.js"></script>
 </body>
