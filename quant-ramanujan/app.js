@@ -155,16 +155,22 @@ function initDashboard(data) {
   navSeries.applyOptions({ visible: false });
   bnhSeries.applyOptions({ visible: false });
 
-  // Synchronize TimeScales
-  priceChart.timeScale().subscribeVisibleTimeRangeChange(range => {
-    if (range) waveChart.timeScale().setVisibleRange(range);
+  // Synchronize TimeScales safely with isSyncing flag to prevent call stack recursion
+  let isSyncing = false;
+  priceChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+    if (isSyncing || !range) return;
+    isSyncing = true;
+    waveChart.timeScale().setVisibleLogicalRange(range);
+    isSyncing = false;
   });
-  waveChart.timeScale().subscribeVisibleTimeRangeChange(range => {
-    if (range) priceChart.timeScale().setVisibleRange(range);
+  waveChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
+    if (isSyncing || !range) return;
+    isSyncing = true;
+    priceChart.timeScale().setVisibleLogicalRange(range);
+    isSyncing = false;
   });
 
   priceChart.timeScale().fitContent();
-  waveChart.timeScale().fitContent();
 
   window.addEventListener('resize', () => {
     if (priceContainer) priceChart.applyOptions({ width: priceContainer.clientWidth });
@@ -516,15 +522,36 @@ function initDashboard(data) {
     waveChart.timeScale().fitContent();
   }
 
+  function showToast(msg, type = 'info') {
+    const existing = document.querySelector('.quant-toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'quant-toast';
+    if (type === 'success') t.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+    t.innerHTML = msg;
+    document.body.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transition = 'opacity 0.3s';
+      setTimeout(() => t.remove(), 300);
+    }, 2800);
+  }
+
   // Event Listeners for Mode Switcher
   const btnModeCycle = document.getElementById('tabModeCycle');
   const btnModeRebalance = document.getElementById('tabModeRebalance');
 
   if (btnModeCycle) {
-    btnModeCycle.addEventListener('click', () => setMode('cycle'));
+    btnModeCycle.addEventListener('click', () => {
+      setMode('cycle');
+      showToast('🎯 สลับเข้าสู่โหมด 1: Pure Cycle Timing สำเร็จ', 'info');
+    });
   }
   if (btnModeRebalance) {
-    btnModeRebalance.addEventListener('click', () => setMode('rebalance'));
+    btnModeRebalance.addEventListener('click', () => {
+      setMode('rebalance');
+      showToast('⚖️ สลับเข้าสู่โหมด 2: Ramanujan Dynamic Rebalance สำเร็จ', 'success');
+    });
   }
 
   // Initial display in Mode 1
@@ -620,6 +647,7 @@ function initDashboard(data) {
     candleSeries.setMarkers(newMarkers);
     renderCycleMetrics(cycleSummary);
     renderCycleTrades(trades);
+    showToast(`⚡ คำนวณ Backtest สำเร็จ! Win Rate: <b>${winRate}%</b> | Return: <b>${totalReturn >= 0 ? '+' : ''}${totalReturn}%</b> (${totalTrades} รอบ)`, 'success');
   }
 
   // Mode 1 Preset Buttons
@@ -834,6 +862,7 @@ function initDashboard(data) {
     candleSeries.setMarkers(getRebalanceMarkers(transactions));
     renderRebalanceMetrics(newRebalanceSummary);
     renderRebalanceTable(transactions);
+    showToast(`⚖️ คำนวณ Rebalance สดสำเร็จ! NAV: <b>฿${Math.round(finalNav).toLocaleString()}</b> | หุ้นฟรีสะสม: <b>${newRebalanceSummary.sharesGrowth >= 0 ? '+' : ''}${newRebalanceSummary.sharesGrowth.toLocaleString()} หุ้น</b>`, 'success');
   }
 
   function runRebalanceSimFromInputs() {

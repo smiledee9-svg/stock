@@ -1,4 +1,4 @@
-﻿window.REBALANCE_RESULTS = {
+window.REBALANCE_RESULTS = {
   "summary": {
     "symbol": "SCB.BK",
     "period": "2 Years (Daily)",

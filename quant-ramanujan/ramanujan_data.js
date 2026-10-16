@@ -1,4 +1,4 @@
-﻿window.RAMANUJAN_RESULTS = {
+window.RAMANUJAN_RESULTS = {
   "summary": {
     "symbol": "SCB.BK",
     "period": "2 Years (Daily)",
