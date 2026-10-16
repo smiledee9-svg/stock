@@ -56,6 +56,11 @@
         <span class="tab-icon">📐</span>
         <span>4 เสาหลักทฤษฎี</span>
       </button>
+      <button type="button" class="nav-tab-btn" data-tab="viewPredict">
+        <span class="tab-icon">🔮</span>
+        <span>พยากรณ์รอบถัดไป</span>
+        <span class="tab-badge-pill" style="background: rgba(168, 85, 247, 0.35); color: #e9d5ff;">AI Predict</span>
+      </button>
     </nav>
 
     <!-- =========================================================================
@@ -225,6 +230,29 @@
           <div class="toc-card-footer">
             <span class="subpage-badge-info" style="color: #c084fc; background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.25);">แก่นคณิตศาสตร์</span>
             <span class="toc-card-action" style="color: #c084fc;">อ่านพิมพ์เขียว &rarr;</span>
+          </div>
+        </div>
+
+        <!-- TOC Item 5: Predictive Intelligence -->
+        <div class="toc-card" data-jump-tab="viewPredict" role="button" tabindex="0" style="border-color: rgba(168, 85, 247, 0.35);">
+          <div>
+            <div class="toc-card-header">
+              <div class="toc-card-icon" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4);">🔮</div>
+              <span class="toc-card-step">MODULE 05</span>
+            </div>
+            <h3 class="toc-card-title">แผนทำนายล่วงหน้า & ราคาจุดชนวน</h3>
+            <p class="toc-card-desc">
+              คำนวณล่วงหน้าสำหรับรอบถัดไป: ราคาจุดชนวนเปิดซื้อ (Bullish Trigger), กรอบแกว่งตัว &plusmn;&delta;<sub>t</sub>, ราคาเบรกเอาท์เต็มสูบ, และจุดเตือนภัยพักฐาน พร้อมระบบอัปเดตอัตโนมัติรอบเที่ยง (12:45) และรอบเย็น (17:30)
+            </p>
+            <div class="toc-card-highlights">
+              <span class="toc-tag">4 ฉากทัศน์</span>
+              <span class="toc-tag">จุดชนวน ฿146.82</span>
+              <span class="toc-tag">อัปเดตวันละ 2 รอบ</span>
+            </div>
+          </div>
+          <div class="toc-card-footer">
+            <span class="subpage-badge-info" style="color: #d8b4fe; background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.3);">พร้อมทำนาย</span>
+            <span class="toc-card-action" style="color: #d8b4fe;">เปิดดูแผนพยากรณ์ &rarr;</span>
           </div>
         </div>
       </div>
@@ -491,6 +519,161 @@
             </p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         PAGE 6: PREDICTIVE INTELLIGENCE & SCENARIO MATRIX (หน้าพยากรณ์ล่วงหน้า)
+         ========================================================================= -->
+    <section id="viewPredict" class="tab-view">
+      <div class="subpage-nav-header">
+        <div class="subpage-nav-left">
+          <button type="button" class="btn-back-hub" data-target="viewOverview">
+            <span>&larr;</span>
+            <span>กลับหน้าสารบัญ</span>
+          </button>
+          <div class="subpage-nav-title">
+            <span>🔮</span>
+            <span>แผนทำนายล่วงหน้า & ราคาจุดชนวน (Predictive Scenario Matrix)</span>
+          </div>
+        </div>
+        <span class="subpage-badge-info" style="color: #d8b4fe; background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.35);">
+          คำนวณสดสำหรับรอบถัดไป
+        </span>
+      </div>
+
+      <!-- Predictive Hero Box -->
+      <div class="predict-hero-box">
+        <div class="predict-hero-header">
+          <div>
+            <span class="predict-badge-pill">⚡ HARMONIC EXTRAPOLATION ENGINE</span>
+            <h3 style="color: #fff; font-size: 1.25rem; margin-top: 8px;">
+              กรอบการคาดการณ์พฤติกรรมราคาหุ้น SCB.BK รอบถัดไป
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+              ประเมินผ่านทฤษฎีรามานุจัน RPT และ Hardy-Ramanujan Partitioning เพื่อกำหนดราคาแอคชั่นล่วงหน้าก่อนตลาดเปิด
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.78rem; color: #94a3b8;">ราคาปิดล่าสุด (อิงฐานคำนวณ):</div>
+            <div style="font-family: var(--font-code); font-size: 1.6rem; font-weight: 800; color: #38bdf8;" id="predLastPrice">฿146.50</div>
+          </div>
+        </div>
+
+        <div class="predict-meta-grid">
+          <div class="predict-meta-item">
+            <div class="predict-meta-label">กรอบความผันผวนไดนามิก (&plusmn;&delta;<sub>t</sub>):</div>
+            <div class="predict-meta-val text-brand" id="predDeltaVal">&plusmn;3.56%</div>
+          </div>
+          <div class="predict-meta-item">
+            <div class="predict-meta-label">แนวต้านกรอบบน (Expected Ceiling):</div>
+            <div class="predict-meta-val text-green" id="predCeilingVal">฿151.72</div>
+          </div>
+          <div class="predict-meta-item">
+            <div class="predict-meta-label">แนวรับกรอบล่าง (Expected Floor):</div>
+            <div class="predict-meta-val text-amber" id="predFloorVal">฿141.28</div>
+          </div>
+          <div class="predict-meta-item">
+            <div class="predict-meta-label">รอบอัปเดตอัตโนมัติบนคลาวด์:</div>
+            <div class="predict-meta-val" style="font-size: 0.95rem; color: #c084fc;">เที่ยง 12:45 / เย็น 17:30</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenarios Grid -->
+      <div class="scenarios-grid">
+        <!-- Scenario 1: Inflection Trigger -->
+        <div class="scenario-card card-bull">
+          <div>
+            <div class="scenario-header-row">
+              <span class="scenario-icon">🟢</span>
+              <span class="scenario-status-pill pill-bull" id="scen1Badge">🟢 TRIGGER WATCH</span>
+            </div>
+            <h4 class="scenario-title" id="scen1Title">จุดกลับตัวคลื่นสอดคล้อง (Harmonic Inflection)</h4>
+            <div class="scenario-price-box">
+              <span class="scenario-price-main text-green" id="scen1Price">฿146.82</span>
+              <span class="scenario-price-pct text-green" id="scen1Pct">+0.22%</span>
+            </div>
+            <p class="scenario-desc" id="scen1Desc">
+              ราคาปิดยืนเหนือ ฿146.82 คลื่นสัปดาห์ V5 และเดือน V20 จะตัดขึ้นบวกพร้อมกัน (Phase Coherence &ge; 0.25)
+            </p>
+          </div>
+          <div class="scenario-action-box action-bull">
+            <strong>คำแนะนำ:</strong> <span id="scen1Action">จับตาใกล้ชิด เตรียมตั้งรับไม้แรกหยั่งเชิง (Ready to Probe)</span>
+          </div>
+        </div>
+
+        <!-- Scenario 2: Full Resonance Breakout -->
+        <div class="scenario-card card-resonance">
+          <div>
+            <div class="scenario-header-row">
+              <span class="scenario-icon">⚡</span>
+              <span class="scenario-status-pill pill-resonance" id="scen2Badge">⚡ FULL BUY</span>
+            </div>
+            <h4 class="scenario-title" id="scen2Title">จุดระเบิดเบรกเอาท์เต็มสูบ (Full Resonance)</h4>
+            <div class="scenario-price-box">
+              <span class="scenario-price-main text-brand" id="scen2Price">฿153.25</span>
+              <span class="scenario-price-pct text-brand" id="scen2Pct">+4.61%</span>
+            </div>
+            <p class="scenario-desc" id="scen2Desc">
+              ราคาปิดทะลุ ฿153.25 ทะลุกรอบไซด์เวย์ ER &ge; 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด เข้าสู่รอบใหญ่
+            </p>
+          </div>
+          <div class="scenario-action-box action-resonance">
+            <strong>คำแนะนำ:</strong> <span id="scen2Action">เปิดรอบซื้อไม้แรกตามระบบทันที (BUY Entry Stage 1)</span>
+          </div>
+        </div>
+
+        <!-- Scenario 3: Neutral Cash Zone -->
+        <div class="scenario-card card-neutral">
+          <div>
+            <div class="scenario-header-row">
+              <span class="scenario-icon">⚪</span>
+              <span class="scenario-status-pill pill-neutral" id="scen3Badge">⚪ HOLD CASH</span>
+            </div>
+            <h4 class="scenario-title" id="scen3Title">โซนถือเงินสดปลอดภัย (Neutral Cash Zone)</h4>
+            <div class="scenario-price-box">
+              <span class="scenario-price-main" style="color: #cbd5e1; font-size: 1.25rem;" id="scen3Price">฿141.28 - ฿146.82</span>
+              <span class="scenario-price-pct" style="color: #94a3b8;">กรอบพักตัว</span>
+            </div>
+            <p class="scenario-desc" id="scen3Desc">
+              คลื่นความเร็วยังไม่เข้าเกณฑ์คู่ ตลาดยังแกว่งตัวเลือกข้าง ไม่มีสัญญาณยืนยันการขึ้น
+            </p>
+          </div>
+          <div class="scenario-action-box action-neutral">
+            <strong>คำแนะนำ:</strong> <span id="scen3Action">ถือเงินสด 100% สบายใจ ไม่มีความเสี่ยง ปล่อยคนอื่นติดดอย</span>
+          </div>
+        </div>
+
+        <!-- Scenario 4: Bearish Breakdown -->
+        <div class="scenario-card card-bear">
+          <div>
+            <div class="scenario-header-row">
+              <span class="scenario-icon">🔴</span>
+              <span class="scenario-status-pill pill-bear" id="scen4Badge">🔴 DANGER AVOID</span>
+            </div>
+            <h4 class="scenario-title" id="scen4Title">จุดเตือนระวังพักฐานลึก (Floor Breakdown)</h4>
+            <div class="scenario-price-box">
+              <span class="scenario-price-main text-red" id="scen4Price">฿141.28</span>
+              <span class="scenario-price-pct text-red" id="scen4Pct">-3.56%</span>
+            </div>
+            <p class="scenario-desc" id="scen4Desc">
+              ราคาหลุดต่ำกว่า ฿141.28 (หลุดกรอบล่าง Delta_t ของรามานุจัน) บ่งบอกแรงเทขายรุนแรง
+            </p>
+          </div>
+          <div class="scenario-action-box action-bear">
+            <strong>คำแนะนำ:</strong> <span id="scen4Action">ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือรอคลื่นสงบ (AVOID DROP)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Automation Info Bar -->
+      <div class="automation-status-bar">
+        <div class="auto-status-text">
+          <span>🤖</span>
+          <span><strong>ระบบอัตโนมัติ GitHub Actions & Cloudflare:</strong> ทำงานอัตโนมัติวันละ 2 รอบ (12:45 น. และ 17:30 น.) ไม่ต้องเปิดคอมทิ้งไว้</span>
+        </div>
+        <span class="badge-tag tag-success">🟢 ระบบอัปเดตอัตโนมัติพร้อมทำงาน</span>
       </div>
     </section>
 

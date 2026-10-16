@@ -64,6 +64,11 @@ function initDashboard(data) {
   // 6. Initialize Modular Navigation & Trade Filters
   initModularNavigation();
   initTradeFilter();
+
+  // 7. Render Predictive Intelligence Scenarios
+  if (data.predictiveIntelligence) {
+    renderPredictiveIntelligence(data.predictiveIntelligence);
+  }
 }
 
 function renderSummaryMetrics(sm) {
@@ -629,7 +634,8 @@ function syncTabFromHash() {
     'charts': 'viewCharts',
     'trades': 'viewTrades',
     'simulator': 'viewSimulator',
-    'blueprint': 'viewBlueprint'
+    'blueprint': 'viewBlueprint',
+    'predict': 'viewPredict'
   };
   if (hashMap[hash]) {
     switchTab(hashMap[hash], false);
@@ -662,7 +668,8 @@ function switchTab(targetTabId, updateHash = true) {
       'viewCharts': 'charts',
       'viewTrades': 'trades',
       'viewSimulator': 'simulator',
-      'viewBlueprint': 'blueprint'
+      'viewBlueprint': 'blueprint',
+      'viewPredict': 'predict'
     };
     if (tabToHashMap[targetTabId]) {
       history.replaceState(null, '', `#${tabToHashMap[targetTabId]}`);
@@ -706,4 +713,77 @@ function initTradeFilter() {
     });
   });
 }
+
+/**
+ * Predictive Intelligence Renderer
+ */
+function renderPredictiveIntelligence(pred) {
+  if (!pred) return;
+
+  const elLastPrice = document.getElementById('predLastPrice');
+  if (elLastPrice && pred.lastPrice) elLastPrice.textContent = `฿${pred.lastPrice.toFixed(2)}`;
+
+  const elDelta = document.getElementById('predDeltaVal');
+  if (elDelta && pred.dynamicDeltaPct) elDelta.textContent = `&plusmn;${pred.dynamicDeltaPct.toFixed(2)}%`;
+
+  const expRange = pred.expectedRange || {};
+  const elCeil = document.getElementById('predCeilingVal');
+  if (elCeil && expRange.ceiling) elCeil.textContent = `฿${expRange.ceiling.toFixed(2)}`;
+
+  const elFloor = document.getElementById('predFloorVal');
+  if (elFloor && expRange.floor) elFloor.textContent = `฿${expRange.floor.toFixed(2)}`;
+
+  const scens = pred.scenarios || {};
+
+  // 1. Inflection
+  const s1 = scens.bullishInflection;
+  if (s1) {
+    const p1 = document.getElementById('scen1Price');
+    if (p1) p1.textContent = `฿${s1.triggerPrice.toFixed(2)}`;
+    const pct1 = document.getElementById('scen1Pct');
+    if (pct1) pct1.textContent = s1.changePct;
+    const desc1 = document.getElementById('scen1Desc');
+    if (desc1) desc1.textContent = s1.description;
+    const act1 = document.getElementById('scen1Action');
+    if (act1) act1.textContent = s1.actionPlan;
+  }
+
+  // 2. Breakout
+  const s2 = scens.resonanceBreakout;
+  if (s2) {
+    const p2 = document.getElementById('scen2Price');
+    if (p2) p2.textContent = `฿${s2.triggerPrice.toFixed(2)}`;
+    const pct2 = document.getElementById('scen2Pct');
+    if (pct2) pct2.textContent = s2.changePct;
+    const desc2 = document.getElementById('scen2Desc');
+    if (desc2) desc2.textContent = s2.description;
+    const act2 = document.getElementById('scen2Action');
+    if (act2) act2.textContent = s2.actionPlan;
+  }
+
+  // 3. Neutral
+  const s3 = scens.neutralHolding;
+  if (s3) {
+    const p3 = document.getElementById('scen3Price');
+    if (p3) p3.textContent = s3.rangeText;
+    const desc3 = document.getElementById('scen3Desc');
+    if (desc3) desc3.textContent = s3.description;
+    const act3 = document.getElementById('scen3Action');
+    if (act3) act3.textContent = s3.actionPlan;
+  }
+
+  // 4. Bear
+  const s4 = scens.bearishRisk;
+  if (s4) {
+    const p4 = document.getElementById('scen4Price');
+    if (p4) p4.textContent = `฿${s4.triggerPrice.toFixed(2)}`;
+    const pct4 = document.getElementById('scen4Pct');
+    if (pct4) pct4.textContent = s4.changePct;
+    const desc4 = document.getElementById('scen4Desc');
+    if (desc4) desc4.textContent = s4.description;
+    const act4 = document.getElementById('scen4Action');
+    if (act4) act4.textContent = s4.actionPlan;
+  }
+}
+
 
