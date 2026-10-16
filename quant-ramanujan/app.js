@@ -183,11 +183,22 @@ function renderCyclesTable(cycles) {
       exitReasonThai = 'Stagnation (15 วันไม่วิ่งตัดทุนคืน)';
     }
 
+    let tierClass = 'tier-b';
+    let tierLabel = `🔹 Tier B (${c.entry_confidence_pct}%)`;
+    if (c.confidence_tier === 'TIER_A_FULL_RESONANCE') {
+      tierClass = 'tier-a';
+      tierLabel = `⚡ Tier A (${c.entry_confidence_pct}%)`;
+    } else if (c.confidence_tier === 'TIER_C_PROBE_SMALL') {
+      tierClass = 'tier-c';
+      tierLabel = `🔸 Tier C (${c.entry_confidence_pct}%)`;
+    }
+
     tr.innerHTML = `
       <td style="font-weight: 700; color: #94a3b8;">#${c.cycle_id || (idx + 1)}</td>
       <td><strong>${c.entry_date}</strong></td>
       <td>${c.exit_date}</td>
       <td><span class="mode-badge ${modeClass}">${c.mode}</span></td>
+      <td><span class="badge-tier ${tierClass}">${tierLabel}</span></td>
       <td style="text-align: center;"><span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; font-weight: 700;">${c.layers_used} ไม้</span></td>
       <td style="font-family: var(--font-code);">${c.total_shares.toLocaleString()}</td>
       <td style="font-family: var(--font-code);">฿${c.avg_entry.toFixed(2)}</td>

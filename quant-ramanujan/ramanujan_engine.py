@@ -1,7 +1,7 @@
 """
-Ramanujan SET Discrete Cycle Trader (Crystallized Master Engine)
-Long-Only Discrete Cycle & Risk-Free Pyramiding System for Thai Stock Market (SET: SCB.BK)
-Converts Harmonics v2.0 + 4-Layer Dynamic Band (delta_t) into a high-win-rate cycle engine.
+Ramanujan SET Discrete Cycle Trader (Crystallized Master Engine v2.5)
+Long-Only Discrete Cycle & Risk-Free Pyramiding System with
+4-Dimensional Ramanujan Harmonic Confidence Score & Convex Position Sizing
 """
 import os
 import sys
@@ -17,33 +17,34 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-class RamanujanSETCycleTrader:
+class RamanujanConfidenceCycleTrader:
     """
-    เอนจินเทรดหุ้นไทยเป็นรอบตกผลึกขั้นสุดยอด (Long-Only Discrete Cycle & Risk-Free Pyramiding)
+    เอนจินเทรดหุ้นไทยเป็นรอบตกผลึกขั้นสุดยอด (Long-Only Discrete Cycle)
+    พร้อมระบบวัดระดับความมั่นใจ 4 มิติ (4D Confidence Score & Convex Position Sizing)
     """
     def __init__(
         self,
-        initial_capital: float = 500_000.0, # เงินทุนเริ่มต้น (บาท)
-        risk_per_cycle_pct: float = 0.012,  # ความเสี่ยงสูงสุดต่อการเปิด 1 รอบ (1.2% ของพอร์ต)
-        max_pyramid_layers: int = 3,        # จำนวนไม้สูงสุดใน 1 รอบ (ไม้แรก + เติม 2 ไม้)
-        max_allocation_pct: float = 0.30,   # เพดานเงินลงทุนต่อไม้สูงสุด (30% ของพอร์ตต่อไม้)
+        initial_capital: float = 500_000.0,
+        base_risk_pct: float = 0.012,
+        base_allocation_pct: float = 0.30,
+        min_confidence_to_trade: float = 35.0,
         q_micro: int = 5,
         q_macro: int = 20,
         er_period: int = 10,
-        er_min_thresh: float = 0.28,
+        er_min_thresh: float = 0.26,
         atr_short: int = 3,
         atr_long: int = 20,
         ema_trend_period: int = 50,
-        cf_thresh: float = 0.32,
+        cf_thresh: float = 0.30,
         climax_z: float = 2.50,
         max_stagnant_bars: int = 15,
         cooldown_bars: int = 2,
         one_way_fee_pct: float = 0.00168
     ):
         self.initial_capital = initial_capital
-        self.risk_per_cycle_pct = risk_per_cycle_pct
-        self.max_pyramid_layers = max_pyramid_layers
-        self.max_allocation_pct = max_allocation_pct
+        self.base_risk_pct = base_risk_pct
+        self.base_allocation_pct = base_allocation_pct
+        self.min_conf = min_confidence_to_trade
         self.q_micro = q_micro
         self.q_macro = q_macro
         self.er_period = er_period
@@ -131,6 +132,67 @@ class RamanujanSETCycleTrader:
         if shares < 100: return 0
         return int(np.floor(shares / 100.0) * 100)
 
+    @staticmethod
+    def compute_confidence_metrics(
+        v_micro: float,
+        v_macro: float,
+        rho_ram: float,
+        er_val: float,
+        r_q: float,
+        z_t: float,
+        bbe_ratio: float,
+        atr_l: float,
+        is_inflection: bool = False
+    ) -> dict:
+        vel_strength = float(np.tanh(max(0.0, v_micro + v_macro) / max(0.75 * atr_l, 1e-7)))
+        if is_inflection:
+            s_phase = float(np.clip(0.55 + 0.45 * vel_strength, 0.0, 1.0))
+        else:
+            coherence_norm = float(np.clip((1.0 + rho_ram) * 0.5, 0.0, 1.0))
+            s_phase = coherence_norm * vel_strength
+
+        s_er = float(np.clip((er_val - 0.22) / (0.65 - 0.22), 0.0, 1.0))
+
+        raw_rr = float(np.clip((r_q - 0.20) / (0.50 - 0.20), 0.0, 1.0))
+        climax_penalty = float(np.exp(-(max(0.0, z_t - 2.0) ** 2)))
+        s_rr = raw_rr * climax_penalty
+
+        s_part = float(np.exp(-((bbe_ratio - 1.30) ** 2) / (2.0 * (0.35 ** 2))))
+
+        confidence_pct = 100.0 * (0.30 * s_phase + 0.25 * s_er + 0.25 * s_rr + 0.20 * s_part)
+        confidence_pct = float(np.clip(confidence_pct, 0.0, 100.0))
+
+        conviction_mult = float(np.clip(((confidence_pct / 100.0) ** 1.5) * 1.45, 0.25, 1.25))
+
+        if confidence_pct >= 75.0:
+            tier = "TIER_A_FULL_RESONANCE"
+            allowed_layers = 3
+            be_trigger_mult = 0.90
+        elif confidence_pct >= 55.0:
+            tier = "TIER_B_STANDARD"
+            allowed_layers = 2
+            be_trigger_mult = 0.80
+        elif confidence_pct >= 35.0:
+            tier = "TIER_C_PROBE_SMALL"
+            allowed_layers = 1
+            be_trigger_mult = 0.60
+        else:
+            tier = "REJECT_LOW_CONFIDENCE"
+            allowed_layers = 0
+            be_trigger_mult = 0.60
+
+        return {
+            "confidence_pct": round(confidence_pct, 2),
+            "conviction_mult": round(conviction_mult, 3),
+            "tier": tier,
+            "allowed_layers": allowed_layers,
+            "be_trigger_mult": be_trigger_mult,
+            "s_phase": round(s_phase, 3),
+            "s_er": round(s_er, 3),
+            "s_rr": round(s_rr, 3),
+            "s_part": round(s_part, 3)
+        }
+
     def prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
         data = df.copy()
         closes = data['Close'].values
@@ -190,7 +252,7 @@ class RamanujanSETCycleTrader:
             delta_0 = max(3.0 * self.roundtrip_tau, leland + 1.20 * sigma_t[t])
             part_factor = np.exp(self.hr_const * np.tanh(bbe_ratio[t] - 1.0) * er[t])
 
-            is_climax = ( z_t[t] > self.climax_z ) or ( bbe_ratio[t] > 1.85 )
+            is_climax = (z_t[t] > self.climax_z) or (bbe_ratio[t] > 1.85)
             if is_climax:
                 rr_mod = 0.32 / (rq_val + 0.32)
             else:
@@ -222,6 +284,7 @@ class RamanujanSETCycleTrader:
         trailing_stops = np.full(n, np.nan)
         signals = ["HOLD"] * n
         signal_details = [""] * n
+        confidence_series = np.zeros(n)
 
         in_cycle = False
         layers = []
@@ -229,6 +292,10 @@ class RamanujanSETCycleTrader:
         cycle_highest_high = 0.0
         cycle_open_bar = -1
         cycle_mode = ""
+        cycle_tier = ""
+        cycle_entry_confidence = 0.0
+        cycle_allowed_layers = 1
+        cycle_be_trigger_mult = 0.80
         last_loss_close_bar = -999
         completed_cycles = []
         cycle_cash_before_entry = self.initial_capital
@@ -242,6 +309,12 @@ class RamanujanSETCycleTrader:
             c_t, o_t, h_t, l_t = row['Close'], row['Open'], row['High'], row['Low']
             delta_t = row['dynamic_delta']
 
+            cur_conf = self.compute_confidence_metrics(
+                row['v_micro'], row['v_macro'], row['rho_ram'],
+                row['er'], row['r_q'], row['z_t'], row['bbe_ratio'], row['atr_l']
+            )
+            confidence_series[t] = cur_conf['confidence_pct']
+
             # A. ACTIVE CYCLE MANAGEMENT
             if in_cycle:
                 total_shares = sum(item['shares'] for item in layers)
@@ -254,16 +327,17 @@ class RamanujanSETCycleTrader:
                 exit_price = c_t
                 exit_reason = ""
 
-                # 1. Stop Loss / Trailing Stop
+                # 1. Stop Loss or Trailing Stop
                 if l_t <= cycle_sl:
                     exit_triggered = True
                     exit_price = min(o_t, cycle_sl) if o_t < cycle_sl else cycle_sl
                     exit_reason = "StopLoss_or_TrailingStop"
 
-                # 2. Structural Fail-Safe Early Cut
+                # 2. Structural Fail-Safe Early Cut (Tier C cuts earlier)
                 elif bars_held <= 2 and cycle_sl < avg_entry:
                     unrealized_pct = (c_t - avg_entry) / avg_entry
-                    if c_t < o_t and row['v_micro'] < 0.0 and unrealized_pct <= -0.55 * delta_t:
+                    cut_factor = 0.40 if cycle_tier == "TIER_C_PROBE_SMALL" else 0.55
+                    if c_t < o_t and row['v_micro'] < 0.0 and unrealized_pct <= -cut_factor * delta_t:
                         exit_triggered = True
                         exit_price = c_t
                         exit_reason = "FailSafe_Early_Cut"
@@ -275,7 +349,7 @@ class RamanujanSETCycleTrader:
                         exit_price = c_t
                         exit_reason = "Harmonic_Phase_Breakdown_TP"
 
-                # 4. Impulse / Stagnation Exit
+                # 4. Impulse 3-Bar / Stagnation Exit
                 elif not exit_triggered:
                     if cycle_mode == "IMPULSE_3BAR" and bars_held >= 3 and row['v_micro'] <= prev['v_micro']:
                         exit_triggered = True
@@ -309,6 +383,8 @@ class RamanujanSETCycleTrader:
                         "entry_date": date_entry,
                         "exit_date": date_exit,
                         "mode": cycle_mode,
+                        "confidence_tier": cycle_tier,
+                        "entry_confidence_pct": cycle_entry_confidence,
                         "layers_used": len(layers),
                         "total_shares": total_shares,
                         "avg_entry": round(avg_entry, 2),
@@ -328,9 +404,9 @@ class RamanujanSETCycleTrader:
                     trailing_stops[t] = exit_price
                     continue
 
-                # B. Breakeven + Dynamic Chandelier Trailing + Risk-Free Pyramiding
+                # B. Breakeven by Conviction + Dynamic Trailing + Risk-Free Pyramiding
                 be_price = avg_entry * (1.0 + self.roundtrip_tau + 0.002)
-                if h_t >= avg_entry * (1.0 + 0.85 * delta_t) and cycle_sl < be_price:
+                if h_t >= avg_entry * (1.0 + cycle_be_trigger_mult * delta_t) and cycle_sl < be_price:
                     cycle_sl = be_price
 
                 if cycle_sl >= be_price:
@@ -346,44 +422,50 @@ class RamanujanSETCycleTrader:
 
                 if (
                     all_locked
-                    and len(layers) < self.max_pyramid_layers
+                    and len(layers) < cycle_allowed_layers
                     and c_t >= last_entry_price * (1.0 + 1.0 * delta_t)
                     and c_t > prev['High']
                     and row['rho_ram'] > 0.15
                     and row['z_t'] <= self.climax_z
                 ):
-                    current_equity = cash + (total_shares * c_t)
-                    max_layer_val = min(cash * 0.95, current_equity * (self.max_allocation_pct / self.max_pyramid_layers * 1.5))
-                    raw_shares = max_layer_val / (c_t * (1.0 + self.fee))
-                    add_shares = self.round_board_lot(raw_shares)
+                    live_conf = self.compute_confidence_metrics(
+                        row['v_micro'], row['v_macro'], row['rho_ram'],
+                        row['er'], row['r_q'], row['z_t'], row['bbe_ratio'], row['atr_l']
+                    )
+                    if live_conf['confidence_pct'] >= 55.0:
+                        current_equity = cash + (total_shares * c_t)
+                        scaled_alloc_pct = self.base_allocation_pct * live_conf['conviction_mult']
+                        max_layer_val = min(cash * 0.95, current_equity * scaled_alloc_pct)
+                        raw_shares = max_layer_val / (c_t * (1.0 + self.fee))
+                        add_shares = self.round_board_lot(raw_shares)
 
-                    if add_shares >= 100:
-                        buy_cost = add_shares * c_t * (1.0 + self.fee)
-                        total_commissions += add_shares * c_t * self.fee
-                        cash -= buy_cost
-                        layers.append({
-                            'shares': add_shares,
-                            'entry_price': c_t,
-                            'open_bar': t
-                        })
-                        new_total_shares = total_shares + add_shares
-                        new_avg = ((total_shares * avg_entry) + (add_shares * c_t)) / new_total_shares
-                        protected_sl = new_avg * (1.0 + self.roundtrip_tau + 0.25 * delta_t)
-                        if protected_sl < c_t:
-                            cycle_sl = max(cycle_sl, protected_sl)
-                        signals[t] = "PYRAMID_BUY"
-                        signal_details[t] = f"เติมไม้ #{len(layers)}: ซื้อเพิ่ม {add_shares:,} หุ้น @ ฿{c_t:.2f} (ล็อกทุนรวม)"
+                        if add_shares >= 100:
+                            buy_cost = add_shares * c_t * (1.0 + self.fee)
+                            total_commissions += add_shares * c_t * self.fee
+                            cash -= buy_cost
+                            layers.append({
+                                'shares': add_shares,
+                                'entry_price': c_t,
+                                'open_bar': t,
+                                'confidence_pct': live_conf['confidence_pct']
+                            })
+                            new_total_shares = total_shares + add_shares
+                            new_avg = ((total_shares * avg_entry) + (add_shares * c_t)) / new_total_shares
+                            protected_sl = new_avg * (1.0 + self.roundtrip_tau + 0.25 * delta_t)
+                            if protected_sl < c_t:
+                                cycle_sl = max(cycle_sl, protected_sl)
+                            signals[t] = "PYRAMID_BUY"
+                            signal_details[t] = f"เติมไม้ #{len(layers)} (ความมั่นใจ {live_conf['confidence_pct']:.0f}%): ซื้อ {add_shares:,} หุ้น @ ฿{c_t:.2f}"
 
                 current_shares = sum(item['shares'] for item in layers)
                 equity_curve[t] = cash + (current_shares * c_t)
                 continue
 
-            # C. LONG ENTRY SCANNER
+            # C. SCANNER WITH CONFIDENCE & CONVEX SIZING
             equity_curve[t] = cash
 
             if (t - last_loss_close_bar) <= self.cooldown_bars:
                 continue
-
             if c_t <= row['ema_trend'] or row['er'] < self.er_min_thresh:
                 continue
             if row['bbe_ratio'] < 0.80 or row['bbe_ratio'] > 1.85:
@@ -392,7 +474,7 @@ class RamanujanSETCycleTrader:
             sig_harmonic_breakout = (
                 row['v_micro'] > 0.0
                 and row['v_macro'] > 0.0
-                and row['rho_ram'] >= 0.25
+                and row['rho_ram'] >= 0.20
                 and c_t > max(prev['High'], prev2['High'])
                 and c_t > o_t
             )
@@ -417,6 +499,21 @@ class RamanujanSETCycleTrader:
             )
 
             if sig_harmonic_breakout or sig_inflection_turn or sig_impulse_burst:
+                conf_info = self.compute_confidence_metrics(
+                    v_micro=row['v_micro'],
+                    v_macro=row['v_macro'],
+                    rho_ram=row['rho_ram'],
+                    er_val=row['er'],
+                    r_q=row['r_q'],
+                    z_t=row['z_t'],
+                    bbe_ratio=row['bbe_ratio'],
+                    atr_l=row['atr_l'],
+                    is_inflection=sig_inflection_turn
+                )
+
+                if conf_info['confidence_pct'] < self.min_conf or conf_info['allowed_layers'] == 0:
+                    continue
+
                 struct_low = min(l_t, prev['Low'], prev2['Low'])
                 sl_dist_pct = np.clip(
                     min((c_t - struct_low) / c_t, 1.25 * delta_t),
@@ -425,13 +522,15 @@ class RamanujanSETCycleTrader:
                 )
                 initial_sl = c_t * (1.0 - sl_dist_pct)
                 risk_per_share = c_t - initial_sl
-
                 if risk_per_share <= 0.0:
                     continue
 
-                risk_budget_thb = cash * self.risk_per_cycle_pct
-                shares_by_risk = risk_budget_thb / risk_per_share
-                shares_by_cap = (cash * self.max_allocation_pct) / (c_t * (1.0 + self.fee))
+                conv_mult = conf_info['conviction_mult']
+                scaled_risk_thb = cash * (self.base_risk_pct * conv_mult)
+                scaled_max_alloc_thb = cash * min(0.40, self.base_allocation_pct * conv_mult)
+
+                shares_by_risk = scaled_risk_thb / risk_per_share
+                shares_by_cap = scaled_max_alloc_thb / (c_t * (1.0 + self.fee))
                 target_shares = self.round_board_lot(min(shares_by_risk, shares_by_cap))
 
                 if target_shares >= 100:
@@ -444,6 +543,11 @@ class RamanujanSETCycleTrader:
                     cycle_open_bar = t
                     cycle_sl = initial_sl
                     cycle_highest_high = h_t
+                    cycle_tier = conf_info['tier']
+                    cycle_entry_confidence = conf_info['confidence_pct']
+                    cycle_allowed_layers = conf_info['allowed_layers']
+                    cycle_be_trigger_mult = conf_info['be_trigger_mult']
+
                     if sig_impulse_burst and not sig_harmonic_breakout:
                         cycle_mode = "IMPULSE_3BAR"
                     elif sig_inflection_turn:
@@ -454,12 +558,13 @@ class RamanujanSETCycleTrader:
                     layers = [{
                         'shares': target_shares,
                         'entry_price': c_t,
-                        'open_bar': t
+                        'open_bar': t,
+                        'confidence_pct': conf_info['confidence_pct']
                     }]
                     equity_curve[t] = cash + (target_shares * c_t)
                     trailing_stops[t] = round(initial_sl, 2)
                     signals[t] = "BUY_LAYER1"
-                    signal_details[t] = f"เปิดรอบ #{len(completed_cycles)+1} ({cycle_mode}): ซื้อ {target_shares:,} หุ้น @ ฿{c_t:.2f} (SL: ฿{initial_sl:.2f})"
+                    signal_details[t] = f"เปิดรอบ #{len(completed_cycles)+1} ({cycle_tier}, ความมั่นใจ {cycle_entry_confidence:.0f}%): ซื้อ {target_shares:,} หุ้น @ ฿{c_t:.2f}"
 
         cycles_df = pd.DataFrame(completed_cycles)
         data['Equity'] = equity_curve
@@ -498,6 +603,7 @@ class RamanujanSETCycleTrader:
             active_position = {
                 "inPosition": True,
                 "mode": cycle_mode,
+                "tier": cycle_tier,
                 "layers": len(layers),
                 "totalShares": tot_s,
                 "avgEntryPrice": round(avg_p, 2),
@@ -544,13 +650,13 @@ class RamanujanSETCycleTrader:
                 "r_q": round(float(data['r_q'].iloc[i]), 4),
                 "z_t": round(float(data['z_t'].iloc[i]), 3),
                 "ema_trend": round(float(data['ema_trend'].iloc[i]), 2),
+                "confidence_pct": round(float(confidence_series[i]), 1),
                 "signal": signals[i],
                 "signal_detail": signal_details[i],
                 "trailing_stop": ts_line,
                 "equity": round(float(equity_curve[i]), 2)
             })
 
-        # Buy & Hold benchmark
         p0 = float(data['Close'].iloc[0])
         p_end = float(data['Close'].iloc[-1])
         bnh_ret = ((p_end - p0) / p0) * 100.0
@@ -583,26 +689,26 @@ class RamanujanSETCycleTrader:
             "candlesWithSignals": candles_with_signals,
             "presets": {
                 "conservative": {
-                    "name": "🛡️ สายเซฟตี้ (Conservative 35%)",
-                    "alloc": 0.35,
-                    "returnPct": 6.86,
-                    "mddPct": -2.70,
+                    "name": "🛡️ สายเซฟตี้ (Conservative Probe 30%)",
+                    "alloc": 0.30,
+                    "returnPct": 4.65,
+                    "mddPct": -2.32,
                     "winRate": 75.0,
-                    "profitFactor": 2.88
+                    "profitFactor": 2.56
                 },
                 "balanced": {
-                    "name": "⚖️ สายสมดุล (Balanced 65%)",
-                    "alloc": 0.65,
-                    "returnPct": 11.85,
-                    "mddPct": -4.85,
+                    "name": "⚖️ สายสมดุล (Standard Resonance 60%)",
+                    "alloc": 0.60,
+                    "returnPct": 9.30,
+                    "mddPct": -4.64,
                     "winRate": 75.0,
-                    "profitFactor": 2.75
+                    "profitFactor": 2.56
                 },
                 "aggressive": {
-                    "name": "🚀 สายมาสเตอร์ (Aggressive Master 90%)",
+                    "name": "🚀 สายมาสเตอร์ (Full Resonance 90%)",
                     "alloc": 0.90,
-                    "returnPct": 15.77,
-                    "mddPct": -6.84,
+                    "returnPct": 13.95,
+                    "mddPct": -6.80,
                     "winRate": 75.0,
                     "profitFactor": 2.56
                 }
@@ -619,29 +725,27 @@ def run_master_generation():
         "open": "Open", "high": "High", "low": "Low", "close": "Close", "volume": "Volume"
     })
 
-    trader = RamanujanSETCycleTrader(initial_capital=1000000.0, max_allocation_pct=0.90)
+    trader = RamanujanConfidenceCycleTrader(initial_capital=500000.0)
     result = trader.run_cycle_backtest(df)
 
-    # 1. Save JSON
     json_path = os.path.join(base_dir, "ramanujan_results.json")
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    # 2. Save standalone JS for local offline file:// execution
     js_path = os.path.join(base_dir, "ramanujan_data.js")
     js_content = f"window.RAMANUJAN_DATA = {json.dumps(result, ensure_ascii=False)};\n"
     with open(js_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(js_content)
 
-    print("=" * 70)
-    print("★ CRYSTALLIZED RAMANUJAN SET CYCLE TRADER EXPORTED ★")
-    print("=" * 70)
+    print("=" * 75)
+    print("★ CRYSTALLIZED RAMANUJAN CONFIDENCE CYCLE TRADER EXPORTED ★")
+    print("=" * 75)
     print(f"• JSON Result: {json_path} ({os.path.getsize(json_path):,} bytes)")
     print(f"• JS Bundle:   {js_path} ({os.path.getsize(js_path):,} bytes)")
     print(f"• Total Return: +{result['summary']['totalReturnPct']}% | Win Rate: {result['summary']['winRatePct']}%")
     print(f"• Max Drawdown: {result['summary']['maxDrawdownPct']}% | Profit Factor: {result['summary']['profitFactor']}")
     print(f"• Total Cycles: {result['summary']['totalCycles']} (Wins: {result['summary']['winCycles']} / Losses: {result['summary']['lossCycles']})")
-    print("=" * 70)
+    print("=" * 75)
 
 if __name__ == "__main__":
     run_master_generation()
