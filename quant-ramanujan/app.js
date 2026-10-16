@@ -34,6 +34,8 @@ let vMicroSeries = null;
 let vMacroSeries = null;
 let zeroLineSeries = null;
 let rawData = null;
+let currentCyclesList = [];
+let activeTradeFilter = 'all';
 
 function initDashboard(data) {
   rawData = data;
@@ -42,6 +44,8 @@ function initDashboard(data) {
   const completedCycles = data.completedCycles || [];
   const candles = data.candlesWithSignals || [];
 
+  currentCyclesList = completedCycles;
+
   // 1. Render Metrics Cards
   renderSummaryMetrics(summary);
 
@@ -49,13 +53,17 @@ function initDashboard(data) {
   renderActiveState(activePos, candles);
 
   // 3. Render 12 Completed Cycles Table
-  renderCyclesTable(completedCycles);
+  renderCyclesTable(completedCycles, 'all');
 
   // 4. Initialize TradingView Lightweight Charts
   initCharts(candles);
 
   // 5. Initialize Preset & Toolbar Event Listeners
   initToolbar(data);
+
+  // 6. Initialize Modular Navigation & Trade Filters
+  initModularNavigation();
+  initTradeFilter();
 }
 
 function renderSummaryMetrics(sm) {
@@ -151,18 +159,42 @@ function renderActiveState(activePos, candles) {
   }
 }
 
-function renderCyclesTable(cycles) {
+function renderCyclesTable(cycles, filter = null) {
   const tbody = document.getElementById('cyclesTableBody');
   if (!tbody) return;
   tbody.innerHTML = '';
 
-  const summaryBadge = document.getElementById('tableSummaryBadge');
-  const wins = cycles.filter(c => c.net_return_pct > 0).length;
-  if (summaryBadge) {
-    summaryBadge.textContent = `ชนะ ${wins} จาก ${cycles.length} รอบ (${((wins / Math.max(1, cycles.length)) * 100).toFixed(1)}%)`;
+  if (cycles && Array.isArray(cycles)) {
+    currentCyclesList = cycles;
+  }
+  const sourceList = currentCyclesList || [];
+  const activeFilter = filter !== null ? filter : activeTradeFilter;
+
+  let filtered = sourceList;
+  if (activeFilter === 'win') {
+    filtered = sourceList.filter(c => c.net_return_pct > 0);
+  } else if (activeFilter === 'loss') {
+    filtered = sourceList.filter(c => c.net_return_pct <= 0);
   }
 
-  cycles.forEach((c, idx) => {
+  const summaryBadge = document.getElementById('tableSummaryBadge');
+  const wins = sourceList.filter(c => c.net_return_pct > 0).length;
+  if (summaryBadge) {
+    summaryBadge.textContent = `ชนะ ${wins} จาก ${sourceList.length} รอบ (${((wins / Math.max(1, sourceList.length)) * 100).toFixed(1)}%)`;
+  }
+
+  if (filtered.length === 0) {
+    const emptyTr = document.createElement('tr');
+    emptyTr.innerHTML = `
+      <td colspan="14" style="text-align: center; padding: 32px 16px; color: #94a3b8; font-size: 0.95rem;">
+        🔍 ไม่พบรายการรอบเทรดในตัวกรองนี้
+      </td>
+    `;
+    tbody.appendChild(emptyTr);
+    return;
+  }
+
+  filtered.forEach((c, idx) => {
     const tr = document.createElement('tr');
     const isWin = c.net_return_pct > 0;
     const pnlColor = isWin ? '#34d399' : '#f87171';
@@ -506,7 +538,7 @@ function simulateClientSide(initialCapital, maxAlloc, riskPct, maxLayers) {
     };
   });
 
-  renderCyclesTable(scaledCycles);
+  renderCyclesTable(scaledCycles, activeTradeFilter);
   showToast(`⚡ คำนวณพอร์ต ${maxAlloc * 100}% เงินต้น ฿${initialCapital.toLocaleString()} สำเร็จ!`);
 }
 
@@ -543,3 +575,135 @@ function showToast(message) {
     if (toast) toast.style.display = 'none';
   }, 3500);
 }
+
+/**
+ * Modular Multi-Page Tab Navigation Controller
+ */
+function initModularNavigation() {
+  const navBtns = document.querySelectorAll('.nav-tab-btn');
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+      if (targetTab) switchTab(targetTab);
+    });
+  });
+
+  // TOC Directory Cards on the Overview Hub
+  const tocCards = document.querySelectorAll('.toc-card[data-jump-tab]');
+  tocCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const jumpTo = card.dataset.jumpTab;
+      if (jumpTo) switchTab(jumpTo);
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const jumpTo = card.dataset.jumpTab;
+        if (jumpTo) switchTab(jumpTo);
+      }
+    });
+  });
+
+  // Back to Hub Buttons on every Subpage
+  const backBtns = document.querySelectorAll('.btn-back-hub[data-target]');
+  backBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.target || 'viewOverview';
+      switchTab(target);
+    });
+  });
+
+  // Listen to browser hash changes (back/forward history support)
+  window.addEventListener('hashchange', () => {
+    syncTabFromHash();
+  });
+
+  // Initial check on load
+  syncTabFromHash();
+}
+
+function syncTabFromHash() {
+  const hash = window.location.hash.replace('#', '').toLowerCase();
+  const hashMap = {
+    'overview': 'viewOverview',
+    'charts': 'viewCharts',
+    'trades': 'viewTrades',
+    'simulator': 'viewSimulator',
+    'blueprint': 'viewBlueprint'
+  };
+  if (hashMap[hash]) {
+    switchTab(hashMap[hash], false);
+  }
+}
+
+function switchTab(targetTabId, updateHash = true) {
+  const tabViews = document.querySelectorAll('.tab-view');
+  const navBtns = document.querySelectorAll('.nav-tab-btn');
+
+  // Deactivate all views and buttons
+  tabViews.forEach(view => view.classList.remove('active-view'));
+  navBtns.forEach(btn => btn.classList.remove('active'));
+
+  // Activate matching view and button
+  const activeView = document.getElementById(targetTabId);
+  if (activeView) {
+    activeView.classList.add('active-view');
+  }
+
+  const activeBtn = document.querySelector(`.nav-tab-btn[data-tab="${targetTabId}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+  }
+
+  // Update URL hash
+  if (updateHash) {
+    const tabToHashMap = {
+      'viewOverview': 'overview',
+      'viewCharts': 'charts',
+      'viewTrades': 'trades',
+      'viewSimulator': 'simulator',
+      'viewBlueprint': 'blueprint'
+    };
+    if (tabToHashMap[targetTabId]) {
+      history.replaceState(null, '', `#${tabToHashMap[targetTabId]}`);
+    }
+  }
+
+  // If switched to charts, smoothly resize and fit lightweight charts
+  if (targetTabId === 'viewCharts') {
+    setTimeout(() => {
+      const priceContainer = document.getElementById('priceChartContainer');
+      const waveContainer = document.getElementById('waveChartContainer');
+      if (priceChart && priceContainer && priceContainer.clientWidth > 0) {
+        priceChart.applyOptions({ width: priceContainer.clientWidth });
+      }
+      if (waveChart && waveContainer && waveContainer.clientWidth > 0) {
+        waveChart.applyOptions({ width: waveContainer.clientWidth });
+      }
+      if (priceChart) priceChart.timeScale().fitContent();
+      if (waveChart) waveChart.timeScale().fitContent();
+    }, 60);
+  }
+
+  // Smoothly scroll to the navigation bar top
+  const navBar = document.getElementById('mainTabNav');
+  if (navBar && window.scrollY > navBar.offsetTop) {
+    navBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * Trade History Filter Controller (All / Win / Loss)
+ */
+function initTradeFilter() {
+  const filterBtns = document.querySelectorAll('.trades-filter-bar .filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTradeFilter = btn.dataset.filter || 'all';
+      renderCyclesTable(currentCyclesList, activeTradeFilter);
+    });
+  });
+}
+

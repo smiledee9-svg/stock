@@ -21,145 +21,260 @@
         <div>
           <h1>SCB Ramanujan Discrete Cycle Engine</h1>
           <p class="header-sub">
-            ระบบเทรดหุ้นไทยเป็นรอบตกผลึกขั้นสุดยอด (SET Long-Only) &bull; คลื่นฮาร์มอนิกรามานุจัน ($V_5, V_{20}$) &bull; กรอบไดนามิก $\delta_t$ &bull; ก้าวเติมไม้งอกไร้ความเสี่ยง (Risk-Free Pyramiding) &bull; Chandelier Trailing Stop ล้างพอร์ตถือเงินสด 100%
+            ระบบเทรดหุ้นไทยเป็นรอบตกผลึกขั้นสุดยอด (SET Long-Only) &bull; SCB.BK &bull; ตรวจจับวงรอบวัฏจักรด้วยทฤษฎีจำนวนของรามานุจัน
           </p>
         </div>
       </div>
       <div class="header-actions">
-        <span class="status-chip live-chip">● ตกผลึกกลยุทธ์เดียวที่ดีที่สุด 100%</span>
+        <span class="status-chip live-chip">● ตกผลึกกลยุทธ์เดียว 100%</span>
         <a href="../index.html" class="btn btn-outline" title="กลับไปหน้าร้านค้า SmartStock หลัก (โปรเจกต์ 1)">📦 หน้าสต็อกหลัก</a>
         <a href="https://github.com/smiledee9-svg/stock" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="ดูซอร์สโค้ดบน GitHub">⭐ GitHub Repo</a>
       </div>
     </header>
 
-    <!-- Metrics Cards Grid -->
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-label">หุ้นเป้าหมาย (Symbol)</div>
-        <div class="metric-val text-brand" id="mSymbol">SCB.BK</div>
-        <div class="metric-note" id="mNote1">ตลาด SET (บัญชี Cash Balance 100 หุ้น)</div>
+    <!-- Top Navigation Tabs Bar (สารบัญ & แท็บเลือกดูทีละหน้า) -->
+    <nav class="nav-tabs-wrapper" id="mainTabNav" aria-label="สารบัญหน้าหลัก">
+      <button type="button" class="nav-tab-btn active" data-tab="viewOverview">
+        <span class="tab-icon">🏠</span>
+        <span>สารบัญ & ภาพรวม</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="viewCharts">
+        <span class="tab-icon">📊</span>
+        <span>กราฟราคา & คลื่น</span>
+        <span class="tab-badge-pill">SCB</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="viewTrades">
+        <span class="tab-icon">📋</span>
+        <span>ประวัติรอบเทรด</span>
+        <span class="tab-badge-pill">12 รอบ</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="viewSimulator">
+        <span class="tab-icon">🚀</span>
+        <span>จำลองกลยุทธ์</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="viewBlueprint">
+        <span class="tab-icon">📐</span>
+        <span>4 เสาหลักทฤษฎี</span>
+      </button>
+    </nav>
+
+    <!-- =========================================================================
+         PAGE 1: OVERVIEW & TABLE OF CONTENTS HUB (หน้าแรก: สารบัญนำทาง & สรุปภาพรวม)
+         ========================================================================= -->
+    <section id="viewOverview" class="tab-view active-view">
+      <!-- Metrics Cards Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">หุ้นเป้าหมาย (Symbol)</div>
+          <div class="metric-val text-brand" id="mSymbol">SCB.BK</div>
+          <div class="metric-note" id="mNote1">ตลาด SET (บัญชี Cash Balance 100 หุ้น)</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">อัตราความแม่นยำ (Win Rate)</div>
+          <div class="metric-val text-green" id="mWinRate">75.00%</div>
+          <div class="metric-note" id="mWinTrades">9 ชนะ / 3 แพ้ (รวม 12 รอบประวัติการณ์)</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">ผลตอบแทนสุทธิ (Net Return)</div>
+          <div class="metric-val text-green" id="mReturn">+15.77%</div>
+          <div class="metric-note" id="mProfitFactor">Profit Factor: 2.56 (กำไร ฿157,654)</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">การคุมความเสี่ยง (Max Drawdown)</div>
+          <div class="metric-val text-amber" id="mDrawdown">-6.84%</div>
+          <div class="metric-note" id="mCalmar">Calmar Ratio: 2.31 (ปลอดภัยกว่า B&H ครึ่งหนึ่ง)</div>
+        </div>
       </div>
 
-      <div class="metric-card">
-        <div class="metric-label">อัตราความแม่นยำ (Win Rate)</div>
-        <div class="metric-val text-green" id="mWinRate">75.00%</div>
-        <div class="metric-note" id="mWinTrades">9 ชนะ / 3 แพ้ (รวม 12 รอบประวัติการณ์)</div>
+      <!-- Live Active Signal Card -->
+      <div class="live-signal-banner card-box" id="liveSignalBanner">
+        <div class="signal-badge-wrap">
+          <span class="pulse-indicator" id="sigPulse"></span>
+          <span class="signal-tag" id="sigBadge">⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
+        </div>
+        <div class="signal-details-grid">
+          <div class="sig-col">
+            <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
+            <strong class="sig-val" id="sigCurrPrice">฿145.50</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">คลื่นไมโคร $V_5$ (สัปดาห์):</span>
+            <strong class="sig-val text-brand" id="sigVMicro">-0.042 (ชะลอตัว)</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">คลื่นแมโคร $V_{20}$ (เดือน):</span>
+            <strong class="sig-val text-purple" id="sigVMacro">+0.038 (ประคองตัว)</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">Phase Coherence ($\rho_{ram}$):</span>
+            <strong class="sig-val text-amber" id="sigRho">-0.598 (คลื่นแยกทาง)</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">กรอบไดนามิกประจำตัว ($\delta_t$):</span>
+            <strong class="sig-val text-green" id="sigDelta">&plusmn;1.20%</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">แผนกลยุทธ์:</span>
+            <strong class="sig-val text-brand" id="sigActionPlan">ถือเงินสดปลอดภัย รอ $V_5, V_{20} &gt; 0$</strong>
+          </div>
+        </div>
       </div>
 
-      <div class="metric-card">
-        <div class="metric-label">ผลตอบแทนสุทธิ (Net Return)</div>
-        <div class="metric-val text-green" id="mReturn">+15.77%</div>
-        <div class="metric-note" id="mProfitFactor">Profit Factor: 2.56 (กำไร ฿157,654)</div>
+      <!-- Section Title for TOC Directory Grid -->
+      <div class="toc-section-title-wrap">
+        <div>
+          <h2 class="toc-section-title">
+            <span>📑</span>
+            <span>สารบัญระบบเทรดรามานุจัน (System Directory)</span>
+          </h2>
+          <p class="toc-section-desc">เลือกระบบหรือหมวดหมู่ที่ต้องการศึกษาหรือใช้งาน เพื่อเปิดดูทีละหน้าอย่างเป็นระเบียบ</p>
+        </div>
       </div>
 
-      <div class="metric-card">
-        <div class="metric-label">การคุมความเสี่ยง (Max Drawdown)</div>
-        <div class="metric-val text-amber" id="mDrawdown">-6.84%</div>
-        <div class="metric-note" id="mCalmar">Calmar Ratio: 2.31 (ปลอดภัยกว่า B&H ครึ่งหนึ่ง)</div>
-      </div>
-    </div>
-
-    <!-- Live Active Signal Card -->
-    <div class="live-signal-banner card-box" id="liveSignalBanner">
-      <div class="signal-badge-wrap">
-        <span class="pulse-indicator" id="sigPulse"></span>
-        <span class="signal-tag" id="sigBadge">⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
-      </div>
-      <div class="signal-details-grid">
-        <div class="sig-col">
-          <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
-          <strong class="sig-val" id="sigCurrPrice">฿145.50</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">คลื่นไมโคร $V_5$ (สัปดาห์):</span>
-          <strong class="sig-val text-brand" id="sigVMicro">-0.042 (ชะลอตัว)</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">คลื่นแมโคร $V_{20}$ (เดือน):</span>
-          <strong class="sig-val text-purple" id="sigVMacro">+0.038 (ประคองตัว)</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">Phase Coherence ($\rho_{ram}$):</span>
-          <strong class="sig-val text-amber" id="sigRho">-0.598 (คลื่นแยกทาง)</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">กรอบไดนามิกประจำตัว ($\delta_t$):</span>
-          <strong class="sig-val text-green" id="sigDelta">&plusmn;1.20%</strong>
-        </div>
-        <div class="sig-col">
-          <span class="sig-label">แผนกลยุทธ์:</span>
-          <strong class="sig-val text-brand" id="sigActionPlan">ถือเงินสดปลอดภัย รอ $V_5, V_{20} &gt; 0$</strong>
-        </div>
-      </div>
-    </div>
-
-    <!-- Strategy Preset & Interactive Simulation Toolbar -->
-    <div class="card-box backtest-toolbar" id="toolbarCycle">
-      <div class="toolbar-title-row">
-        <div class="toolbar-title">
-          <span class="toolbar-icon">🚀</span>
+      <!-- Table of Contents Directory Grid -->
+      <div class="toc-directory-grid">
+        <!-- TOC Item 1: Charts & Waves -->
+        <div class="toc-card" data-jump-tab="viewCharts" role="button" tabindex="0">
           <div>
-            <h3>เครื่องมือคำนวณรอบเทรดตกผลึก (Ramanujan SET Discrete Cycle Simulator)</h3>
-            <p class="toolbar-desc">คลิกเลือกพรีเซ็ตความดุดันของพอร์ต หรือปรับขนาดเงินลงทุนแล้วกดคำนวณเพื่อจำลอง 12 รอบเทรดสดได้ทันที</p>
+            <div class="toc-card-header">
+              <div class="toc-card-icon">📊</div>
+              <span class="toc-card-step">MODULE 01</span>
+            </div>
+            <h3 class="toc-card-title">กราฟราคา & คลื่นฮาร์มอนิก</h3>
+            <p class="toc-card-desc">
+              ดูกราฟแท่งเทียน SCB รายวัน พร้อมจุดเปิดรอบซื้อไม้แรก, จุดเติมไม้งอก (Pyramid), จุดเทขายทำกำไร และเส้น Chandelier Trailing Stop ควบคู่คลื่นความเร็วรามานุจัน ($V_5, V_{20}$)
+            </p>
+            <div class="toc-card-highlights">
+              <span class="toc-tag">แท่งเทียน 2 ปี</span>
+              <span class="toc-tag">Harmonic Drift</span>
+              <span class="toc-tag">Trailing Stop</span>
+            </div>
+          </div>
+          <div class="toc-card-footer">
+            <span class="subpage-badge-info">พร้อมใช้งาน</span>
+            <span class="toc-card-action">เปิดดูกราฟเทรด &rarr;</span>
           </div>
         </div>
-        <div class="strategy-presets">
-          <button type="button" class="preset-btn active" data-preset="aggressive">🚀 แนะนำ: Aggressive Master 90% (+15.77% | DD -6.84%)</button>
-          <button type="button" class="preset-btn" data-preset="balanced">⚖️ Balanced 65% (+11.85% | DD -4.85%)</button>
-          <button type="button" class="preset-btn" data-preset="conservative">🛡️ Conservative 35% (+6.86% | DD -2.70%)</button>
+
+        <!-- TOC Item 2: Trade History Log -->
+        <div class="toc-card" data-jump-tab="viewTrades" role="button" tabindex="0">
+          <div>
+            <div class="toc-card-header">
+              <div class="toc-card-icon" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3);">📋</div>
+              <span class="toc-card-step">MODULE 02</span>
+            </div>
+            <h3 class="toc-card-title">บันทึกประวัติการเทรด 12 รอบ</h3>
+            <p class="toc-card-desc">
+              รายละเอียดผลการเทรดจริงครบทั้ง 12 รอบ (ชนะ 9 รอบ / ตัดขาดทุน 3 รอบ, Win Rate 75%) พร้อมระดับความมั่นใจ 4D Tier (A/B/C), จำนวนไม้ที่ใช้, ราคาเข้าเฉลี่ย และกำไรสุทธิหักคอมมิชชัน
+            </p>
+            <div class="toc-card-highlights">
+              <span class="toc-tag">Win Rate 75%</span>
+              <span class="toc-tag">4D Tier A/B/C</span>
+              <span class="toc-tag">กำไร ฿157,654</span>
+            </div>
+          </div>
+          <div class="toc-card-footer">
+            <span class="subpage-badge-info" style="color: #34d399; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.25);">ชนะ 9 / แพ้ 3</span>
+            <span class="toc-card-action" style="color: #34d399;">เปิดดูประวัติรอบ &rarr;</span>
+          </div>
+        </div>
+
+        <!-- TOC Item 3: Strategy Simulator -->
+        <div class="toc-card" data-jump-tab="viewSimulator" role="button" tabindex="0">
+          <div>
+            <div class="toc-card-header">
+              <div class="toc-card-icon" style="background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3);">🚀</div>
+              <span class="toc-card-step">MODULE 03</span>
+            </div>
+            <h3 class="toc-card-title">เครื่องมือจำลองกลยุทธ์ & ปรับพอร์ต</h3>
+            <p class="toc-card-desc">
+              ห้องทดลองปรับแต่งพารามิเตอร์: เลือกพรีเซ็ตสำเร็จรูป (Aggressive 90%, Balanced 65%, Conservative 35%) หรือปรับขนาดเงินลงทุนเริ่มต้นและสัดส่วนความเสี่ยงเพื่อคำนวณผลลัพธ์พอร์ตแบบเรียลไทม์
+            </p>
+            <div class="toc-card-highlights">
+              <span class="toc-tag">3 Presets</span>
+              <span class="toc-tag">ปรับเงินต้นอิสระ</span>
+              <span class="toc-tag">จำลองความเสี่ยง</span>
+            </div>
+          </div>
+          <div class="toc-card-footer">
+            <span class="subpage-badge-info" style="color: #fbbf24; background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.25);">คำนวณสด</span>
+            <span class="toc-card-action" style="color: #fbbf24;">เปิดตัวจำลอง &rarr;</span>
+          </div>
+        </div>
+
+        <!-- TOC Item 4: Mathematics Blueprint -->
+        <div class="toc-card" data-jump-tab="viewBlueprint" role="button" tabindex="0">
+          <div>
+            <div class="toc-card-header">
+              <div class="toc-card-icon" style="background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.3);">📐</div>
+              <span class="toc-card-step">MODULE 04</span>
+            </div>
+            <h3 class="toc-card-title">พิมพ์เขียว 4 เสาหลักคณิตศาสตร์</h3>
+            <p class="toc-card-desc">
+              ศึกษาเอกสารและทฤษฎีรามานุจันบริสุทธิ์: Zero-Lag Drift, ตัวกรองไซด์เวย์ Kaufman ER, เมทริกซ์ความมั่นใจ 4 มิติ และ Rogers-Ramanujan Climax Snap-Back Trailing Stop
+            </p>
+            <div class="toc-card-highlights">
+              <span class="toc-tag">ทฤษฎี RPT</span>
+              <span class="toc-tag">Kaufman ER</span>
+              <span class="toc-tag">Rogers-Ramanujan</span>
+            </div>
+          </div>
+          <div class="toc-card-footer">
+            <span class="subpage-badge-info" style="color: #c084fc; background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.25);">แก่นคณิตศาสตร์</span>
+            <span class="toc-card-action" style="color: #c084fc;">อ่านพิมพ์เขียว &rarr;</span>
+          </div>
         </div>
       </div>
 
-      <div class="param-controls-grid">
-        <div class="param-group">
-          <label for="inputInitialCapital">เงินลงทุนเริ่มต้น (Initial Capital):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputInitialCapital" value="1000000" step="50000" min="100000">
-            <span>฿</span>
+      <!-- Quick Strategy Rules Banner (สรุปหัวใจระบบเทรดใน 3 ข้อ) -->
+      <div class="quick-rules-banner">
+        <h3 style="color: #fff; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+          <span>💡</span>
+          <span>สรุป 3 กฎเหล็กการเทรดหุ้นเป็นรอบของรามานุจัน (Golden Rules)</span>
+        </h3>
+        <div class="quick-rules-grid">
+          <div class="quick-rule-item">
+            <div class="quick-rule-num">1</div>
+            <div class="quick-rule-text">
+              <h4>เปิดรอบเมื่อคลื่นพุ่งพร้อมกัน</h4>
+              <p>เปิดซื้อเฉพาะตอนคลื่นสัปดาห์ $V_5$ และเดือน $V_{20}$ พุ่งขึ้นเหนือ 0 พร้อมกัน ร่วมกับตัวกรองไซด์เวย์ผ่านเกณฑ์</p>
+            </div>
+          </div>
+          <div class="quick-rule-item">
+            <div class="quick-rule-num">2</div>
+            <div class="quick-rule-text">
+              <h4>เติมไม้งอกเมื่อมีกำไรแล้วเท่านั้น</h4>
+              <p>เติมไม้ 2 และไม้ 3 (Pyramiding) เฉพาะตอนไม้แรกวิ่งบวกเกินกรอบ $\delta_t$ พร้อมล็อกทุน Breakeven เสมอ</p>
+            </div>
+          </div>
+          <div class="quick-rule-item">
+            <div class="quick-rule-num">3</div>
+            <div class="quick-rule-text">
+              <h4>หลุด Trailing Stop ล้างพอร์ต 100%</h4>
+              <p>เมื่อราคาวิ่งชนเส้น Trailing Stop หรือคลื่นหักหัวลงพร้อมกัน จะขายทุกล็อตทันที ไม่ติดดอย ถือเงินสด 100% สบายใจ</p>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="param-group">
-          <label for="inputMaxAlloc">เพดานเงินลงทุนต่อไม้ (Max Allocation):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputMaxAlloc" value="90" step="5" min="20" max="95">
-            <span>%</span>
-          </div>
-        </div>
-
-        <div class="param-group">
-          <label for="inputRiskCycle">ความเสี่ยงต่อรอบ (Risk Budget):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputRiskCycle" value="5.4" step="0.5" min="1.0" max="10.0">
-            <span>%</span>
-          </div>
-        </div>
-
-        <div class="param-group">
-          <label for="inputMaxLayers">จำนวนไม้สูงสุดใน 1 รอบ (Max Layers):</label>
-          <div class="input-with-unit">
-            <input type="number" id="inputMaxLayers" value="3" step="1" min="1" max="3">
-            <span>ไม้</span>
-          </div>
-        </div>
-
-        <div class="param-group param-action">
-          <button type="button" id="btnRunSimulation" class="btn btn-primary btn-run">
-            ⚡ คำนวณสัญญาณ & จำลองรอบเทรด
+    <!-- =========================================================================
+         PAGE 2: CHARTS & WAVE DYNAMICS (หน้ากราฟราคา & คลื่นฮาร์มอนิก)
+         ========================================================================= -->
+    <section id="viewCharts" class="tab-view">
+      <div class="subpage-nav-header">
+        <div class="subpage-nav-left">
+          <button type="button" class="btn-back-hub" data-target="viewOverview">
+            <span>&larr;</span>
+            <span>กลับหน้าสารบัญ</span>
           </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Chart Section -->
-    <section class="chart-section card-box">
-      <div class="section-header">
-        <div class="section-title-wrap">
-          <h2 id="chartSectionTitle">📊 กราฟราคาแท่งเทียน SCB, สัญญาณเปิดรอบ/เติมไม้ & Chandelier Trailing Stop</h2>
-          <span class="chart-legend-badge legend-buy">▲ ซื้อไม้แรก (Entry)</span>
-          <span class="chart-legend-badge legend-pyramid">◆ เติมไม้งอก (Pyramid)</span>
-          <span class="chart-legend-badge legend-sell">▼ ขายปิดรอบ (Exit 100%)</span>
-          <span class="chart-legend-badge legend-trailing">─ Chandelier Trailing Stop</span>
+          <div class="subpage-nav-title">
+            <span>📊</span>
+            <span>กราฟราคาแท่งเทียน SCB & สัญญาณคลื่นฮาร์มอนิกรามานุจัน</span>
+          </div>
         </div>
         <div class="chart-controls">
           <button type="button" class="btn-time active" data-range="all">2 ปีเต็ม</button>
@@ -168,90 +283,214 @@
         </div>
       </div>
 
-      <!-- Main Price Candlestick Chart -->
-      <div id="priceChartContainer" class="chart-container"></div>
+      <div class="chart-section card-box">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <h2 id="chartSectionTitle" style="font-size: 1.05rem;">แท่งเทียนราคา SCB.BK, สัญญาณเปิดรอบ/เติมไม้ & Chandelier Trailing Stop</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+              <span class="chart-legend-badge legend-buy">▲ ซื้อไม้แรก (Entry)</span>
+              <span class="chart-legend-badge legend-pyramid">◆ เติมไม้งอก (Pyramid)</span>
+              <span class="chart-legend-badge legend-sell">▼ ขายปิดรอบ (Exit 100%)</span>
+              <span class="chart-legend-badge legend-trailing">─ Chandelier Trailing Stop</span>
+            </div>
+          </div>
+        </div>
 
-      <!-- Sub-Chart Container (Harmonic Waves & Coherence) -->
-      <div class="sub-chart-title">
-        <span>🌊 ความเร็วคลื่นรามานุจัน (Zero-Lag Harmonic Drift: $V_5$ ฟ้า / $V_{20}$ ม่วง)</span>
-        <span class="sub-note">เปิดรอบเมื่อทั้งสองเส้นพุ่งเหนือ 0 พร้อมกัน | ขายทำกำไรเมื่อหักหัวลงหลุด 0 พร้อมกัน</span>
+        <!-- Main Price Candlestick Chart -->
+        <div id="priceChartContainer" class="chart-container"></div>
+
+        <!-- Sub-Chart Container (Harmonic Waves & Coherence) -->
+        <div class="sub-chart-title">
+          <span>🌊 ความเร็วคลื่นรามานุจัน (Zero-Lag Harmonic Drift: $V_5$ ฟ้า / $V_{20}$ ม่วง)</span>
+          <span class="sub-note">เปิดรอบเมื่อทั้งสองเส้นพุ่งเหนือ 0 พร้อมกัน | ขายทำกำไรเมื่อหักหัวลงหลุด 0 พร้อมกัน</span>
+        </div>
+        <div id="waveChartContainer" class="sub-chart-container"></div>
       </div>
-      <div id="waveChartContainer" class="sub-chart-container"></div>
     </section>
 
-    <!-- The 4 Pillars of Victory (พิมพ์เขียว 4 เสาหลักการเอาชนะตลาดหุ้นไทย) -->
-    <div class="card-box" style="border-color: rgba(6, 182, 212, 0.35); background: linear-gradient(135deg, rgba(8, 13, 26, 0.95) 0%, rgba(6, 182, 212, 0.08) 100%);">
-      <div class="card-box-header">
-        <h3 style="color: #38bdf8;">📐 พิมพ์เขียว 4 เสาหลักคณิตศาสตร์รามานุจัน (The 4 Pillars of SET Discrete Cycle Trading)</h3>
-      </div>
-      <div class="pillars-grid">
-        <div class="pillar-card">
-          <div class="pillar-icon">🌊</div>
-          <strong>1. Zero-Lag Drift ($V_5, V_{20}$) & Coherence ($\rho_{ram}$)</strong>
-          <p>
-            ใช้ Ramanujan Periodic Transform (RPT) คัดกรองรอบวัฏจักร สั่งเปิดรอบซื้อเมื่อคลื่นสัปดาห์ $V_5$ และเดือน $V_{20}$ พุ่งขึ้นพร้อมกัน ($\rho_{ram} \ge 0.25$) และสั่งเทขายล้างพอร์ตทันทีเมื่อคลื่นหักหัวลงพร้อมกัน
-          </p>
-        </div>
-
-        <div class="pillar-card">
-          <div class="pillar-icon">🛡️</div>
-          <strong>2. ตัวกรองหุ้นไซด์เวย์ ($ER_{10} \ge 0.28, BBE \ge 0.80$)</strong>
-          <p>
-            Kaufman Efficiency Ratio ร่วมกับ Volatility Partition Density สกัดกั้นไม่ให้เปิดรอบตอนตลาดซึม วอลุ่มแห้ง หรือเจ้ามือพักหุ้น เงินสด 100% จึงนอนนิ่งปลอดภัย ไม่ติดดอยยาวเหมือนการถือหุ้นตลอดเวลา
-          </p>
-        </div>
-
-        <div class="pillar-card">
-          <div class="pillar-icon">🎯</div>
-          <strong>3. 4D Confidence ($\mathcal{C}_t$) & Convex Sizing ($\lambda_t$)</strong>
-          <p>
-            ประเมินคะแนนความมั่นใจ 4 มิติ ($S_{\text{phase}}, S_{\text{ER}}, S_{\text{RR}}, S_{\text{part}}$) แปลงด้วยฟังก์ชันยกกำลัง 1.5 คุมขนาดไม้และเพดานไม้งอก (Tier A: 3 ไม้, Tier B: 2 ไม้, Tier C: 1 ไม้หยั่งเชิง) พร้อมล็อก Breakeven อัตโนมัติ
-          </p>
-        </div>
-
-        <div class="pillar-card">
-          <div class="pillar-icon">⛰️</div>
-          <strong>4. Dynamic $\delta_t$ Chandelier Trailing & Climax Snap-Back</strong>
-          <p>
-            กรอบ $\delta_t$ ปรับตัวตามนิสัยหุ้น ตอนราคาพุ่งแรงปลายคลื่น ($Z_t \gt 2.50$) โมดูลัสเศษส่วนต่อเนื่องโรเจอร์ส-รามานุจันจะบีบเส้น Trailing Stop ให้กระโดดมาชิดราคาปัจจุบันทันที เพื่อล็อกกำไรก้อนใหญ่ที่ยอดดอยก่อนราคาพักฐาน
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Completed Cycles History Table -->
-    <section class="card-box" style="margin-top: 24px;">
-      <div class="section-header-compact">
-        <div>
-          <h3>📋 บันทึกประวัติการเทรดเป็นรอบทั้ง 12 รอบ (All Completed Discrete Cycles)</h3>
-          <p class="table-subtitle">รายละเอียดครบถ้วนทุกรอบ: สัญญาณเปิดรอบ, ระดับความมั่นใจ 4D Tier, จำนวนไม้ที่เติม, ราคาเข้าเฉลี่ย, ราคาออก, กำไรสุทธิหลังหักค่าคอมมิชชัน 0.168% ต่อขา</p>
+    <!-- =========================================================================
+         PAGE 3: TRADE HISTORY LOG (หน้าบันทึกประวัติการเทรด 12 รอบ)
+         ========================================================================= -->
+    <section id="viewTrades" class="tab-view">
+      <div class="subpage-nav-header">
+        <div class="subpage-nav-left">
+          <button type="button" class="btn-back-hub" data-target="viewOverview">
+            <span>&larr;</span>
+            <span>กลับหน้าสารบัญ</span>
+          </button>
+          <div class="subpage-nav-title">
+            <span>📋</span>
+            <span>บันทึกประวัติรอบเทรด SCB ทั้ง 12 รอบ (Completed Discrete Cycles)</span>
+          </div>
         </div>
         <div class="badge-tag tag-success" id="tableSummaryBadge">ชนะ 9 จาก 12 รอบ (75.0%)</div>
       </div>
-      <div class="table-responsive">
-        <table class="quant-table">
-          <thead>
-            <tr>
-              <th>รอบที่</th>
-              <th>วันเข้าซื้อ</th>
-              <th>วันปิดรอบ</th>
-              <th>รูปแบบสัญญาณ</th>
-              <th>ความมั่นใจ (4D Tier)</th>
-              <th>ไม้ที่ใช้</th>
-              <th>จำนวนหุ้น</th>
-              <th>ราคาเข้าเฉลี่ย</th>
-              <th>ราคาออก</th>
-              <th>ถือครอง</th>
-              <th>กำไรสุทธิ (฿)</th>
-              <th>ผลตอบแทน (%)</th>
-              <th>เหตุผลที่ปิดรอบ</th>
-              <th>ผลลัพธ์</th>
-            </tr>
-          </thead>
-          <tbody id="cyclesTableBody">
-            <!-- Populated via JavaScript -->
-          </tbody>
-        </table>
+
+      <!-- Trade Filter Buttons Bar -->
+      <div class="trades-filter-bar">
+        <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;">กรองแสดงผล:</span>
+        <button type="button" class="filter-btn active" data-filter="all">ทั้งหมด (12 รอบ)</button>
+        <button type="button" class="filter-btn filter-win" data-filter="win">🟢 เฉพาะรอบชนะ (9 รอบ)</button>
+        <button type="button" class="filter-btn filter-loss" data-filter="loss">🔴 เฉพาะรอบตัดขาดทุน (3 รอบ)</button>
+      </div>
+
+      <div class="card-box">
+        <div class="table-responsive">
+          <table class="quant-table">
+            <thead>
+              <tr>
+                <th>รอบที่</th>
+                <th>วันเข้าซื้อ</th>
+                <th>วันปิดรอบ</th>
+                <th>รูปแบบสัญญาณ</th>
+                <th>ความมั่นใจ (4D Tier)</th>
+                <th>ไม้ที่ใช้</th>
+                <th>จำนวนหุ้น</th>
+                <th>ราคาเข้าเฉลี่ย</th>
+                <th>ราคาออก</th>
+                <th>ถือครอง</th>
+                <th>กำไรสุทธิ (฿)</th>
+                <th>ผลตอบแทน (%)</th>
+                <th>เหตุผลที่ปิดรอบ</th>
+                <th>ผลลัพธ์</th>
+              </tr>
+            </thead>
+            <tbody id="cyclesTableBody">
+              <!-- Populated via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         PAGE 4: STRATEGY SIMULATOR (หน้าเครื่องมือจำลองกลยุทธ์ & ปรับพอร์ต)
+         ========================================================================= -->
+    <section id="viewSimulator" class="tab-view">
+      <div class="subpage-nav-header">
+        <div class="subpage-nav-left">
+          <button type="button" class="btn-back-hub" data-target="viewOverview">
+            <span>&larr;</span>
+            <span>กลับหน้าสารบัญ</span>
+          </button>
+          <div class="subpage-nav-title">
+            <span>🚀</span>
+            <span>เครื่องมือคำนวณรอบเทรดตกผลึก (Ramanujan Simulator)</span>
+          </div>
+        </div>
+        <span class="subpage-badge-info" style="color: #fbbf24; background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.25);">จำลองผลทันที</span>
+      </div>
+
+      <div class="card-box backtest-toolbar" id="toolbarCycle">
+        <div class="toolbar-title-row">
+          <div class="toolbar-title">
+            <span class="toolbar-icon">⚙️</span>
+            <div>
+              <h3>เลือกพรีเซ็ตความดุดันของพอร์ต (Strategy Presets)</h3>
+              <p class="toolbar-desc">คลิกเลือกรูปแบบพอร์ตที่ต้องการ หรือปรับขนาดเงินลงทุนแล้วกดคำนวณเพื่อจำลอง 12 รอบเทรดสดได้ทันที</p>
+            </div>
+          </div>
+          <div class="strategy-presets">
+            <button type="button" class="preset-btn active" data-preset="aggressive">🚀 แนะนำ: Aggressive Master 90% (+15.77% | DD -6.84%)</button>
+            <button type="button" class="preset-btn" data-preset="balanced">⚖️ Balanced 65% (+11.85% | DD -4.85%)</button>
+            <button type="button" class="preset-btn" data-preset="conservative">🛡️ Conservative 35% (+6.86% | DD -2.70%)</button>
+          </div>
+        </div>
+
+        <div class="param-controls-grid">
+          <div class="param-group">
+            <label for="inputInitialCapital">เงินลงทุนเริ่มต้น (Initial Capital):</label>
+            <div class="input-with-unit">
+              <input type="number" id="inputInitialCapital" value="1000000" step="50000" min="100000">
+              <span>฿</span>
+            </div>
+          </div>
+
+          <div class="param-group">
+            <label for="inputMaxAlloc">เพดานเงินลงทุนต่อไม้ (Max Allocation):</label>
+            <div class="input-with-unit">
+              <input type="number" id="inputMaxAlloc" value="90" step="5" min="20" max="95">
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="param-group">
+            <label for="inputRiskCycle">ความเสี่ยงต่อรอบ (Risk Budget):</label>
+            <div class="input-with-unit">
+              <input type="number" id="inputRiskCycle" value="5.4" step="0.5" min="1.0" max="10.0">
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="param-group">
+            <label for="inputMaxLayers">จำนวนไม้สูงสุดใน 1 รอบ (Max Layers):</label>
+            <div class="input-with-unit">
+              <input type="number" id="inputMaxLayers" value="3" step="1" min="1" max="3">
+              <span>ไม้</span>
+            </div>
+          </div>
+
+          <div class="param-group param-action">
+            <button type="button" id="btnRunSimulation" class="btn btn-primary btn-run">
+              ⚡ คำนวณสัญญาณ & จำลองรอบเทรด
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         PAGE 5: THE 4 PILLARS BLUEPRINT (หน้าพิมพ์เขียว 4 เสาหลักคณิตศาสตร์)
+         ========================================================================= -->
+    <section id="viewBlueprint" class="tab-view">
+      <div class="subpage-nav-header">
+        <div class="subpage-nav-left">
+          <button type="button" class="btn-back-hub" data-target="viewOverview">
+            <span>&larr;</span>
+            <span>กลับหน้าสารบัญ</span>
+          </button>
+          <div class="subpage-nav-title">
+            <span>📐</span>
+            <span>พิมพ์เขียว 4 เสาหลักคณิตศาสตร์รามานุจัน (The 4 Pillars of Victory)</span>
+          </div>
+        </div>
+        <span class="subpage-badge-info" style="color: #c084fc; background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.25);">โมเดลคณิตศาสตร์บริสุทธิ์</span>
+      </div>
+
+      <div class="card-box" style="border-color: rgba(6, 182, 212, 0.35); background: linear-gradient(135deg, rgba(8, 13, 26, 0.95) 0%, rgba(6, 182, 212, 0.08) 100%);">
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-icon">🌊</div>
+            <strong>1. Zero-Lag Drift ($V_5, V_{20}$) & Coherence ($\rho_{ram}$)</strong>
+            <p>
+              ใช้ Ramanujan Periodic Transform (RPT) คัดกรองรอบวัฏจักร สั่งเปิดรอบซื้อเมื่อคลื่นสัปดาห์ $V_5$ และเดือน $V_{20}$ พุ่งขึ้นพร้อมกัน ($\rho_{ram} \ge 0.25$) และสั่งเทขายล้างพอร์ตทันทีเมื่อคลื่นหักหัวลงพร้อมกัน
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">🛡️</div>
+            <strong>2. ตัวกรองหุ้นไซด์เวย์ ($ER_{10} \ge 0.28, BBE \ge 0.80$)</strong>
+            <p>
+              Kaufman Efficiency Ratio ร่วมกับ Volatility Partition Density สกัดกั้นไม่ให้เปิดรอบตอนตลาดซึม วอลุ่มแห้ง หรือเจ้ามือพักหุ้น เงินสด 100% จึงนอนนิ่งปลอดภัย ไม่ติดดอยยาวเหมือนการถือหุ้นตลอดเวลา
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">🎯</div>
+            <strong>3. 4D Confidence ($\mathcal{C}_t$) & Convex Sizing ($\lambda_t$)</strong>
+            <p>
+              ประเมินคะแนนความมั่นใจ 4 มิติ ($S_{\text{phase}}, S_{\text{ER}}, S_{\text{RR}}, S_{\text{part}}$) แปลงด้วยฟังก์ชันยกกำลัง 1.5 คุมขนาดไม้และเพดานไม้งอก (Tier A: 3 ไม้, Tier B: 2 ไม้, Tier C: 1 ไม้หยั่งเชิง) พร้อมล็อก Breakeven อัตโนมัติ
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">⛰️</div>
+            <strong>4. Dynamic $\delta_t$ Chandelier Trailing & Climax Snap-Back</strong>
+            <p>
+              กรอบ $\delta_t$ ปรับตัวตามนิสัยหุ้น ตอนราคาพุ่งแรงปลายคลื่น ($Z_t \gt 2.50$) โมดูลัสเศษส่วนต่อเนื่องโรเจอร์ส-รามานุจันจะบีบเส้น Trailing Stop ให้กระโดดมาชิดราคาปัจจุบันทันที เพื่อล็อกกำไรก้อนใหญ่ที่ยอดดอยก่อนราคาพักฐาน
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 
