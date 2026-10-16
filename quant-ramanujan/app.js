@@ -293,8 +293,8 @@ function initDashboard(data) {
     document.getElementById('lblMetric3').textContent = 'ต้นทุนเฉลี่ยแท้จริง (Cost Basis)';
     document.getElementById('mWinRate').textContent = `฿${(rs.effectiveCostBasis || 112.66).toFixed(2)}/หุ้น`;
     const curP = (rs.currentHolding && rs.currentHolding.lastPrice) ? rs.currentHolding.lastPrice : 145.5;
-    const discount = ((curP - (rs.effectiveCostBasis || 112.66)) / curP) * 100;
-    document.getElementById('mWinTrades').textContent = `ราคาตลาด ฿${curP.toFixed(2)} (ต้นทุนได้เปรียบตลาด ${discount.toFixed(1)}%)`;
+    const cardDiscount = ((curP - (rs.effectiveCostBasis || 112.66)) / curP) * 100;
+    document.getElementById('mWinTrades').textContent = `ราคาตลาด ฿${curP.toFixed(2)} (ต้นทุนได้เปรียบตลาด ${cardDiscount.toFixed(1)}%)`;
 
     document.getElementById('lblMetric4').textContent = 'ความคุ้มค่าความเสี่ยง (Risk Shield)';
     const retEl = document.getElementById('mReturn');
@@ -308,7 +308,7 @@ function initDashboard(data) {
     const cashRatio = Math.max(0, 100 - stockRatio);
     const curPrice = cur.lastPrice || 145.5;
     const cost = rs.effectiveCostBasis || 112.66;
-    const discount = ((curPrice - cost) / curPrice) * 100;
+    const bannerDiscount = ((curPrice - cost) / curPrice) * 100;
 
     const barStockEl = document.getElementById('barStockRatio');
     const barCashEl = document.getElementById('barCashRatio');
@@ -333,7 +333,7 @@ function initDashboard(data) {
     const rebCostEl = document.getElementById('rebEffectiveCost');
     if (rebCostEl) rebCostEl.textContent = `฿${cost.toFixed(2)} / หุ้น`;
     const rebMarketEl = document.getElementById('rebMarketPrice');
-    if (rebMarketEl) rebMarketEl.textContent = `฿${curPrice.toFixed(2)} (ต้นทุนถูกกว่า ${discount.toFixed(1)}%)`;
+    if (rebMarketEl) rebMarketEl.textContent = `฿${curPrice.toFixed(2)} (ต้นทุนถูกกว่า ${bannerDiscount.toFixed(1)}%)`;
     const rebNextEl = document.getElementById('rebNextAction');
     if (rebNextEl) {
       const waveTh = document.getElementById('inputRebTroughTh') ? document.getElementById('inputRebTroughTh').value : -30;
