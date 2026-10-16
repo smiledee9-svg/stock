@@ -4,26 +4,26 @@
     "period": "2 Years (Daily SET)",
     "totalCandles": 484,
     "initialCapital": 1000000.0,
-    "finalEquity": 1157654.02,
-    "totalReturnPct": 15.77,
-    "maxDrawdownPct": -6.84,
-    "annVolPct": 8.21,
-    "sharpe": 0.67,
-    "sortino": 1.02,
-    "calmar": 2.3,
+    "finalEquity": 1102045.23,
+    "totalReturnPct": 10.2,
+    "maxDrawdownPct": -3.63,
+    "annVolPct": 5.52,
+    "sharpe": 0.49,
+    "sortino": 0.8,
+    "calmar": 2.81,
     "totalCycles": 12,
     "winCycles": 9,
     "lossCycles": 3,
     "winRatePct": 75.0,
-    "profitFactor": 2.56,
-    "totalFeesPaid": 40333.76,
+    "profitFactor": 3.38,
+    "totalFeesPaid": 23276.77,
     "bnhReturnPct": 33.49,
     "bnhMaxDrawdownPct": -12.73,
     "currentPrice": 145.5
   },
   "activePosition": {
     "inPosition": false,
-    "cash": 1157654.02,
+    "cash": 1102045.23,
     "status": "CASH_100",
     "message": "ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่ (เกราะคุ้มกันความเสี่ยงสมบูรณ์แบบ)"
   },
@@ -34,12 +34,12 @@
       "exit_date": "2025-01-21",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 1,
-      "total_shares": 7400,
+      "total_shares": 4000,
       "avg_entry": 120.0,
       "exit_price": 120.64,
       "bars_held": 10,
-      "net_pnl_thb": 1768.0,
-      "net_return_pct": 0.18,
+      "net_pnl_thb": 955.68,
+      "net_return_pct": 0.1,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -49,12 +49,12 @@
       "exit_date": "2025-02-11",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 1,
-      "total_shares": 7200,
+      "total_shares": 2600,
       "avg_entry": 124.5,
       "exit_price": 125.17,
       "bars_held": 14,
-      "net_pnl_thb": 1784.73,
-      "net_return_pct": 0.18,
+      "net_pnl_thb": 644.49,
+      "net_return_pct": 0.06,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -64,12 +64,12 @@
       "exit_date": "2025-05-30",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 1,
-      "total_shares": 7300,
+      "total_shares": 3000,
       "avg_entry": 122.5,
       "exit_price": 118.5,
       "bars_held": 8,
-      "net_pnl_thb": -32155.62,
-      "net_return_pct": -3.2,
+      "net_pnl_thb": -13214.64,
+      "net_return_pct": -1.32,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "LOSS"
     },
@@ -79,12 +79,12 @@
       "exit_date": "2025-08-21",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 2,
-      "total_shares": 7900,
-      "avg_entry": 120.75,
+      "total_shares": 6400,
+      "avg_entry": 124.65,
       "exit_price": 128.5,
       "bars_held": 32,
-      "net_pnl_thb": 57891.91,
-      "net_return_pct": 5.96,
+      "net_pnl_thb": 21928.15,
+      "net_return_pct": 2.22,
       "exit_reason": "Harmonic_Phase_Breakdown_TP",
       "status": "WIN"
     },
@@ -94,12 +94,12 @@
       "exit_date": "2025-10-27",
       "mode": "INFLECTION_TURN",
       "layers_used": 1,
-      "total_shares": 7100,
+      "total_shares": 4000,
       "avg_entry": 129.5,
       "exit_price": 132.76,
       "bars_held": 11,
-      "net_pnl_thb": 19990.3,
-      "net_return_pct": 1.94,
+      "net_pnl_thb": 11262.14,
+      "net_return_pct": 1.11,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -109,12 +109,12 @@
       "exit_date": "2026-01-14",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 2,
-      "total_shares": 7800,
-      "avg_entry": 132.04,
+      "total_shares": 7400,
+      "avg_entry": 133.53,
       "exit_price": 137.19,
       "bars_held": 30,
-      "net_pnl_thb": 36642.91,
-      "net_return_pct": 3.49,
+      "net_pnl_thb": 23729.9,
+      "net_return_pct": 2.32,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -124,12 +124,12 @@
       "exit_date": "2026-02-25",
       "mode": "INFLECTION_TURN",
       "layers_used": 1,
-      "total_shares": 6900,
+      "total_shares": 2700,
       "avg_entry": 140.0,
       "exit_price": 146.47,
       "bars_held": 12,
-      "net_pnl_thb": 41340.32,
-      "net_return_pct": 3.81,
+      "net_pnl_thb": 16176.65,
+      "net_return_pct": 1.55,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -139,12 +139,12 @@
       "exit_date": "2026-06-09",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 1,
-      "total_shares": 7300,
+      "total_shares": 3600,
       "avg_entry": 137.5,
       "exit_price": 138.24,
       "bars_held": 4,
-      "net_pnl_thb": 1998.46,
-      "net_return_pct": 0.18,
+      "net_pnl_thb": 985.54,
+      "net_return_pct": 0.09,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -154,12 +154,12 @@
       "exit_date": "2026-07-06",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 2,
-      "total_shares": 7900,
-      "avg_entry": 140.58,
+      "total_shares": 7200,
+      "avg_entry": 142.71,
       "exit_price": 152.27,
       "bars_held": 16,
-      "net_pnl_thb": 88476.63,
-      "net_return_pct": 7.83,
+      "net_pnl_thb": 65257.97,
+      "net_return_pct": 6.14,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -169,12 +169,12 @@
       "exit_date": "2026-07-17",
       "mode": "INFLECTION_TURN",
       "layers_used": 1,
-      "total_shares": 7000,
+      "total_shares": 3300,
       "avg_entry": 155.0,
       "exit_price": 156.75,
       "bars_held": 6,
-      "net_pnl_thb": 8613.35,
-      "net_return_pct": 0.71,
+      "net_pnl_thb": 4060.58,
+      "net_return_pct": 0.36,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "WIN"
     },
@@ -184,12 +184,12 @@
       "exit_date": "2026-07-21",
       "mode": "INFLECTION_TURN",
       "layers_used": 1,
-      "total_shares": 6900,
+      "total_shares": 3800,
       "avg_entry": 158.5,
       "exit_price": 155.0,
       "bars_held": 1,
-      "net_pnl_thb": -27784.09,
-      "net_return_pct": -2.27,
+      "net_pnl_thb": -15301.38,
+      "net_return_pct": -1.35,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "LOSS"
     },
@@ -199,12 +199,12 @@
       "exit_date": "2026-09-30",
       "mode": "HARMONIC_BREAKOUT",
       "layers_used": 1,
-      "total_shares": 6800,
+      "total_shares": 2400,
       "avg_entry": 156.5,
       "exit_price": 151.0,
       "bars_held": 7,
-      "net_pnl_thb": -40912.88,
-      "net_return_pct": -3.41,
+      "net_pnl_thb": -14439.84,
+      "net_return_pct": -1.29,
       "exit_reason": "StopLoss_or_TrailingStop",
       "status": "LOSS"
     }
@@ -1382,9 +1382,9 @@
       "z_t": 1.281,
       "ema_trend": 115.7,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #1 (HARMONIC_BREAKOUT): ซื้อ 7,400 หุ้น @ ฿120.00 (SL: ฿117.00)",
+      "signal_detail": "เปิดรอบ #1 (HARMONIC_BREAKOUT): ซื้อ 4,000 หุ้น @ ฿120.00 (SL: ฿117.00)",
       "trailing_stop": 117.0,
-      "equity": 998508.16
+      "equity": 999193.6
     },
     {
       "time": "2025-01-08",
@@ -1405,7 +1405,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 991108.16
+      "equity": 995193.6
     },
     {
       "time": "2025-01-09",
@@ -1426,7 +1426,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 987408.16
+      "equity": 993193.6
     },
     {
       "time": "2025-01-10",
@@ -1447,7 +1447,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 991108.16
+      "equity": 995193.6
     },
     {
       "time": "2025-01-13",
@@ -1468,7 +1468,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 1005908.16
+      "equity": 1003193.6
     },
     {
       "time": "2025-01-14",
@@ -1489,7 +1489,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 994808.16
+      "equity": 997193.6
     },
     {
       "time": "2025-01-15",
@@ -1510,7 +1510,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 1009608.16
+      "equity": 1005193.6
     },
     {
       "time": "2025-01-16",
@@ -1531,7 +1531,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 1013308.16
+      "equity": 1007193.6
     },
     {
       "time": "2025-01-17",
@@ -1552,7 +1552,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 117.0,
-      "equity": 1009608.16
+      "equity": 1005193.6
     },
     {
       "time": "2025-01-20",
@@ -1573,7 +1573,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.64,
-      "equity": 1009608.16
+      "equity": 1005193.6
     },
     {
       "time": "2025-01-21",
@@ -1592,9 +1592,9 @@
       "z_t": 0.618,
       "ema_trend": 117.36,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,400 หุ้น @ ฿120.64 (StopLoss_or_TrailingStop) กำไร +0.18%",
+      "signal_detail": "ขาย 4,000 หุ้น @ ฿120.64 (StopLoss_or_TrailingStop) กำไร +0.10%",
       "trailing_stop": 120.64,
-      "equity": 1001768.0
+      "equity": 1000955.68
     },
     {
       "time": "2025-01-22",
@@ -1613,9 +1613,9 @@
       "z_t": 1.186,
       "ema_trend": 117.64,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #2 (HARMONIC_BREAKOUT): ซื้อ 7,200 หุ้น @ ฿124.50 (SL: ฿120.00)",
+      "signal_detail": "เปิดรอบ #2 (HARMONIC_BREAKOUT): ซื้อ 2,600 หุ้น @ ฿124.50 (SL: ฿120.00)",
       "trailing_stop": 120.0,
-      "equity": 1000262.05
+      "equity": 1000411.86
     },
     {
       "time": "2025-01-23",
@@ -1636,7 +1636,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 985862.05
+      "equity": 995211.86
     },
     {
       "time": "2025-01-24",
@@ -1657,7 +1657,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 989462.05
+      "equity": 996511.86
     },
     {
       "time": "2025-01-27",
@@ -1678,7 +1678,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 996662.05
+      "equity": 999111.86
     },
     {
       "time": "2025-01-28",
@@ -1699,7 +1699,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1003862.05
+      "equity": 1001711.86
     },
     {
       "time": "2025-01-29",
@@ -1720,7 +1720,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1011062.05
+      "equity": 1004311.86
     },
     {
       "time": "2025-01-30",
@@ -1741,7 +1741,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1007462.05
+      "equity": 1003011.86
     },
     {
       "time": "2025-01-31",
@@ -1762,7 +1762,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1003862.05
+      "equity": 1001711.86
     },
     {
       "time": "2025-02-03",
@@ -1783,7 +1783,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1011062.05
+      "equity": 1004311.86
     },
     {
       "time": "2025-02-04",
@@ -1804,7 +1804,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1018262.05
+      "equity": 1006911.86
     },
     {
       "time": "2025-02-05",
@@ -1825,7 +1825,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1014662.05
+      "equity": 1005611.86
     },
     {
       "time": "2025-02-06",
@@ -1846,7 +1846,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1021862.05
+      "equity": 1008211.86
     },
     {
       "time": "2025-02-07",
@@ -1867,7 +1867,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.0,
-      "equity": 1011062.05
+      "equity": 1004311.86
     },
     {
       "time": "2025-02-10",
@@ -1888,7 +1888,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 125.17,
-      "equity": 1014662.05
+      "equity": 1005611.86
     },
     {
       "time": "2025-02-11",
@@ -1907,9 +1907,9 @@
       "z_t": -0.486,
       "ema_trend": 121.05,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,200 หุ้น @ ฿125.17 (StopLoss_or_TrailingStop) กำไร +0.18%",
+      "signal_detail": "ขาย 2,600 หุ้น @ ฿125.17 (StopLoss_or_TrailingStop) กำไร +0.06%",
       "trailing_stop": 125.17,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-13",
@@ -1930,7 +1930,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-14",
@@ -1951,7 +1951,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-17",
@@ -1972,7 +1972,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-18",
@@ -1993,7 +1993,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-19",
@@ -2014,7 +2014,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-20",
@@ -2035,7 +2035,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-21",
@@ -2056,7 +2056,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-24",
@@ -2077,7 +2077,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-25",
@@ -2098,7 +2098,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-26",
@@ -2119,7 +2119,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-27",
@@ -2140,7 +2140,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-02-28",
@@ -2161,7 +2161,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-03",
@@ -2182,7 +2182,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-04",
@@ -2203,7 +2203,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-05",
@@ -2224,7 +2224,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-06",
@@ -2245,7 +2245,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-07",
@@ -2266,7 +2266,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-10",
@@ -2287,7 +2287,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-11",
@@ -2308,7 +2308,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-12",
@@ -2329,7 +2329,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-13",
@@ -2350,7 +2350,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-14",
@@ -2371,7 +2371,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-17",
@@ -2392,7 +2392,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-18",
@@ -2413,7 +2413,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-19",
@@ -2434,7 +2434,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-20",
@@ -2455,7 +2455,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-21",
@@ -2476,7 +2476,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-24",
@@ -2497,7 +2497,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-25",
@@ -2518,7 +2518,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-26",
@@ -2539,7 +2539,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-27",
@@ -2560,7 +2560,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-28",
@@ -2581,7 +2581,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-03-31",
@@ -2602,7 +2602,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-01",
@@ -2623,7 +2623,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-02",
@@ -2644,7 +2644,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-03",
@@ -2665,7 +2665,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-04",
@@ -2686,7 +2686,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-08",
@@ -2707,7 +2707,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-09",
@@ -2728,7 +2728,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-10",
@@ -2749,7 +2749,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-11",
@@ -2770,7 +2770,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-16",
@@ -2791,7 +2791,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-17",
@@ -2812,7 +2812,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-18",
@@ -2833,7 +2833,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-21",
@@ -2854,7 +2854,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-22",
@@ -2875,7 +2875,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-23",
@@ -2896,7 +2896,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-24",
@@ -2917,7 +2917,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-25",
@@ -2938,7 +2938,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-28",
@@ -2959,7 +2959,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-29",
@@ -2980,7 +2980,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-04-30",
@@ -3001,7 +3001,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-02",
@@ -3022,7 +3022,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-06",
@@ -3043,7 +3043,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-07",
@@ -3064,7 +3064,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-08",
@@ -3085,7 +3085,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-09",
@@ -3106,7 +3106,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-13",
@@ -3127,7 +3127,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-14",
@@ -3148,7 +3148,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-15",
@@ -3169,7 +3169,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-16",
@@ -3190,7 +3190,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-19",
@@ -3211,7 +3211,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1003552.73
+      "equity": 1001600.16
     },
     {
       "time": "2025-05-20",
@@ -3230,9 +3230,9 @@
       "z_t": 1.175,
       "ema_trend": 120.11,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #3 (HARMONIC_BREAKOUT): ซื้อ 7,300 หุ้น @ ฿122.50 (SL: ฿118.50)",
+      "signal_detail": "เปิดรอบ #3 (HARMONIC_BREAKOUT): ซื้อ 3,000 หุ้น @ ฿122.50 (SL: ฿118.50)",
       "trailing_stop": 118.5,
-      "equity": 1002050.39
+      "equity": 1000982.76
     },
     {
       "time": "2025-05-21",
@@ -3253,7 +3253,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 991100.39
+      "equity": 996482.76
     },
     {
       "time": "2025-05-22",
@@ -3274,7 +3274,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 991100.39
+      "equity": 996482.76
     },
     {
       "time": "2025-05-23",
@@ -3295,7 +3295,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 998400.39
+      "equity": 999482.76
     },
     {
       "time": "2025-05-26",
@@ -3316,7 +3316,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 994750.39
+      "equity": 997982.76
     },
     {
       "time": "2025-05-27",
@@ -3337,7 +3337,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 983800.39
+      "equity": 993482.76
     },
     {
       "time": "2025-05-28",
@@ -3358,7 +3358,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 980150.39
+      "equity": 991982.76
     },
     {
       "time": "2025-05-29",
@@ -3379,7 +3379,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 118.5,
-      "equity": 980150.39
+      "equity": 991982.76
     },
     {
       "time": "2025-05-30",
@@ -3398,9 +3398,9 @@
       "z_t": -0.524,
       "ema_trend": 120.16,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,300 หุ้น @ ฿118.50 (StopLoss_or_TrailingStop) กำไร -3.20%",
+      "signal_detail": "ขาย 3,000 หุ้น @ ฿118.50 (StopLoss_or_TrailingStop) กำไร -1.32%",
       "trailing_stop": 118.5,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-04",
@@ -3421,7 +3421,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-05",
@@ -3442,7 +3442,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-06",
@@ -3463,7 +3463,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-09",
@@ -3484,7 +3484,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-10",
@@ -3505,7 +3505,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-11",
@@ -3526,7 +3526,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-12",
@@ -3547,7 +3547,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-13",
@@ -3568,7 +3568,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-16",
@@ -3589,7 +3589,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-17",
@@ -3610,7 +3610,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-18",
@@ -3631,7 +3631,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-19",
@@ -3652,7 +3652,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-20",
@@ -3673,7 +3673,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-23",
@@ -3694,7 +3694,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-24",
@@ -3715,7 +3715,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-25",
@@ -3736,7 +3736,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-26",
@@ -3757,7 +3757,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-27",
@@ -3778,7 +3778,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-06-30",
@@ -3799,7 +3799,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-07-01",
@@ -3820,7 +3820,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 971397.11
+      "equity": 988385.52
     },
     {
       "time": "2025-07-02",
@@ -3839,9 +3839,9 @@
       "z_t": 1.034,
       "ema_trend": 118.87,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #4 (HARMONIC_BREAKOUT): ซื้อ 7,200 หุ้น @ ฿120.00 (SL: ฿116.00)",
+      "signal_detail": "เปิดรอบ #4 (HARMONIC_BREAKOUT): ซื้อ 2,900 หุ้น @ ฿120.00 (SL: ฿116.00)",
       "trailing_stop": 116.0,
-      "equity": 969945.59
+      "equity": 987800.88
     },
     {
       "time": "2025-07-03",
@@ -3862,7 +3862,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 969945.59
+      "equity": 987800.88
     },
     {
       "time": "2025-07-04",
@@ -3883,7 +3883,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 962745.59
+      "equity": 984900.88
     },
     {
       "time": "2025-07-07",
@@ -3904,7 +3904,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 962745.59
+      "equity": 984900.88
     },
     {
       "time": "2025-07-08",
@@ -3925,7 +3925,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 955545.59
+      "equity": 982000.88
     },
     {
       "time": "2025-07-09",
@@ -3946,7 +3946,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 951945.59
+      "equity": 980550.88
     },
     {
       "time": "2025-07-11",
@@ -3967,7 +3967,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 955545.59
+      "equity": 982000.88
     },
     {
       "time": "2025-07-14",
@@ -3988,7 +3988,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 962745.59
+      "equity": 984900.88
     },
     {
       "time": "2025-07-15",
@@ -4009,7 +4009,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 955545.59
+      "equity": 982000.88
     },
     {
       "time": "2025-07-16",
@@ -4030,7 +4030,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 951945.59
+      "equity": 980550.88
     },
     {
       "time": "2025-07-17",
@@ -4051,7 +4051,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 955545.59
+      "equity": 982000.88
     },
     {
       "time": "2025-07-18",
@@ -4072,7 +4072,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 962745.59
+      "equity": 984900.88
     },
     {
       "time": "2025-07-21",
@@ -4093,7 +4093,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 977145.59
+      "equity": 990700.88
     },
     {
       "time": "2025-07-22",
@@ -4114,7 +4114,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 980745.59
+      "equity": 992150.88
     },
     {
       "time": "2025-07-23",
@@ -4135,7 +4135,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 987945.59
+      "equity": 995050.88
     },
     {
       "time": "2025-07-24",
@@ -4156,7 +4156,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 116.0,
-      "equity": 995145.59
+      "equity": 997950.88
     },
     {
       "time": "2025-07-25",
@@ -4177,7 +4177,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.64,
-      "equity": 998745.59
+      "equity": 999400.88
     },
     {
       "time": "2025-07-29",
@@ -4198,7 +4198,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 120.64,
-      "equity": 1009545.59
+      "equity": 1003750.88
     },
     {
       "time": "2025-07-30",
@@ -4219,7 +4219,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 122.84,
-      "equity": 1009545.59
+      "equity": 1003750.88
     },
     {
       "time": "2025-07-31",
@@ -4240,7 +4240,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 122.99,
-      "equity": 1016745.59
+      "equity": 1006650.88
     },
     {
       "time": "2025-08-01",
@@ -4261,7 +4261,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 122.99,
-      "equity": 1005945.59
+      "equity": 1002300.88
     },
     {
       "time": "2025-08-04",
@@ -4282,7 +4282,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 122.99,
-      "equity": 1016745.59
+      "equity": 1006650.88
     },
     {
       "time": "2025-08-05",
@@ -4303,7 +4303,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 124.92,
-      "equity": 1020345.59
+      "equity": 1008100.88
     },
     {
       "time": "2025-08-06",
@@ -4322,9 +4322,9 @@
       "z_t": 0.85,
       "ema_trend": 121.12,
       "signal": "PYRAMID_BUY",
-      "signal_detail": "เติมไม้ #2: ซื้อเพิ่ม 700 หุ้น @ ฿128.50 (ล็อกทุนรวม)",
+      "signal_detail": "เติมไม้ #2: ซื้อเพิ่ม 3,500 หุ้น @ ฿128.50 (ล็อกทุนรวม)",
       "trailing_stop": 124.92,
-      "equity": 1030994.47
+      "equity": 1011695.3
     },
     {
       "time": "2025-08-07",
@@ -4344,8 +4344,8 @@
       "ema_trend": 121.41,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.92,
-      "equity": 1030994.47
+      "trailing_stop": 126.24,
+      "equity": 1011695.3
     },
     {
       "time": "2025-08-08",
@@ -4365,8 +4365,8 @@
       "ema_trend": 121.75,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.92,
-      "equity": 1042844.47
+      "trailing_stop": 126.24,
+      "equity": 1021295.3
     },
     {
       "time": "2025-08-13",
@@ -4386,8 +4386,8 @@
       "ema_trend": 122.13,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.92,
-      "equity": 1054694.47
+      "trailing_stop": 126.24,
+      "equity": 1030895.3
     },
     {
       "time": "2025-08-14",
@@ -4407,8 +4407,8 @@
       "ema_trend": 122.44,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.92,
-      "equity": 1042844.47
+      "trailing_stop": 126.24,
+      "equity": 1021295.3
     },
     {
       "time": "2025-08-15",
@@ -4428,8 +4428,8 @@
       "ema_trend": 122.78,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.92,
-      "equity": 1050744.47
+      "trailing_stop": 126.24,
+      "equity": 1027695.3
     },
     {
       "time": "2025-08-18",
@@ -4449,8 +4449,8 @@
       "ema_trend": 123.04,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.92,
-      "equity": 1038894.47
+      "trailing_stop": 126.24,
+      "equity": 1018095.3
     },
     {
       "time": "2025-08-19",
@@ -4470,8 +4470,8 @@
       "ema_trend": 123.27,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.95,
-      "equity": 1034944.47
+      "trailing_stop": 126.24,
+      "equity": 1014895.3
     },
     {
       "time": "2025-08-20",
@@ -4491,8 +4491,8 @@
       "ema_trend": 123.52,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 124.95,
-      "equity": 1038894.47
+      "trailing_stop": 126.24,
+      "equity": 1018095.3
     },
     {
       "time": "2025-08-21",
@@ -4511,9 +4511,9 @@
       "z_t": -0.517,
       "ema_trend": 123.71,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,900 หุ้น @ ฿128.50 (Harmonic_Phase_Breakdown_TP) กำไร +5.96%",
+      "signal_detail": "ขาย 6,400 หุ้น @ ฿128.50 (Harmonic_Phase_Breakdown_TP) กำไร +2.22%",
       "trailing_stop": 128.5,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-08-22",
@@ -4534,7 +4534,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-08-25",
@@ -4555,7 +4555,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-08-26",
@@ -4576,7 +4576,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-08-27",
@@ -4597,7 +4597,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-08-28",
@@ -4618,7 +4618,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-08-29",
@@ -4639,7 +4639,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-01",
@@ -4660,7 +4660,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-02",
@@ -4681,7 +4681,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-03",
@@ -4702,7 +4702,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-04",
@@ -4723,7 +4723,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-05",
@@ -4744,7 +4744,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-08",
@@ -4765,7 +4765,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-09",
@@ -4786,7 +4786,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-10",
@@ -4807,7 +4807,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-11",
@@ -4828,7 +4828,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-12",
@@ -4849,7 +4849,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-15",
@@ -4870,7 +4870,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-16",
@@ -4891,7 +4891,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-17",
@@ -4912,7 +4912,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-18",
@@ -4933,7 +4933,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-19",
@@ -4954,7 +4954,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-22",
@@ -4975,7 +4975,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-23",
@@ -4996,7 +4996,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-24",
@@ -5017,7 +5017,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-25",
@@ -5038,7 +5038,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-26",
@@ -5059,7 +5059,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-29",
@@ -5080,7 +5080,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-09-30",
@@ -5101,7 +5101,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-10-01",
@@ -5122,7 +5122,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-10-02",
@@ -5143,7 +5143,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-10-03",
@@ -5164,7 +5164,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-10-06",
@@ -5185,7 +5185,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-10-07",
@@ -5206,7 +5206,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1029289.02
+      "equity": 1010313.67
     },
     {
       "time": "2025-10-08",
@@ -5225,9 +5225,9 @@
       "z_t": 2.291,
       "ema_trend": 126.27,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #5 (INFLECTION_TURN): ซื้อ 7,100 หุ้น @ ฿129.50 (SL: ฿126.50)",
+      "signal_detail": "เปิดรอบ #5 (INFLECTION_TURN): ซื้อ 4,000 หุ้น @ ฿129.50 (SL: ฿126.50)",
       "trailing_stop": 126.5,
-      "equity": 1027744.34
+      "equity": 1009443.43
     },
     {
       "time": "2025-10-09",
@@ -5248,7 +5248,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1024194.34
+      "equity": 1007443.43
     },
     {
       "time": "2025-10-10",
@@ -5269,7 +5269,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1024194.34
+      "equity": 1007443.43
     },
     {
       "time": "2025-10-14",
@@ -5290,7 +5290,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1017094.34
+      "equity": 1003443.43
     },
     {
       "time": "2025-10-15",
@@ -5311,7 +5311,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1027744.34
+      "equity": 1009443.43
     },
     {
       "time": "2025-10-16",
@@ -5332,7 +5332,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1027744.34
+      "equity": 1009443.43
     },
     {
       "time": "2025-10-17",
@@ -5353,7 +5353,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1031294.34
+      "equity": 1011443.43
     },
     {
       "time": "2025-10-20",
@@ -5374,7 +5374,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1038394.34
+      "equity": 1015443.43
     },
     {
       "time": "2025-10-21",
@@ -5395,7 +5395,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 126.5,
-      "equity": 1059694.34
+      "equity": 1027443.43
     },
     {
       "time": "2025-10-22",
@@ -5416,7 +5416,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 132.76,
-      "equity": 1056144.34
+      "equity": 1025443.43
     },
     {
       "time": "2025-10-24",
@@ -5437,7 +5437,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 132.76,
-      "equity": 1056144.34
+      "equity": 1025443.43
     },
     {
       "time": "2025-10-27",
@@ -5456,9 +5456,9 @@
       "z_t": -1.339,
       "ema_trend": 127.93,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,100 หุ้น @ ฿132.76 (StopLoss_or_TrailingStop) กำไร +1.94%",
+      "signal_detail": "ขาย 4,000 หุ้น @ ฿132.76 (StopLoss_or_TrailingStop) กำไร +1.11%",
       "trailing_stop": 132.76,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-10-28",
@@ -5479,7 +5479,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-10-29",
@@ -5500,7 +5500,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-10-30",
@@ -5521,7 +5521,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-10-31",
@@ -5542,7 +5542,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-03",
@@ -5563,7 +5563,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-04",
@@ -5584,7 +5584,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-05",
@@ -5605,7 +5605,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-06",
@@ -5626,7 +5626,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-07",
@@ -5647,7 +5647,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-10",
@@ -5668,7 +5668,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-11",
@@ -5689,7 +5689,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-12",
@@ -5710,7 +5710,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-13",
@@ -5731,7 +5731,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-14",
@@ -5752,7 +5752,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-17",
@@ -5773,7 +5773,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-18",
@@ -5794,7 +5794,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-19",
@@ -5815,7 +5815,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-20",
@@ -5836,7 +5836,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-21",
@@ -5857,7 +5857,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-24",
@@ -5878,7 +5878,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-25",
@@ -5899,7 +5899,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1049279.32
+      "equity": 1021575.81
     },
     {
       "time": "2025-11-26",
@@ -5918,9 +5918,9 @@
       "z_t": 0.805,
       "ema_trend": 129.0,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #6 (HARMONIC_BREAKOUT): ซื้อ 7,100 หุ้น @ ฿131.50 (SL: ฿129.00)",
+      "signal_detail": "เปิดรอบ #6 (HARMONIC_BREAKOUT): ซื้อ 4,900 หุ้น @ ฿131.50 (SL: ฿129.00)",
       "trailing_stop": 129.0,
-      "equity": 1047710.78
+      "equity": 1020493.3
     },
     {
       "time": "2025-11-27",
@@ -5941,7 +5941,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1040610.78
+      "equity": 1015593.3
     },
     {
       "time": "2025-11-28",
@@ -5962,7 +5962,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1037060.78
+      "equity": 1013143.3
     },
     {
       "time": "2025-12-01",
@@ -5983,7 +5983,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1040610.78
+      "equity": 1015593.3
     },
     {
       "time": "2025-12-02",
@@ -6004,7 +6004,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1047710.78
+      "equity": 1020493.3
     },
     {
       "time": "2025-12-03",
@@ -6025,7 +6025,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1061910.78
+      "equity": 1030293.3
     },
     {
       "time": "2025-12-04",
@@ -6046,7 +6046,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1061910.78
+      "equity": 1030293.3
     },
     {
       "time": "2025-12-08",
@@ -6067,7 +6067,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1047710.78
+      "equity": 1020493.3
     },
     {
       "time": "2025-12-09",
@@ -6088,7 +6088,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1051260.78
+      "equity": 1022943.3
     },
     {
       "time": "2025-12-11",
@@ -6109,7 +6109,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1058360.78
+      "equity": 1027843.3
     },
     {
       "time": "2025-12-12",
@@ -6130,7 +6130,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1065460.78
+      "equity": 1032743.3
     },
     {
       "time": "2025-12-15",
@@ -6151,7 +6151,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1065460.78
+      "equity": 1032743.3
     },
     {
       "time": "2025-12-16",
@@ -6172,7 +6172,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1072560.78
+      "equity": 1037643.3
     },
     {
       "time": "2025-12-17",
@@ -6193,7 +6193,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1065460.78
+      "equity": 1032743.3
     },
     {
       "time": "2025-12-18",
@@ -6214,7 +6214,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 129.0,
-      "equity": 1079660.78
+      "equity": 1042543.3
     },
     {
       "time": "2025-12-19",
@@ -6235,7 +6235,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 133.98,
-      "equity": 1079660.78
+      "equity": 1042543.3
     },
     {
       "time": "2025-12-22",
@@ -6256,7 +6256,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 133.98,
-      "equity": 1076110.78
+      "equity": 1040093.3
     },
     {
       "time": "2025-12-23",
@@ -6277,7 +6277,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 133.98,
-      "equity": 1079660.78
+      "equity": 1042543.3
     },
     {
       "time": "2025-12-24",
@@ -6298,7 +6298,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 133.98,
-      "equity": 1083210.78
+      "equity": 1044993.3
     },
     {
       "time": "2025-12-25",
@@ -6317,9 +6317,9 @@
       "z_t": 0.565,
       "ema_trend": 131.75,
       "signal": "PYRAMID_BUY",
-      "signal_detail": "เติมไม้ #2: ซื้อเพิ่ม 700 หุ้น @ ฿137.50 (ล็อกทุนรวม)",
+      "signal_detail": "เติมไม้ #2: ซื้อเพิ่ม 2,500 หุ้น @ ฿137.50 (ล็อกทุนรวม)",
       "trailing_stop": 133.98,
-      "equity": 1090149.08
+      "equity": 1049315.8
     },
     {
       "time": "2025-12-26",
@@ -6339,8 +6339,8 @@
       "ema_trend": 131.99,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 133.98,
-      "equity": 1094049.08
+      "trailing_stop": 135.04,
+      "equity": 1053015.8
     },
     {
       "time": "2025-12-29",
@@ -6361,7 +6361,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1090149.08
+      "equity": 1049315.8
     },
     {
       "time": "2025-12-30",
@@ -6382,7 +6382,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1101849.08
+      "equity": 1060415.8
     },
     {
       "time": "2026-01-05",
@@ -6403,7 +6403,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1125249.08
+      "equity": 1082615.8
     },
     {
       "time": "2026-01-06",
@@ -6424,7 +6424,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1113549.08
+      "equity": 1071515.8
     },
     {
       "time": "2026-01-07",
@@ -6445,7 +6445,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1105749.08
+      "equity": 1064115.8
     },
     {
       "time": "2026-01-08",
@@ -6466,7 +6466,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1113549.08
+      "equity": 1071515.8
     },
     {
       "time": "2026-01-09",
@@ -6487,7 +6487,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.18,
-      "equity": 1105749.08
+      "equity": 1064115.8
     },
     {
       "time": "2026-01-12",
@@ -6508,7 +6508,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.19,
-      "equity": 1105749.08
+      "equity": 1064115.8
     },
     {
       "time": "2026-01-13",
@@ -6529,7 +6529,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.19,
-      "equity": 1109649.08
+      "equity": 1067815.8
     },
     {
       "time": "2026-01-14",
@@ -6548,9 +6548,9 @@
       "z_t": 0.257,
       "ema_trend": 134.59,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,800 หุ้น @ ฿137.19 (StopLoss_or_TrailingStop) กำไร +3.49%",
+      "signal_detail": "ขาย 7,400 หุ้น @ ฿137.19 (StopLoss_or_TrailingStop) กำไร +2.32%",
       "trailing_stop": 137.19,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-15",
@@ -6571,7 +6571,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-16",
@@ -6592,7 +6592,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-19",
@@ -6613,7 +6613,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-20",
@@ -6634,7 +6634,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-21",
@@ -6655,7 +6655,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-22",
@@ -6676,7 +6676,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-23",
@@ -6697,7 +6697,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-26",
@@ -6718,7 +6718,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-27",
@@ -6739,7 +6739,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-28",
@@ -6760,7 +6760,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-29",
@@ -6781,7 +6781,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-01-30",
@@ -6802,7 +6802,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-02-02",
@@ -6823,7 +6823,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-02-03",
@@ -6844,7 +6844,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-02-04",
@@ -6865,7 +6865,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-02-05",
@@ -6886,7 +6886,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-02-06",
@@ -6907,7 +6907,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1085922.23
+      "equity": 1045305.71
     },
     {
       "time": "2026-02-09",
@@ -6926,9 +6926,9 @@
       "z_t": 1.639,
       "ema_trend": 135.89,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #7 (INFLECTION_TURN): ซื้อ 6,900 หุ้น @ ฿140.00 (SL: ฿135.50)",
+      "signal_detail": "เปิดรอบ #7 (INFLECTION_TURN): ซื้อ 2,700 หุ้น @ ฿140.00 (SL: ฿135.50)",
       "trailing_stop": 135.5,
-      "equity": 1084299.35
+      "equity": 1044670.67
     },
     {
       "time": "2026-02-10",
@@ -6949,7 +6949,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.5,
-      "equity": 1087749.35
+      "equity": 1046020.67
     },
     {
       "time": "2026-02-11",
@@ -6970,7 +6970,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.5,
-      "equity": 1080849.35
+      "equity": 1043320.67
     },
     {
       "time": "2026-02-12",
@@ -6991,7 +6991,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.5,
-      "equity": 1094649.35
+      "equity": 1048720.67
     },
     {
       "time": "2026-02-13",
@@ -7012,7 +7012,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.5,
-      "equity": 1091199.35
+      "equity": 1047370.67
     },
     {
       "time": "2026-02-16",
@@ -7033,7 +7033,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.5,
-      "equity": 1098099.35
+      "equity": 1050070.67
     },
     {
       "time": "2026-02-17",
@@ -7054,7 +7054,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 135.5,
-      "equity": 1125699.35
+      "equity": 1060870.67
     },
     {
       "time": "2026-02-18",
@@ -7075,7 +7075,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 140.75,
-      "equity": 1132599.35
+      "equity": 1063570.67
     },
     {
       "time": "2026-02-19",
@@ -7096,7 +7096,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 140.75,
-      "equity": 1142949.35
+      "equity": 1067620.67
     },
     {
       "time": "2026-02-20",
@@ -7117,7 +7117,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 145.96,
-      "equity": 1139499.35
+      "equity": 1066270.67
     },
     {
       "time": "2026-02-23",
@@ -7138,7 +7138,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 145.96,
-      "equity": 1129149.35
+      "equity": 1062220.67
     },
     {
       "time": "2026-02-24",
@@ -7159,7 +7159,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 146.47,
-      "equity": 1136049.35
+      "equity": 1064920.67
     },
     {
       "time": "2026-02-25",
@@ -7178,9 +7178,9 @@
       "z_t": -0.246,
       "ema_trend": 139.35,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 6,900 หุ้น @ ฿146.47 (StopLoss_or_TrailingStop) กำไร +3.81%",
+      "signal_detail": "ขาย 2,700 หุ้น @ ฿146.47 (StopLoss_or_TrailingStop) กำไร +1.55%",
       "trailing_stop": 146.47,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-02-26",
@@ -7201,7 +7201,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-02-27",
@@ -7222,7 +7222,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-02",
@@ -7243,7 +7243,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-04",
@@ -7264,7 +7264,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-05",
@@ -7285,7 +7285,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-06",
@@ -7306,7 +7306,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-09",
@@ -7327,7 +7327,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-10",
@@ -7348,7 +7348,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-11",
@@ -7369,7 +7369,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-12",
@@ -7390,7 +7390,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-13",
@@ -7411,7 +7411,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-16",
@@ -7432,7 +7432,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-17",
@@ -7453,7 +7453,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-18",
@@ -7474,7 +7474,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-19",
@@ -7495,7 +7495,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-20",
@@ -7516,7 +7516,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-23",
@@ -7537,7 +7537,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-24",
@@ -7558,7 +7558,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-25",
@@ -7579,7 +7579,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-26",
@@ -7600,7 +7600,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-27",
@@ -7621,7 +7621,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-30",
@@ -7642,7 +7642,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-03-31",
@@ -7663,7 +7663,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-01",
@@ -7684,7 +7684,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-02",
@@ -7705,7 +7705,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-03",
@@ -7726,7 +7726,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-07",
@@ -7747,7 +7747,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-08",
@@ -7768,7 +7768,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-09",
@@ -7789,7 +7789,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-10",
@@ -7810,7 +7810,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-16",
@@ -7831,7 +7831,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-17",
@@ -7852,7 +7852,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-20",
@@ -7873,7 +7873,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-21",
@@ -7894,7 +7894,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-22",
@@ -7915,7 +7915,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-23",
@@ -7936,7 +7936,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-24",
@@ -7957,7 +7957,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-27",
@@ -7978,7 +7978,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-28",
@@ -7999,7 +7999,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-29",
@@ -8020,7 +8020,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-04-30",
@@ -8041,7 +8041,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-05",
@@ -8062,7 +8062,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-06",
@@ -8083,7 +8083,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-07",
@@ -8104,7 +8104,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-08",
@@ -8125,7 +8125,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-11",
@@ -8146,7 +8146,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-12",
@@ -8167,7 +8167,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-13",
@@ -8188,7 +8188,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-14",
@@ -8209,7 +8209,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-15",
@@ -8230,7 +8230,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-18",
@@ -8251,7 +8251,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-19",
@@ -8272,7 +8272,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-20",
@@ -8293,7 +8293,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-21",
@@ -8314,7 +8314,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-22",
@@ -8335,7 +8335,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-25",
@@ -8356,7 +8356,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-26",
@@ -8377,7 +8377,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-27",
@@ -8398,7 +8398,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-28",
@@ -8419,7 +8419,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-05-29",
@@ -8440,7 +8440,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1127262.55
+      "equity": 1061482.36
     },
     {
       "time": "2026-06-02",
@@ -8459,9 +8459,9 @@
       "z_t": 1.596,
       "ema_trend": 136.62,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #8 (HARMONIC_BREAKOUT): ซื้อ 7,300 หุ้น @ ฿137.50 (SL: ฿134.00)",
+      "signal_detail": "เปิดรอบ #8 (HARMONIC_BREAKOUT): ซื้อ 3,600 หุ้น @ ฿137.50 (SL: ฿134.00)",
       "trailing_stop": 134.0,
-      "equity": 1125576.25
+      "equity": 1060650.76
     },
     {
       "time": "2026-06-04",
@@ -8482,7 +8482,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 134.0,
-      "equity": 1151126.25
+      "equity": 1073250.76
     },
     {
       "time": "2026-06-05",
@@ -8503,7 +8503,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 138.24,
-      "equity": 1151126.25
+      "equity": 1073250.76
     },
     {
       "time": "2026-06-08",
@@ -8524,7 +8524,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 138.24,
-      "equity": 1136526.25
+      "equity": 1066050.76
     },
     {
       "time": "2026-06-09",
@@ -8543,9 +8543,9 @@
       "z_t": -0.969,
       "ema_trend": 137.04,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,300 หุ้น @ ฿138.24 (StopLoss_or_TrailingStop) กำไร +0.18%",
+      "signal_detail": "ขาย 3,600 หุ้น @ ฿138.24 (StopLoss_or_TrailingStop) กำไร +0.09%",
       "trailing_stop": 138.24,
-      "equity": 1129261.01
+      "equity": 1062467.9
     },
     {
       "time": "2026-06-10",
@@ -8566,7 +8566,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1129261.01
+      "equity": 1062467.9
     },
     {
       "time": "2026-06-11",
@@ -8587,7 +8587,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1129261.01
+      "equity": 1062467.9
     },
     {
       "time": "2026-06-12",
@@ -8606,9 +8606,9 @@
       "z_t": 1.231,
       "ema_trend": 137.19,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #9 (HARMONIC_BREAKOUT): ซื้อ 7,200 หุ้น @ ฿140.00 (SL: ฿137.00)",
+      "signal_detail": "เปิดรอบ #9 (HARMONIC_BREAKOUT): ซื้อ 4,200 หุ้น @ ฿140.00 (SL: ฿137.00)",
       "trailing_stop": 137.0,
-      "equity": 1127567.57
+      "equity": 1061480.06
     },
     {
       "time": "2026-06-15",
@@ -8629,7 +8629,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.0,
-      "equity": 1127567.57
+      "equity": 1061480.06
     },
     {
       "time": "2026-06-16",
@@ -8650,7 +8650,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.0,
-      "equity": 1145567.57
+      "equity": 1071980.06
     },
     {
       "time": "2026-06-17",
@@ -8671,7 +8671,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.0,
-      "equity": 1141967.57
+      "equity": 1069880.06
     },
     {
       "time": "2026-06-18",
@@ -8692,7 +8692,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.0,
-      "equity": 1141967.57
+      "equity": 1069880.06
     },
     {
       "time": "2026-06-19",
@@ -8713,7 +8713,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.0,
-      "equity": 1134767.57
+      "equity": 1065680.06
     },
     {
       "time": "2026-06-22",
@@ -8734,7 +8734,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 137.0,
-      "equity": 1152767.57
+      "equity": 1076180.06
     },
     {
       "time": "2026-06-23",
@@ -8755,7 +8755,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 140.75,
-      "equity": 1149167.57
+      "equity": 1074080.06
     },
     {
       "time": "2026-06-24",
@@ -8776,7 +8776,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 141.57,
-      "equity": 1149167.57
+      "equity": 1074080.06
     },
     {
       "time": "2026-06-25",
@@ -8797,7 +8797,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 141.57,
-      "equity": 1152767.57
+      "equity": 1076180.06
     },
     {
       "time": "2026-06-26",
@@ -8818,7 +8818,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 142.06,
-      "equity": 1163567.57
+      "equity": 1082480.06
     },
     {
       "time": "2026-06-29",
@@ -8837,9 +8837,9 @@
       "z_t": 0.693,
       "ema_trend": 139.29,
       "signal": "PYRAMID_BUY",
-      "signal_detail": "เติมไม้ #2: ซื้อเพิ่ม 700 หุ้น @ ฿146.50 (ล็อกทุนรวม)",
+      "signal_detail": "เติมไม้ #2: ซื้อเพิ่ม 3,000 หุ้น @ ฿146.50 (ล็อกทุนรวม)",
       "trailing_stop": 142.06,
-      "equity": 1174195.29
+      "equity": 1088041.7
     },
     {
       "time": "2026-06-30",
@@ -8859,8 +8859,8 @@
       "ema_trend": 139.63,
       "signal": "HOLD",
       "signal_detail": "",
-      "trailing_stop": 142.64,
-      "equity": 1186045.29
+      "trailing_stop": 144.8,
+      "equity": 1098841.7
     },
     {
       "time": "2026-07-01",
@@ -8881,7 +8881,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 145.49,
-      "equity": 1182095.29
+      "equity": 1095241.7
     },
     {
       "time": "2026-07-02",
@@ -8902,7 +8902,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 152.27,
-      "equity": 1229495.29
+      "equity": 1138441.7
     },
     {
       "time": "2026-07-03",
@@ -8923,7 +8923,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 152.27,
-      "equity": 1229495.29
+      "equity": 1138441.7
     },
     {
       "time": "2026-07-06",
@@ -8942,9 +8942,9 @@
       "z_t": -0.883,
       "ema_trend": 141.4,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,900 หุ้น @ ฿152.27 (StopLoss_or_TrailingStop) กำไร +7.83%",
+      "signal_detail": "ขาย 7,200 หุ้น @ ฿152.27 (StopLoss_or_TrailingStop) กำไร +6.14%",
       "trailing_stop": 152.27,
-      "equity": 1217737.65
+      "equity": 1127725.87
     },
     {
       "time": "2026-07-07",
@@ -8965,7 +8965,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1217737.65
+      "equity": 1127725.87
     },
     {
       "time": "2026-07-08",
@@ -8986,7 +8986,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1217737.65
+      "equity": 1127725.87
     },
     {
       "time": "2026-07-09",
@@ -9005,9 +9005,9 @@
       "z_t": 1.084,
       "ema_trend": 142.77,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #10 (INFLECTION_TURN): ซื้อ 7,000 หุ้น @ ฿155.00 (SL: ฿151.00)",
+      "signal_detail": "เปิดรอบ #10 (INFLECTION_TURN): ซื้อ 3,300 หุ้น @ ฿155.00 (SL: ฿151.00)",
       "trailing_stop": 151.0,
-      "equity": 1215914.85
+      "equity": 1126866.55
     },
     {
       "time": "2026-07-10",
@@ -9028,7 +9028,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1226414.85
+      "equity": 1131816.55
     },
     {
       "time": "2026-07-13",
@@ -9049,7 +9049,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1240414.85
+      "equity": 1138416.55
     },
     {
       "time": "2026-07-14",
@@ -9070,7 +9070,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1229914.85
+      "equity": 1133466.55
     },
     {
       "time": "2026-07-15",
@@ -9091,7 +9091,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1219414.85
+      "equity": 1128516.55
     },
     {
       "time": "2026-07-16",
@@ -9112,7 +9112,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 156.75,
-      "equity": 1236914.85
+      "equity": 1136766.55
     },
     {
       "time": "2026-07-17",
@@ -9131,9 +9131,9 @@
       "z_t": -0.391,
       "ema_trend": 145.82,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 7,000 หุ้น @ ฿156.75 (StopLoss_or_TrailingStop) กำไร +0.71%",
+      "signal_detail": "ขาย 3,300 หุ้น @ ฿156.75 (StopLoss_or_TrailingStop) กำไร +0.36%",
       "trailing_stop": 156.75,
-      "equity": 1226351.0
+      "equity": 1131786.45
     },
     {
       "time": "2026-07-20",
@@ -9152,9 +9152,9 @@
       "z_t": 0.574,
       "ema_trend": 146.32,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #11 (INFLECTION_TURN): ซื้อ 6,900 หุ้น @ ฿158.50 (SL: ฿155.00)",
+      "signal_detail": "เปิดรอบ #11 (INFLECTION_TURN): ซื้อ 3,800 หุ้น @ ฿158.50 (SL: ฿155.00)",
       "trailing_stop": 155.0,
-      "equity": 1224513.66
+      "equity": 1130774.59
     },
     {
       "time": "2026-07-21",
@@ -9173,9 +9173,9 @@
       "z_t": -1.214,
       "ema_trend": 146.66,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 6,900 หุ้น @ ฿155.00 (StopLoss_or_TrailingStop) กำไร -2.27%",
+      "signal_detail": "ขาย 3,800 หุ้น @ ฿155.00 (StopLoss_or_TrailingStop) กำไร -1.35%",
       "trailing_stop": 155.0,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-07-22",
@@ -9196,7 +9196,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-07-23",
@@ -9217,7 +9217,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-07-24",
@@ -9238,7 +9238,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-07-27",
@@ -9259,7 +9259,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-07-30",
@@ -9280,7 +9280,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-07-31",
@@ -9301,7 +9301,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-03",
@@ -9322,7 +9322,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-04",
@@ -9343,7 +9343,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-05",
@@ -9364,7 +9364,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-06",
@@ -9385,7 +9385,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-07",
@@ -9406,7 +9406,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-10",
@@ -9427,7 +9427,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-11",
@@ -9448,7 +9448,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-13",
@@ -9469,7 +9469,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-14",
@@ -9490,7 +9490,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-17",
@@ -9511,7 +9511,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-18",
@@ -9532,7 +9532,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-19",
@@ -9553,7 +9553,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-20",
@@ -9574,7 +9574,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-21",
@@ -9595,7 +9595,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-24",
@@ -9616,7 +9616,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-25",
@@ -9637,7 +9637,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-26",
@@ -9658,7 +9658,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-27",
@@ -9679,7 +9679,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-28",
@@ -9700,7 +9700,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-08-31",
@@ -9721,7 +9721,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-01",
@@ -9742,7 +9742,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-02",
@@ -9763,7 +9763,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-03",
@@ -9784,7 +9784,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-04",
@@ -9805,7 +9805,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-07",
@@ -9826,7 +9826,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-08",
@@ -9847,7 +9847,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-09",
@@ -9868,7 +9868,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-10",
@@ -9889,7 +9889,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-11",
@@ -9910,7 +9910,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-14",
@@ -9931,7 +9931,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-15",
@@ -9952,7 +9952,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-16",
@@ -9973,7 +9973,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-17",
@@ -9994,7 +9994,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-18",
@@ -10015,7 +10015,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1198566.9
+      "equity": 1116485.07
     },
     {
       "time": "2026-09-21",
@@ -10034,9 +10034,9 @@
       "z_t": 1.977,
       "ema_trend": 150.7,
       "signal": "BUY_LAYER1",
-      "signal_detail": "เปิดรอบ #12 (HARMONIC_BREAKOUT): ซื้อ 6,800 หุ้น @ ฿156.50 (SL: ฿151.00)",
+      "signal_detail": "เปิดรอบ #12 (HARMONIC_BREAKOUT): ซื้อ 2,400 หุ้น @ ฿156.50 (SL: ฿151.00)",
       "trailing_stop": 151.0,
-      "equity": 1196779.05
+      "equity": 1115854.06
     },
     {
       "time": "2026-09-22",
@@ -10057,7 +10057,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1206979.05
+      "equity": 1119454.06
     },
     {
       "time": "2026-09-23",
@@ -10078,7 +10078,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1193379.05
+      "equity": 1114654.06
     },
     {
       "time": "2026-09-24",
@@ -10099,7 +10099,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1193379.05
+      "equity": 1114654.06
     },
     {
       "time": "2026-09-25",
@@ -10120,7 +10120,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1193379.05
+      "equity": 1114654.06
     },
     {
       "time": "2026-09-28",
@@ -10141,7 +10141,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1189979.05
+      "equity": 1113454.06
     },
     {
       "time": "2026-09-29",
@@ -10162,7 +10162,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": 151.0,
-      "equity": 1172979.05
+      "equity": 1107454.06
     },
     {
       "time": "2026-09-30",
@@ -10181,9 +10181,9 @@
       "z_t": -1.609,
       "ema_trend": 151.67,
       "signal": "CYCLE_EXIT",
-      "signal_detail": "ขาย 6,800 หุ้น @ ฿151.00 (StopLoss_or_TrailingStop) กำไร -3.41%",
+      "signal_detail": "ขาย 2,400 หุ้น @ ฿151.00 (StopLoss_or_TrailingStop) กำไร -1.29%",
       "trailing_stop": 151.0,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-01",
@@ -10204,7 +10204,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-02",
@@ -10225,7 +10225,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-05",
@@ -10246,7 +10246,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-06",
@@ -10267,7 +10267,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-07",
@@ -10288,7 +10288,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-08",
@@ -10309,7 +10309,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-09",
@@ -10330,7 +10330,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-12",
@@ -10351,7 +10351,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     },
     {
       "time": "2026-10-14",
@@ -10372,7 +10372,7 @@
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
-      "equity": 1157654.02
+      "equity": 1102045.23
     }
   ],
   "presets": {

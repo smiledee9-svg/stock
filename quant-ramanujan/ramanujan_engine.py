@@ -23,10 +23,10 @@ class RamanujanSETCycleTrader:
     """
     def __init__(
         self,
-        initial_capital: float = 1_000_000.0,
-        risk_per_cycle_pct: float = 0.054,  # ความเสี่ยงต่อรอบ (สัมพันธ์กับ alloc 90%)
-        max_pyramid_layers: int = 3,
-        max_allocation_pct: float = 0.90,   # เพดานเงินลงทุนต่อไม้ (Master Aggressive Preset: 90%)
+        initial_capital: float = 500_000.0, # เงินทุนเริ่มต้น (บาท)
+        risk_per_cycle_pct: float = 0.012,  # ความเสี่ยงสูงสุดต่อการเปิด 1 รอบ (1.2% ของพอร์ต)
+        max_pyramid_layers: int = 3,        # จำนวนไม้สูงสุดใน 1 รอบ (ไม้แรก + เติม 2 ไม้)
+        max_allocation_pct: float = 0.30,   # เพดานเงินลงทุนต่อไม้สูงสุด (30% ของพอร์ตต่อไม้)
         q_micro: int = 5,
         q_macro: int = 20,
         er_period: int = 10,
