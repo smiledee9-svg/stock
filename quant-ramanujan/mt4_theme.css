@@ -1,0 +1,904 @@
+/* ==========================================================================
+   MetaTrader 4 (MT4) Strategy Tester & Terminal Theme
+   Pixel-perfect authentic MT4 desktop workstation look and feel
+   ========================================================================== */
+
+/* MT4 Container */
+.mt4-terminal-wrapper {
+  background: #181d26;
+  color: #d1d5db;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  border: 1px solid #323946;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. MT4 Window Titlebar */
+.mt4-titlebar {
+  background: #1e2532;
+  border-bottom: 1px solid #2d3545;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  user-select: none;
+}
+
+.mt4-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.mt4-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 800;
+  font-size: 9px;
+}
+
+.mt4-titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mt4-win-btn {
+  width: 22px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.mt4-win-btn:hover {
+  background: #334155;
+  color: #fff;
+}
+.mt4-win-btn.close:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* 2. MT4 Menu Bar */
+.mt4-menubar {
+  background: #232a38;
+  border-bottom: 1px solid #2d3545;
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 2px;
+  user-select: none;
+}
+
+.mt4-menu-item {
+  padding: 3px 8px;
+  color: #cbd5e1;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.mt4-menu-item:hover {
+  background: #334155;
+  color: #fff;
+}
+
+/* 3. MT4 Main Toolbar */
+.mt4-toolbar {
+  background: #1e2532;
+  border-bottom: 1px solid #2d3545;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mt4-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.mt4-tool-sep {
+  width: 1px;
+  height: 18px;
+  background: #334155;
+  margin: 0 4px;
+}
+
+.mt4-btn-tool {
+  background: #273142;
+  border: 1px solid #374151;
+  color: #e2e8f0;
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+.mt4-btn-tool:hover {
+  background: #334155;
+  border-color: #4b5563;
+  color: #fff;
+}
+.mt4-btn-tool.active {
+  background: #1e3a8a;
+  border-color: #3b82f6;
+  color: #60a5fa;
+  font-weight: 600;
+}
+.mt4-btn-tool.btn-highlight {
+  background: #065f46;
+  border-color: #10b981;
+  color: #a7f3d0;
+  font-weight: 600;
+}
+
+.mt4-timeframes {
+  display: flex;
+  gap: 1px;
+}
+.mt4-tf-btn {
+  background: #232a38;
+  border: 1px solid #374151;
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+.mt4-tf-btn:hover {
+  background: #334155;
+  color: #fff;
+}
+.mt4-tf-btn.active {
+  background: #1e3a8a;
+  color: #93c5fd;
+  border-color: #3b82f6;
+  font-weight: 700;
+}
+
+/* Switch back button */
+.mt4-mode-switch-btn {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+.mt4-mode-switch-btn:hover {
+  background: #2563eb;
+}
+
+/* 4. MT4 Main Split Workspace (Left Sidebar + Center Chart) */
+.mt4-workspace {
+  display: flex;
+  min-height: 440px;
+  background: #131722;
+  border-bottom: 2px solid #2d3545;
+}
+
+/* Left Sidebar: Market Watch & Navigator */
+.mt4-sidebar {
+  width: 270px;
+  min-width: 240px;
+  background: #1c222e;
+  border-right: 1px solid #2d3545;
+  display: flex;
+  flex-direction: column;
+}
+
+.mt4-panel-header {
+  background: #232a38;
+  border-bottom: 1px solid #2d3545;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Market Watch Table */
+.mt4-marketwatch-pane {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
+  border-bottom: 1px solid #2d3545;
+}
+
+.mt4-mw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+}
+.mt4-mw-table th {
+  background: #19202c;
+  color: #94a3b8;
+  text-align: left;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border-bottom: 1px solid #2d3545;
+  position: sticky;
+  top: 0;
+}
+.mt4-mw-table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+.mt4-mw-table tr:hover td {
+  background: #273142;
+}
+.mt4-mw-table tr.selected td {
+  background: #1e3a8a;
+  color: #fff;
+  font-weight: 600;
+}
+.mt4-mw-symbol {
+  color: #f8fafc;
+  font-weight: 600;
+}
+.mt4-mw-bid {
+  color: #60a5fa;
+  text-align: right;
+}
+.mt4-mw-ask {
+  color: #f87171;
+  text-align: right;
+}
+.mt4-mw-spread {
+  color: #94a3b8;
+  text-align: center;
+  font-size: 10px;
+}
+
+/* Navigator Tree */
+.mt4-navigator-pane {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
+  padding: 4px;
+}
+
+.mt4-tree-node {
+  padding: 2px 4px;
+  font-size: 11px;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 2px;
+}
+.mt4-tree-node:hover {
+  background: #273142;
+  color: #fff;
+}
+.mt4-tree-node.active-ea {
+  background: #065f46;
+  color: #a7f3d0;
+  font-weight: 600;
+}
+.mt4-tree-node.sub-item {
+  padding-left: 20px;
+}
+.mt4-tree-icon {
+  font-size: 12px;
+}
+
+/* Center Chart Container */
+.mt4-chart-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0c1017;
+  position: relative;
+  overflow: hidden;
+}
+
+.mt4-chart-tabbar {
+  background: #19202c;
+  border-bottom: 1px solid #2d3545;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+.mt4-chart-tab {
+  background: #0c1017;
+  color: #f8fafc;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #2d3545;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mt4-watermark-overlay {
+  position: absolute;
+  top: 34px;
+  left: 12px;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  color: #64748b;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mt4-watermark-title {
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 12px;
+}
+.mt4-watermark-ohlc {
+  color: #cbd5e1;
+}
+
+#mt4LightweightChart {
+  width: 100%;
+  height: 380px;
+}
+
+/* 5. MT4 Bottom Pane: Strategy Tester */
+.mt4-tester-container {
+  background: #1a202c;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid #2b3342;
+}
+
+/* Strategy Tester Controls */
+.mt4-tester-controls {
+  background: #202735;
+  padding: 8px 12px;
+  border-bottom: 1px solid #2d3545;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mt4-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mt4-control-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mt4-control-group label {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.mt4-select, .mt4-input {
+  background: #111620;
+  border: 1px solid #374151;
+  color: #f8fafc;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  outline: none;
+}
+.mt4-select:focus, .mt4-input:focus {
+  border-color: #3b82f6;
+}
+
+.mt4-btn-action {
+  background: #273142;
+  border: 1px solid #4b5563;
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.mt4-btn-action:hover {
+  background: #374151;
+  color: #fff;
+}
+.mt4-btn-action.btn-start {
+  background: #15803d;
+  border-color: #22c55e;
+  color: #fff;
+  min-width: 70px;
+}
+.mt4-btn-action.btn-start:hover {
+  background: #16a34a;
+}
+.mt4-btn-action.btn-modify {
+  background: #1e3a8a;
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+.mt4-btn-action.btn-modify:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Progress bar */
+.mt4-progress-wrap {
+  flex: 1;
+  min-width: 140px;
+  height: 16px;
+  background: #111620;
+  border: 1px solid #374151;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.mt4-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  transition: width 0.3s ease;
+}
+.mt4-progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Strategy Tester Tab Bar */
+.mt4-tester-tabbar {
+  background: #181f2a;
+  border-bottom: 1px solid #2d3545;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  gap: 1px;
+}
+.mt4-tester-tab {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.mt4-tester-tab:hover {
+  color: #f8fafc;
+  background: #232c3d;
+}
+.mt4-tester-tab.active {
+  color: #60a5fa;
+  background: #202735;
+  border-bottom-color: #3b82f6;
+}
+
+/* Tester Content Panes */
+.mt4-tester-pane {
+  display: none;
+  background: #151a24;
+  min-height: 240px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 10px;
+}
+.mt4-tester-pane.active {
+  display: block;
+}
+
+/* Table in Results Pane */
+.mt4-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+}
+.mt4-table th {
+  background: #1f2736;
+  color: #94a3b8;
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid #2d3545;
+  position: sticky;
+  top: 0;
+}
+.mt4-table td {
+  padding: 4px 8px;
+  border: 1px solid #242c3d;
+  color: #cbd5e1;
+}
+.mt4-table tr:nth-child(even) td {
+  background: #131722;
+}
+.mt4-table tr:hover td {
+  background: #232c3d;
+}
+.mt4-val-win {
+  color: #34d399 !important;
+  font-weight: 600;
+}
+.mt4-val-loss {
+  color: #f87171 !important;
+  font-weight: 600;
+}
+
+/* MT4 Graph Canvas */
+.mt4-graph-canvas-wrap {
+  width: 100%;
+  height: 220px;
+  background: #0c1017;
+  border: 1px solid #2d3545;
+  position: relative;
+  overflow: hidden;
+}
+#mt4EquityCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* MT4 Official Strategy Tester Report Layout */
+.mt4-report-container {
+  background: #0f141d;
+  border: 1px solid #2d3545;
+  padding: 16px 20px;
+  color: #cbd5e1;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  font-size: 11px;
+}
+.mt4-report-header {
+  border-bottom: 2px solid #334155;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+.mt4-report-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+.mt4-report-sub {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.mt4-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.mt4-report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mt4-report-table td {
+  padding: 3px 6px;
+  border-bottom: 1px dotted #2d3545;
+  font-size: 11px;
+}
+.mt4-report-table td.label {
+  color: #94a3b8;
+  width: 60%;
+}
+.mt4-report-table td.val {
+  text-align: right;
+  color: #f8fafc;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Journal Terminal Log */
+.mt4-journal-log {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mt4-log-entry {
+  padding: 2px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.mt4-log-time {
+  color: #64748b;
+  margin-right: 8px;
+}
+.mt4-log-sender {
+  color: #38bdf8;
+  font-weight: 600;
+  margin-right: 8px;
+}
+.mt4-log-msg {
+  color: #e2e8f0;
+}
+.mt4-log-msg.win {
+  color: #4ade80;
+}
+.mt4-log-msg.loss {
+  color: #f87171;
+}
+
+/* 6. MT4 Status Bar */
+.mt4-statusbar {
+  background: #181e28;
+  border-top: 1px solid #2d3545;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 8px;
+  font-size: 10px;
+  color: #64748b;
+  user-select: none;
+}
+.mt4-status-left {
+  display: flex;
+  gap: 12px;
+}
+.mt4-status-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #34d399;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   MetaEditor IDE Modal
+   ========================================================================== */
+.metaeditor-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.metaeditor-modal-backdrop.open {
+  display: flex;
+}
+
+.metaeditor-window {
+  width: 900px;
+  max-width: 95vw;
+  height: 600px;
+  max-height: 90vh;
+  background: #1e1e1e;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.metaeditor-header {
+  background: #252526;
+  border-bottom: 1px solid #3c3c3c;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.metaeditor-title {
+  color: #cccccc;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaeditor-toolbar {
+  background: #2d2d2d;
+  border-bottom: 1px solid #3c3c3c;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metaeditor-tool-btn {
+  background: #3a3d41;
+  border: 1px solid #4a4d52;
+  color: #ffffff;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.metaeditor-tool-btn:hover {
+  background: #4a4d52;
+}
+.metaeditor-tool-btn.compile-btn {
+  background: #0e639c;
+  border-color: #1177bb;
+  font-weight: 700;
+}
+.metaeditor-tool-btn.compile-btn:hover {
+  background: #1177bb;
+}
+
+.metaeditor-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.metaeditor-code-container {
+  flex: 1;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 12px;
+  overflow: auto;
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  border: none;
+  outline: none;
+  resize: none;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.metaeditor-console {
+  height: 90px;
+  background: #181818;
+  border-top: 1px solid #3c3c3c;
+  padding: 6px 12px;
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 11px;
+  color: #858585;
+  overflow-y: auto;
+}
+.metaeditor-console-msg {
+  color: #4ec9b0;
+}
+
+/* ==========================================================================
+   Expert Properties Modal
+   ========================================================================== */
+.expert-props-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.expert-props-modal-backdrop.open {
+  display: flex;
+}
+
+.expert-props-window {
+  width: 520px;
+  background: #1e2430;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.expert-props-header {
+  background: #252d3d;
+  padding: 8px 14px;
+  border-bottom: 1px solid #374151;
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expert-props-body {
+  padding: 14px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.expert-props-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.expert-props-table th {
+  background: #181e28;
+  color: #94a3b8;
+  padding: 5px 8px;
+  text-align: left;
+  border: 1px solid #334155;
+  font-size: 10px;
+}
+.expert-props-table td {
+  padding: 5px 8px;
+  border: 1px solid #2d3748;
+}
+.expert-props-table td.var-name {
+  color: #93c5fd;
+  font-family: 'JetBrains Mono', monospace;
+}
+.expert-props-input {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #4b5563;
+  color: #f8fafc;
+  padding: 3px 6px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 2px;
+}
+.expert-props-input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.expert-props-footer {
+  background: #181e28;
+  border-top: 1px solid #374151;
+  padding: 8px 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

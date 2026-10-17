@@ -11,6 +11,7 @@
   <!-- TradingView Lightweight Charts (v4.1.3 local bundle) -->
   <script src="lightweight-charts.js"></script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="mt4_theme.css">
 </head>
 <body>
   <div class="quant-container">
@@ -27,6 +28,7 @@
       </div>
       <div class="header-actions">
         <span class="status-chip live-chip">● ตกผลึกกลยุทธ์เดียว 100%</span>
+        <button type="button" id="btnToggleMt4Mode" class="btn btn-outline" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.12); font-weight: 600;">🖥️ สลับเป็นโหมด MT4 Terminal</button>
         <a href="../index.html" class="btn btn-outline" title="กลับไปหน้าร้านค้า SmartStock หลัก (โปรเจกต์ 1)">📦 หน้าสต็อกหลัก</a>
         <a href="https://github.com/smiledee9-svg/stock" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="ดูซอร์สโค้ดบน GitHub">⭐ GitHub Repo</a>
       </div>
@@ -61,8 +63,15 @@
         <span>พยากรณ์รอบถัดไป</span>
         <span class="tab-badge-pill" style="background: rgba(168, 85, 247, 0.35); color: #e9d5ff;">AI Predict</span>
       </button>
+      <button type="button" class="nav-tab-btn" data-tab="viewMt4Terminal" id="navTabMt4" style="border-color: rgba(56, 189, 248, 0.4);">
+        <span class="tab-icon">🖥️</span>
+        <span>MT4 Strategy Tester</span>
+        <span class="tab-badge-pill" style="background: rgba(56, 189, 248, 0.25); color: #38bdf8;">MT4 EA</span>
+      </button>
     </nav>
 
+    <!-- Main Quant Dashboard Wrapper -->
+    <main id="quantMainView">
     <!-- =========================================================================
          PAGE 1: OVERVIEW & TABLE OF CONTENTS HUB (หน้าแรก: สารบัญนำทาง & สรุปภาพรวม)
          ========================================================================= -->
@@ -676,6 +685,473 @@
         <span class="badge-tag tag-success">🟢 ระบบอัปเดตอัตโนมัติพร้อมทำงาน</span>
       </div>
     </section>
+    </main>
+
+    <!-- =========================================================================
+         MT4 TERMINAL & STRATEGY TESTER WORKSTATION
+         ========================================================================= -->
+    <div id="mt4TerminalRoot" class="mt4-terminal-wrapper" style="display: none;">
+      <!-- 1. Window Titlebar -->
+      <div class="mt4-titlebar">
+        <div class="mt4-titlebar-left">
+          <span class="mt4-icon">4</span>
+          <span>1004819 : SCB Ramanujan Quant Server - MetaTrader 4 [Strategy Tester: Ramanujan_Cycle_Adaptive_EA.mq4, SCB.BK, Daily]</span>
+        </div>
+        <div class="mt4-titlebar-right">
+          <button type="button" class="mt4-win-btn" title="ย่อหน้าต่าง">_</button>
+          <button type="button" class="mt4-win-btn" title="ขยายเต็มจอ">□</button>
+          <button type="button" class="mt4-win-btn close" id="btnMt4CloseWin" title="ปิด / สลับกลับหน้าโมเดิร์น">✕</button>
+        </div>
+      </div>
+
+      <!-- 2. Menu Bar -->
+      <div class="mt4-menubar">
+        <span class="mt4-menu-item">File</span>
+        <span class="mt4-menu-item">View</span>
+        <span class="mt4-menu-item">Insert</span>
+        <span class="mt4-menu-item">Charts</span>
+        <span class="mt4-menu-item">Tools</span>
+        <span class="mt4-menu-item">Window</span>
+        <span class="mt4-menu-item">Help</span>
+      </div>
+
+      <!-- 3. Toolbar -->
+      <div class="mt4-toolbar">
+        <div class="mt4-toolbar-group">
+          <button type="button" class="mt4-btn-tool" id="btnMt4NewOrder">📄 New Order</button>
+          <button type="button" class="mt4-btn-tool btn-highlight" id="btnMt4AutoTrading">🤖 AutoTrading <span style="color:#4ade80;">● ON</span></button>
+          <div class="mt4-tool-sep"></div>
+          <button type="button" class="mt4-btn-tool active" id="btnMt4StrategyTesterToggle">🔍 Strategy Tester</button>
+          <button type="button" class="mt4-btn-tool" id="btnMt4MetaEditorNav">📝 MetaEditor (IDE)</button>
+        </div>
+
+        <div class="mt4-toolbar-group">
+          <div class="mt4-timeframes">
+            <button type="button" class="mt4-tf-btn">M1</button>
+            <button type="button" class="mt4-tf-btn">M5</button>
+            <button type="button" class="mt4-tf-btn">M15</button>
+            <button type="button" class="mt4-tf-btn">M30</button>
+            <button type="button" class="mt4-tf-btn">H1</button>
+            <button type="button" class="mt4-tf-btn">H4</button>
+            <button type="button" class="mt4-tf-btn active">D1</button>
+            <button type="button" class="mt4-tf-btn">W1</button>
+            <button type="button" class="mt4-tf-btn">MN</button>
+          </div>
+        </div>
+
+        <button type="button" class="mt4-mode-switch-btn" id="btnMt4BackToQuant">
+          <span>📊 สลับกลับหน้า Modern Quant</span>
+        </button>
+      </div>
+
+      <!-- 4. Main Workspace (Market Watch + Navigator + Center Chart) -->
+      <div class="mt4-workspace">
+        <!-- Left Sidebar -->
+        <div class="mt4-sidebar">
+          <!-- Market Watch -->
+          <div class="mt4-panel-header">
+            <span>Market Watch: 09:45:00</span>
+            <span style="font-size: 10px; color: #60a5fa;">SET Stock Quotes</span>
+          </div>
+          <div class="mt4-marketwatch-pane">
+            <table class="mt4-mw-table">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th style="text-align: right;">Bid</th>
+                  <th style="text-align: right;">Ask</th>
+                  <th style="text-align: center;">!</th>
+                </tr>
+              </thead>
+              <tbody id="mt4MarketWatchBody">
+                <!-- Populated dynamically by mt4_controller.js -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Navigator -->
+          <div class="mt4-panel-header" style="border-top: 1px solid #2d3545;">
+            <span>Navigator</span>
+            <button type="button" id="btnMt4CreateEa" style="background:#1e3a8a; border:none; color:#fff; font-size:9px; padding:1px 5px; border-radius:2px; cursor:pointer;" title="สร้างไฟล์ EA ใหม่">+ New EA</button>
+          </div>
+          <div class="mt4-navigator-pane">
+            <div class="mt4-tree-node"><span class="mt4-tree-icon">📁</span> <strong>Accounts</strong> (1004819: Ramanujan)</div>
+            <div class="mt4-tree-node"><span class="mt4-tree-icon">📁</span> <strong>Indicators</strong> (Ramanujan Harmonic, Kaufman ER)</div>
+            <div class="mt4-tree-node"><span class="mt4-tree-icon">📂</span> <strong>Expert Advisors (EA)</strong></div>
+            <div id="mt4NavigatorEaList">
+              <!-- Populated dynamically with .mq4 files -->
+            </div>
+            <div class="mt4-tree-node"><span class="mt4-tree-icon">📁</span> <strong>Scripts</strong></div>
+          </div>
+        </div>
+
+        <!-- Center Chart Area -->
+        <div class="mt4-chart-area">
+          <div class="mt4-chart-tabbar">
+            <div class="mt4-chart-tab">
+              <span style="color:#22c55e;">📈</span>
+              <span id="mt4ActiveChartTabTitle">SCB.BK, Daily</span>
+            </div>
+          </div>
+
+          <div class="mt4-watermark-overlay">
+            <div class="mt4-watermark-title" id="mt4WatermarkSymbol">SCB.BK, Daily</div>
+            <div class="mt4-watermark-ohlc" id="mt4WatermarkOhlc">O: 146.50 H: 147.00 L: 145.50 C: 146.50 (Spread: 5)</div>
+          </div>
+
+          <div style="flex: 1; padding: 10px; display: flex; flex-direction: column; justify-content: center;">
+            <div style="border: 1px solid #232c3d; border-radius: 4px; overflow: hidden; background: #080c12;">
+              <!-- SVG MT4 Candlestick Preview with Signature Trades -->
+              <svg viewBox="0 0 800 240" style="width: 100%; height: 240px; display: block; background: #080c12;">
+                <!-- Gridlines -->
+                <defs>
+                  <pattern id="mt4Grid" width="40" height="30" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 30" fill="none" stroke="#141a24" stroke-width="1" stroke-dasharray="2,2"/>
+                  </pattern>
+                </defs>
+                <rect width="800" height="240" fill="url(#mt4Grid)"/>
+
+                <!-- Candlesticks simulation (SCB rally) -->
+                <g stroke="#22c55e" stroke-width="1" fill="#22c55e">
+                  <!-- Candles rising -->
+                  <line x1="80" y1="180" x2="80" y2="150" stroke="#22c55e"/>
+                  <rect x="76" y="155" width="8" height="20" fill="#22c55e"/>
+
+                  <line x1="120" y1="170" x2="120" y2="135" stroke="#22c55e"/>
+                  <rect x="116" y="140" width="8" height="25" fill="#22c55e"/>
+
+                  <!-- MT4 Order Entry Arrow -->
+                  <polygon points="120,180 114,192 126,192" fill="#38bdf8"/>
+                  <text x="120" y="206" fill="#38bdf8" font-size="10" font-family="Consolas" text-anchor="middle">#1001 buy 3.1k @ 110.8</text>
+
+                  <!-- Running up -->
+                  <line x1="160" y1="150" x2="160" y2="120" stroke="#22c55e"/>
+                  <rect x="156" y="125" width="8" height="20" fill="#22c55e"/>
+
+                  <line x1="200" y1="135" x2="200" y2="110" stroke="#22c55e"/>
+                  <rect x="196" y="115" width="8" height="15" fill="#22c55e"/>
+
+                  <!-- MT4 Order Exit Arrow & Trailing dashed line -->
+                  <polygon points="200,95 194,83 206,83" fill="#ef4444"/>
+                  <text x="200" y="78" fill="#ef4444" font-size="10" font-family="Consolas" text-anchor="middle">#1001 close @ 111.6 (+฿1.3k)</text>
+                  <line x1="120" y1="180" x2="200" y2="95" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,3"/>
+
+                  <!-- More candles showing full wave -->
+                  <line x1="240" y1="130" x2="240" y2="95" stroke="#22c55e"/>
+                  <rect x="236" y="100" width="8" height="25" fill="#22c55e"/>
+
+                  <line x1="280" y1="110" x2="280" y2="80" stroke="#22c55e"/>
+                  <rect x="276" y="85" width="8" height="20" fill="#22c55e"/>
+
+                  <!-- Next big trade entry -->
+                  <polygon points="400,160 394,172 406,172" fill="#38bdf8"/>
+                  <text x="400" y="186" fill="#38bdf8" font-size="10" font-family="Consolas" text-anchor="middle">#1024 buy 1.1k @ 140.0</text>
+
+                  <line x1="400" y1="160" x2="400" y2="135" stroke="#22c55e"/>
+                  <rect x="396" y="140" width="8" height="15" fill="#22c55e"/>
+
+                  <line x1="440" y1="140" x2="440" y2="90" stroke="#22c55e"/>
+                  <rect x="436" y="95" width="8" height="40" fill="#22c55e"/>
+
+                  <line x1="480" y1="100" x2="480" y2="60" stroke="#22c55e"/>
+                  <rect x="476" y="65" width="8" height="30" fill="#22c55e"/>
+
+                  <!-- SuperTrend Trailing Exit arrow -->
+                  <polygon points="520,50 514,38 526,38" fill="#ef4444"/>
+                  <text x="520" y="32" fill="#4ade80" font-size="10" font-family="Consolas" text-anchor="middle">#1024 close @ 146.2 (+฿6.3k SuperTrend)</text>
+                  <line x1="400" y1="160" x2="520" y2="50" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+                  <line x1="560" y1="80" x2="560" y2="50" stroke="#22c55e"/>
+                  <rect x="556" y="55" width="8" height="20" fill="#22c55e"/>
+
+                  <line x1="600" y1="70" x2="600" y2="40" stroke="#22c55e"/>
+                  <rect x="596" y="45" width="8" height="20" fill="#22c55e"/>
+
+                  <!-- Trade 27: Entry and big super trend ride -->
+                  <polygon points="640,110 634,122 646,122" fill="#38bdf8"/>
+                  <text x="640" y="136" fill="#38bdf8" font-size="10" font-family="Consolas" text-anchor="middle">#1027 buy 2k @ 150.7</text>
+
+                  <line x1="680" y1="90" x2="680" y2="40" stroke="#22c55e"/>
+                  <rect x="676" y="45" width="8" height="40" fill="#22c55e"/>
+
+                  <polygon points="720,35 714,23 726,23" fill="#ef4444"/>
+                  <text x="720" y="18" fill="#4ade80" font-size="10" font-family="Consolas" text-anchor="middle">#1027 close @ 155.5 (+฿8.4k)</text>
+                  <line x1="640" y1="110" x2="720" y2="35" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                </g>
+
+                <!-- Chandelier Trailing line -->
+                <path d="M 60,195 Q 200,140 350,150 T 520,70 T 750,45" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2"/>
+                <text x="750" y="60" fill="#f59e0b" font-size="10" font-family="Consolas">Trailing Stop Line</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Bottom Strategy Tester -->
+      <div class="mt4-tester-container">
+        <!-- Tester Controls Bar -->
+        <div class="mt4-tester-controls">
+          <div class="mt4-controls-row">
+            <div class="mt4-control-group">
+              <label>Expert Advisor:</label>
+              <select id="mt4TesterEaSelect" class="mt4-select" style="min-width: 220px;">
+                <option value="ramanujan_adaptive">Ramanujan_Cycle_Adaptive_EA.mq4</option>
+                <option value="ichimoku_hosoda">Hosoda_Ichimoku_Cloud_EA.mq4</option>
+                <option value="rebalance_grid">Quant_Rebalance_Grid_EA.mq4</option>
+                <option value="custom_strategy">Custom_MQL4_Strategy.mq4</option>
+              </select>
+            </div>
+
+            <div class="mt4-control-group">
+              <label>Symbol:</label>
+              <select id="mt4TesterSymbol" class="mt4-select">
+                <option value="SCB.BK">SCB.BK (SCBX Public Co)</option>
+                <option value="KBANK.BK">KBANK.BK (Kasikornbank)</option>
+                <option value="BBL.BK">BBL.BK (Bangkok Bank)</option>
+                <option value="PTT.BK">PTT.BK (PTT Public Co)</option>
+              </select>
+            </div>
+
+            <div class="mt4-control-group">
+              <label>Model:</label>
+              <select class="mt4-select">
+                <option>Every tick (the most precise method based on all available least timeframes)</option>
+                <option>Control points (the very crude method based on the nearest less timeframe)</option>
+                <option>Open prices only (fastest method to analyze the bar just completed)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt4-controls-row">
+            <div class="mt4-control-group">
+              <input type="checkbox" id="mt4UseDateCheck" checked>
+              <label for="mt4UseDateCheck">Use date</label>
+              <label style="margin-left: 6px;">From:</label>
+              <input type="text" class="mt4-input" style="width: 80px;" value="2022.10.17">
+              <label>To:</label>
+              <input type="text" class="mt4-input" style="width: 80px;" value="2026.10.15">
+            </div>
+
+            <div class="mt4-control-group">
+              <label>Period:</label>
+              <select class="mt4-select">
+                <option>Daily (D1)</option>
+                <option>H4</option>
+                <option>H1</option>
+                <option>M15</option>
+              </select>
+            </div>
+
+            <div class="mt4-control-group">
+              <label>Spread:</label>
+              <select class="mt4-select">
+                <option>Current (5)</option>
+                <option>2</option>
+                <option>10</option>
+              </select>
+            </div>
+
+            <div class="mt4-control-group" style="margin-left: auto;">
+              <button type="button" class="mt4-btn-action" id="btnMt4ExpertProps">Expert properties</button>
+              <button type="button" class="mt4-btn-action btn-modify" id="btnMt4ModifyExpert">Modify expert (IDE)</button>
+              <button type="button" class="mt4-btn-action btn-start" id="btnMt4StartTest">▶ Start</button>
+            </div>
+
+            <div class="mt4-progress-wrap">
+              <div class="mt4-progress-fill" id="mt4ProgressFill"></div>
+              <div class="mt4-progress-text" id="mt4ProgressText">Test Completed (100%)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy Tester Tabs -->
+        <div class="mt4-tester-tabbar">
+          <button type="button" class="mt4-tester-tab active" data-pane="mt4PaneSettings">Settings</button>
+          <button type="button" class="mt4-tester-tab" data-pane="mt4PaneResults">Results</button>
+          <button type="button" class="mt4-tester-tab" data-pane="mt4PaneGraph">Graph</button>
+          <button type="button" class="mt4-tester-tab" data-pane="mt4PaneReport">Report</button>
+          <button type="button" class="mt4-tester-tab" data-pane="mt4PaneJournal">Journal</button>
+        </div>
+
+        <!-- 1. Settings Pane -->
+        <div id="mt4PaneSettings" class="mt4-tester-pane active">
+          <div style="background: #111620; border: 1px solid #2d3545; padding: 14px; border-radius: 4px; line-height: 1.6;">
+            <h4 style="color: #60a5fa; margin-bottom: 8px;">⚙️ MT4 Strategy Tester Parameters Summary</h4>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 11px;">
+              <div>
+                <div style="color: #94a3b8;">Expert Advisor:</div>
+                <div style="color: #f8fafc; font-weight: 600;">Ramanujan_Cycle_Adaptive_EA.mq4</div>
+              </div>
+              <div>
+                <div style="color: #94a3b8;">Symbol / Dataset:</div>
+                <div style="color: #f8fafc; font-weight: 600;">SCB.BK &bull; 4 Years Daily (971 bars)</div>
+              </div>
+              <div>
+                <div style="color: #94a3b8;">Trading Strategy:</div>
+                <div style="color: #34d399; font-weight: 600;">TP กลาง +2.5% + Super-Trend Trailing Switcher</div>
+              </div>
+              <div>
+                <div style="color: #94a3b8;">Initial Deposit:</div>
+                <div style="color: #f8fafc; font-weight: 600;">500,000.00 THB</div>
+              </div>
+              <div>
+                <div style="color: #94a3b8;">Stop Loss Model:</div>
+                <div style="color: #f8fafc; font-weight: 600;">Wave Structural SL (Avg Cut -0.7%)</div>
+              </div>
+              <div>
+                <div style="color: #94a3b8;">Broker Commission:</div>
+                <div style="color: #f8fafc; font-weight: 600;">0.157% Roundtrip (SET Standard)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Results Pane -->
+        <div id="mt4PaneResults" class="mt4-tester-pane">
+          <table class="mt4-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Order</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>S / L</th>
+                <th>T / P</th>
+                <th>Profit (THB)</th>
+                <th>Balance (THB)</th>
+              </tr>
+            </thead>
+            <tbody id="mt4ResultsTableBody">
+              <!-- Populated dynamically by mt4_controller.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3. Graph Pane -->
+        <div id="mt4PaneGraph" class="mt4-tester-pane">
+          <div class="mt4-graph-canvas-wrap">
+            <canvas id="mt4EquityCanvas"></canvas>
+          </div>
+        </div>
+
+        <!-- 4. Report Pane -->
+        <div id="mt4PaneReport" class="mt4-tester-pane">
+          <div class="mt4-report-container">
+            <div class="mt4-report-header">
+              <div class="mt4-report-title">Strategy Tester Report: Ramanujan_Cycle_Adaptive_EA</div>
+              <div class="mt4-report-sub">SCB.BK, Daily (2022.10.17 - 2026.10.15) &bull; Model: Every tick &bull; Initial Deposit: ฿500,000.00</div>
+            </div>
+
+            <div class="mt4-report-grid">
+              <table class="mt4-report-table">
+                <tr><td class="label">Bars in test:</td><td class="val">971</td></tr>
+                <tr><td class="label">Ticks modelled:</td><td class="val">2,427</td></tr>
+                <tr><td class="label">Modelling quality:</td><td class="val" style="color:#22c55e;">90.00%</td></tr>
+                <tr><td class="label">Total net profit:</td><td class="val" id="repTotalNetProfit" style="color:#22c55e;">+13,648.63</td></tr>
+                <tr><td class="label">Gross profit:</td><td class="val" id="repGrossProfit" style="color:#22c55e;">49,618.32</td></tr>
+                <tr><td class="label">Gross loss:</td><td class="val" id="repGrossLoss" style="color:#f87171;">-35,969.69</td></tr>
+                <tr><td class="label">Profit factor:</td><td class="val" id="repProfitFactor" style="color:#60a5fa;">1.38</td></tr>
+                <tr><td class="label">Expected payoff:</td><td class="val" id="repExpectedPayoff">+470.64</td></tr>
+              </table>
+
+              <table class="mt4-report-table">
+                <tr><td class="label">Maximal drawdown:</td><td class="val" id="repMaximalDD" style="color:#f87171;">3.88% (19,400.00)</td></tr>
+                <tr><td class="label">Total trades:</td><td class="val" id="repTotalTrades">29</td></tr>
+                <tr><td class="label">Short positions (won %):</td><td class="val">0 (0.00%)</td></tr>
+                <tr><td class="label">Long positions (won %):</td><td class="val">29 (65.52%)</td></tr>
+                <tr><td class="label">Profit trades (% of total):</td><td class="val" id="repProfitTrades" style="color:#22c55e;">19 (65.52%)</td></tr>
+                <tr><td class="label">Loss trades (% of total):</td><td class="val" id="repLossTrades" style="color:#f87171;">10 (34.48%)</td></tr>
+                <tr><td class="label">Largest profit trade:</td><td class="val" id="repLargestProfit" style="color:#22c55e;">+8,471.00</td></tr>
+                <tr><td class="label">Largest loss trade:</td><td class="val" id="repLargestLoss" style="color:#f87171;">-7,132.22</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Journal Pane -->
+        <div id="mt4PaneJournal" class="mt4-tester-pane">
+          <div class="mt4-journal-log" id="mt4JournalLogBox">
+            <div class="mt4-log-entry"><span class="mt4-log-time">2026.10.17 08:30:00.000</span> <span class="mt4-log-sender">Tester</span> <span class="mt4-log-msg">Expert Advisor 'Ramanujan_Cycle_Adaptive_EA.mq4' loaded successfully.</span></div>
+            <div class="mt4-log-entry"><span class="mt4-log-time">2026.10.17 08:30:00.001</span> <span class="mt4-log-sender">Tester</span> <span class="mt4-log-msg">SCB.BK 4 Years Daily candle feed loaded: 971 bars verified (2022.10.17 - 2026.10.15).</span></div>
+            <div class="mt4-log-entry"><span class="mt4-log-time">2023.01.04 09:30:00.000</span> <span class="mt4-log-sender">Expert</span> <span class="mt4-log-msg">OrderSend: #1001 buy 3,100 SCB.BK at 110.81, sl: 108.50, tp: 113.58 ok</span></div>
+            <div class="mt4-log-entry"><span class="mt4-log-time">2023.01.10 16:30:00.000</span> <span class="mt4-log-sender">Expert</span> <span class="mt4-log-msg win">OrderClose: #1001 close 3,100 SCB.BK at 111.63, profit: +1,391.09 THB (SuperTrend_Trailing_Exit)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Status Bar -->
+      <div class="mt4-statusbar">
+        <div class="mt4-status-left">
+          <span>For Help, press F1</span>
+          <span>O: 146.50  H: 147.00  L: 145.50  C: 146.50  V: 15,482,000</span>
+        </div>
+        <div class="mt4-status-right">
+          <span>● Connected (48/5 kbps)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         MetaEditor IDE Modal
+         ========================================================================= -->
+    <div id="metaEditorModal" class="metaeditor-modal-backdrop">
+      <div class="metaeditor-window">
+        <div class="metaeditor-header">
+          <div class="metaeditor-title">
+            <span style="color:#38bdf8;">📝</span>
+            <span id="metaEditorTitle">MetaEditor - [Ramanujan_Cycle_Adaptive_EA.mq4]</span>
+          </div>
+          <button type="button" class="mt4-win-btn close" id="btnMetaEditorClose">✕</button>
+        </div>
+
+        <div class="metaeditor-toolbar">
+          <button type="button" class="metaeditor-tool-btn compile-btn" id="btnMetaEditorCompile">▶ Compile</button>
+          <button type="button" class="metaeditor-tool-btn" id="btnMetaEditorSave">💾 Save</button>
+          <span style="color:#64748b; font-size:11px; margin-left:auto;">MQL4 Language &bull; Strict Syntax</span>
+        </div>
+
+        <div class="metaeditor-body">
+          <textarea id="metaEditorCodeText" class="metaeditor-code-container" spellcheck="false"></textarea>
+          <div class="metaeditor-console" id="metaEditorConsole">
+            <div>MetaEditor Ready.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         Expert Properties Modal
+         ========================================================================= -->
+    <div id="expertPropsModal" class="expert-props-modal-backdrop">
+      <div class="expert-props-window">
+        <div class="expert-props-header">
+          <span id="expertPropsTitle">Expert - Ramanujan_Cycle_Adaptive_EA.mq4</span>
+          <button type="button" class="mt4-win-btn close" id="btnExpertPropsClose">✕</button>
+        </div>
+
+        <div class="expert-props-body">
+          <table class="expert-props-table">
+            <thead>
+              <tr>
+                <th style="width: 50%;">Variable</th>
+                <th style="width: 50%;">Value</th>
+              </tr>
+            </thead>
+            <tbody id="expertPropsTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="expert-props-footer">
+          <button type="button" class="mt4-btn-action" id="btnExpertPropsCancel">Cancel</button>
+          <button type="button" class="mt4-btn-action btn-start" id="btnExpertPropsOk">OK</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="quant-footer">
@@ -686,5 +1162,6 @@
   <!-- Load Data Fallback & Main App Logic -->
   <script src="ramanujan_data.js"></script>
   <script src="app.js"></script>
+  <script src="mt4_controller.js"></script>
 </body>
 </html>
