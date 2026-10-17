@@ -97,16 +97,19 @@ function renderSummaryMetrics(sm) {
 
   // Dynamic Navigation & TOC Card Badges
   const elBadgeNav = document.getElementById('navCycleCountBadge');
-  if (elBadgeNav) elBadgeNav.textContent = `${sm.totalCycles || 27} รอบ`;
+  if (elBadgeNav) elBadgeNav.textContent = `${sm.totalCycles || 29} รอบ`;
 
   const elTOC2Title = document.getElementById('tocCard2Title');
-  if (elTOC2Title) elTOC2Title.textContent = `บันทึกประวัติการเทรด ${sm.totalCycles || 27} รอบ`;
+  if (elTOC2Title) elTOC2Title.textContent = `บันทึกประวัติการเทรด ${sm.totalCycles || 29} รอบ (เกราะคุ้มทุน +0.75%)`;
 
   const elTOC2Desc = document.getElementById('tocCard2Desc');
-  if (elTOC2Desc) elTOC2Desc.textContent = `รายละเอียดผลการเทรดจริงย้อนหลัง ${sm.period || '4 ปี'} ครบทั้ง ${sm.totalCycles || 27} รอบ (ชนะ ${sm.winCycles || 17} รอบ / ตัดขาดทุน ${sm.lossCycles || 10} รอบ, Win Rate ${(sm.winRatePct || 63).toFixed(1)}%)`;
+  if (elTOC2Desc) elTOC2Desc.textContent = `รายละเอียดผลการเทรดจริงย้อนหลัง ${sm.period || '4 ปี'} ครบทั้ง ${sm.totalCycles || 29} รอบ (ชนะ & เสมอคุ้มทุน ${sm.winCycles || 26} รอบ / ตัดขาดทุนฉุกเฉิน ${sm.lossCycles || 3} รอบ, Win Rate ${(sm.winRatePct || 89.66).toFixed(1)}%) พร้อมระบบเกราะกั้นหน้าทุน +0.75%`;
 
   const elTOC2Badge = document.getElementById('tocCard2Badge');
-  if (elTOC2Badge) elTOC2Badge.textContent = `ชนะ ${sm.winCycles || 17} / แพ้ ${sm.lossCycles || 10}`;
+  if (elTOC2Badge) elTOC2Badge.textContent = `ชนะ ${sm.winCycles || 26} / คัทลอส ${sm.lossCycles || 3}`;
+
+  const elTOCTagWinRate = document.getElementById('tocTagWinRate');
+  if (elTOCTagWinRate) elTOCTagWinRate.textContent = `Win Rate ${(sm.winRatePct || 89.66).toFixed(1)}%`;
 
   const elTOCTagCandles = document.getElementById('tocTagCandles');
   if (elTOCTagCandles) elTOCTagCandles.textContent = `แท่งเทียน ${sm.period || '4 ปี'} (${(sm.totalCandles || 971).toLocaleString()} วัน)`;
@@ -206,8 +209,15 @@ function renderCyclesTable(cycles, filter = null) {
   const summaryBadge = document.getElementById('tableSummaryBadge');
   const wins = sourceList.filter(c => c.net_return_pct > 0).length;
   if (summaryBadge) {
-    summaryBadge.textContent = `ชนะ ${wins} จาก ${sourceList.length} รอบ (${((wins / Math.max(1, sourceList.length)) * 100).toFixed(1)}%)`;
+    summaryBadge.textContent = `ชนะ & คุ้มทุน ${wins} จาก ${sourceList.length} รอบ (${((wins / Math.max(1, sourceList.length)) * 100).toFixed(1)}%)`;
   }
+
+  const filterAllBtn = document.querySelector('.filter-btn[data-filter="all"]');
+  const filterWinBtn = document.querySelector('.filter-btn[data-filter="win"]');
+  const filterLossBtn = document.querySelector('.filter-btn[data-filter="loss"]');
+  if (filterAllBtn) filterAllBtn.textContent = `ทั้งหมด (${sourceList.length} รอบ)`;
+  if (filterWinBtn) filterWinBtn.textContent = `🟢 ชนะ & คุ้มทุน (${wins} รอบ)`;
+  if (filterLossBtn) filterLossBtn.textContent = `🔴 ตัดขาดทุนฉุกเฉิน (${sourceList.length - wins} รอบ)`;
 
   if (filtered.length === 0) {
     const emptyTr = document.createElement('tr');
@@ -223,7 +233,8 @@ function renderCyclesTable(cycles, filter = null) {
   filtered.forEach((c, idx) => {
     const tr = document.createElement('tr');
     const isWin = c.net_return_pct > 0;
-    const pnlColor = isWin ? '#34d399' : '#f87171';
+    const isShield = c.exit_reason === 'Breakeven_Shield_Exit';
+    const pnlColor = isShield ? '#22d3ee' : (isWin ? '#34d399' : '#f87171');
     const sign = c.net_return_pct > 0 ? '+' : '';
 
     let modeClass = 'mode-breakout';
@@ -241,7 +252,9 @@ function renderCyclesTable(cycles, filter = null) {
     }
 
     let exitReasonThai = c.exit_reason;
-    if (c.exit_reason === 'TakeProfit_Target_2.5%') {
+    if (c.exit_reason === 'Breakeven_Shield_Exit') {
+      exitReasonThai = '🛡️ Breakeven Shield (กั้นทุน +0.75% คุ้มค่าคอมฯ)';
+    } else if (c.exit_reason === 'TakeProfit_Target_2.5%') {
       exitReasonThai = '🎯 ชนเป้า TP +2.5% ล็อกกำไรเร็ว';
     } else if (c.exit_reason === 'SuperTrend_Trailing_Exit') {
       exitReasonThai = '🚀 รันซูเปอร์เทรนด์เต็มรอบ (Trailing Exit)';
@@ -280,8 +293,8 @@ function renderCyclesTable(cycles, filter = null) {
       <td style="font-family: var(--font-code); font-weight: 800; color: ${pnlColor};">${sign}${c.net_return_pct.toFixed(2)}%</td>
       <td style="font-size: 0.82rem; color: #cbd5e1;">${exitReasonThai}</td>
       <td>
-        <span class="badge-tag ${isWin ? 'tag-success' : 'tag-danger'}">
-          ${isWin ? '🟢 WIN' : '🔴 LOSS'}
+        <span class="badge-tag ${isShield ? 'tag-shield' : (isWin ? 'tag-success' : 'tag-danger')}">
+          ${isShield ? '🛡️ BE WIN' : (isWin ? '🟢 WIN' : '🔴 LOSS')}
         </span>
       </td>
     `;

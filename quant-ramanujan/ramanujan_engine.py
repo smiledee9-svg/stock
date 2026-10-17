@@ -302,6 +302,7 @@ class RamanujanConfidenceCycleTrader:
         cycle_super_trend = False
         cycle_guaranteed_floor = 0.0
         last_loss_close_bar = -999
+        last_cycle_close_bar = -999
         completed_cycles = []
         cycle_cash_before_entry = self.initial_capital
         total_commissions = 0.0
@@ -331,6 +332,12 @@ class RamanujanConfidenceCycleTrader:
                 exit_triggered = False
                 exit_price = c_t
                 exit_reason = ""
+
+                # 0. EARLY BREAKEVEN SHIELD (+0.75% trigger -> move SL to +0.35% fee-covered)
+                if not cycle_super_trend:
+                    fee_breakeven_price = round(avg_entry * (1.0 + self.roundtrip_tau + 0.0005), 2)
+                    if h_t >= avg_entry * 1.0075 and cycle_sl < fee_breakeven_price:
+                        cycle_sl = fee_breakeven_price
 
                 # 1. EVALUATE TP +2.5% & DYNAMIC SUPER TREND SWITCHER
                 if not cycle_tp_hit and h_t >= cycle_tp_target:
@@ -404,6 +411,7 @@ class RamanujanConfidenceCycleTrader:
                     net_cycle_pnl = cash - cycle_cash_before_entry
                     net_cycle_ret_pct = (net_cycle_pnl / cycle_cash_before_entry) * 100.0
 
+                    last_cycle_close_bar = t
                     if net_cycle_pnl < 0.0:
                         last_loss_close_bar = t
 
@@ -499,6 +507,8 @@ class RamanujanConfidenceCycleTrader:
             # C. SCANNER WITH CONFIDENCE & CONVEX SIZING
             equity_curve[t] = cash
 
+            if (t - last_cycle_close_bar) <= 3:
+                continue
             if (t - last_loss_close_bar) <= self.cooldown_bars:
                 continue
             if c_t <= row['ema_trend'] or row['er'] < self.er_min_thresh:
