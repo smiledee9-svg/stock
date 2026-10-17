@@ -758,7 +758,7 @@ function renderPredictiveIntelligence(pred) {
   if (elLastPrice && pred.lastPrice) elLastPrice.textContent = `฿${pred.lastPrice.toFixed(2)}`;
 
   const elDelta = document.getElementById('predDeltaVal');
-  if (elDelta && pred.dynamicDeltaPct) elDelta.textContent = `&plusmn;${pred.dynamicDeltaPct.toFixed(2)}%`;
+  if (elDelta && pred.dynamicDeltaPct) elDelta.textContent = `±${pred.dynamicDeltaPct.toFixed(2)}%`;
 
   const expRange = pred.expectedRange || {};
   const elCeil = document.getElementById('predCeilingVal');
