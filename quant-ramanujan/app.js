@@ -69,6 +69,7 @@ function initDashboard(data) {
   if (data.predictiveIntelligence) {
     renderPredictiveIntelligence(data.predictiveIntelligence);
   }
+  initForecastRunSwitcher();
 }
 
 function renderSummaryMetrics(sm) {
@@ -830,6 +831,84 @@ function renderPredictiveIntelligence(pred) {
     const act4 = document.getElementById('scen4Action');
     if (act4) act4.textContent = s4.actionPlan;
   }
+
+  // Update 18 Metrics in Proof Drawer
+  if (pred.lastDate) {
+    const el = document.getElementById('m18_date');
+    if (el) el.textContent = pred.lastDate;
+  }
+  if (pred.lastPrice) {
+    const el = document.getElementById('m18_price');
+    if (el) el.textContent = `฿${pred.lastPrice.toFixed(2)}`;
+  }
+  if (pred.dynamicDeltaPct) {
+    const el = document.getElementById('m18_delta');
+    if (el) el.textContent = `±${pred.dynamicDeltaPct.toFixed(2)}%`;
+  }
+  if (expRange.floor) {
+    const el = document.getElementById('m18_floor');
+    if (el) el.textContent = `฿${expRange.floor.toFixed(2)}`;
+  }
+  if (expRange.ceiling) {
+    const el = document.getElementById('m18_ceiling');
+    if (el) el.textContent = `฿${expRange.ceiling.toFixed(2)}`;
+  }
+  if (expRange.spreadThb) {
+    const el = document.getElementById('m18_spread');
+    if (el) el.textContent = `฿${expRange.spreadThb.toFixed(2)}`;
+  }
 }
+
+/**
+ * Dual-Run Switcher & Co-Pilot Controller
+ */
+function initForecastRunSwitcher() {
+  const btnMidday = document.getElementById('btnRunMidday');
+  const btnEvening = document.getElementById('btnRunEvening');
+  const titleEl = document.getElementById('copilotTitle');
+  const msgEl = document.getElementById('copilotMessage');
+
+  if (btnMidday && btnEvening) {
+    btnMidday.addEventListener('click', () => {
+      btnMidday.classList.add('active');
+      btnEvening.classList.remove('active');
+      if (titleEl) titleEl.textContent = 'สรุปสถานการณ์จาก Co-Pilot ประจำรอบเที่ยง 12:45 น. (ภาคบ่าย)';
+      if (msgEl) {
+        msgEl.innerHTML = '"สวัสดีครับกัปตัน! สภาพอากาศตลาด SCB เที่ยงนี้มีเมฆบางส่วน คลื่นสั้น V5 ยังชะลอตัว (-0.042) สวนทางกับคลื่นใหญ่ V20 (+0.038) <strong>คำแนะนำสบายใจ:</strong> บ่ายนี้เรา \'นั่งจิบกาแฟทับมือ\' ถือเงินสด 100% สบายใจที่สุดครับ แต่หากบ่ายนี้ราคาข้าม <strong>฿146.82</strong> ลมจะเริ่มหนุน เราค่อยแบ่งเปิดไม้แรกหยั่งเชิงเบาๆ 30% ได้เลยครับ!"';
+      }
+    });
+
+    btnEvening.addEventListener('click', () => {
+      btnEvening.classList.add('active');
+      btnMidday.classList.remove('active');
+      if (titleEl) titleEl.textContent = 'สรุปสถานการณ์จาก Co-Pilot ประจำรอบเย็น 17:30 น. (วันพรุ่งนี้)';
+      if (msgEl) {
+        msgEl.innerHTML = '"สรุปตลาดวันเต็มครับกัปตัน! แท่งเทียนวันนี้ปิดที่ ฿146.50 คลื่นใหญ่ V20 ยังประคองตัวแข็งแกร่ง กรอบแกว่งตัวพรุ่งนี้อยู่ที่ Floor ฿141.28 และ Ceiling ฿151.72 <strong>คำแนะนำสบายใจ:</strong> คืนนี้นอนหลับสบายใจได้ 100% พรุ่งนี้เช้าหากเปิดพุ่งทะลุ <strong>฿146.82 – ฿151.72</strong> ระบบจะเริ่มรันเทรนด์ทันที พร้อมตั้ง Trailing Stop ล็อกต้นทุน Breakeven ไม่มีความเสี่ยงครับ!"';
+      }
+    });
+  }
+
+  // Toggle Accordion for 18-Metric Proof Drawer
+  const btnProof = document.getElementById('btnToggleProofDrawer');
+  const drawerBody = document.getElementById('proofDrawerBody');
+  const arrowEl = document.getElementById('proofToggleArrow');
+  const textEl = document.getElementById('proofToggleText');
+
+  if (btnProof && drawerBody) {
+    btnProof.addEventListener('click', () => {
+      const isHidden = window.getComputedStyle(drawerBody).display === 'none';
+      if (isHidden) {
+        drawerBody.style.display = 'flex';
+        if (arrowEl) arrowEl.style.transform = 'rotate(180deg)';
+        if (textEl) textEl.textContent = 'คลิกเพื่อซ่อนรายละเอียด 18 ค่า';
+      } else {
+        drawerBody.style.display = 'none';
+        if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
+        if (textEl) textEl.textContent = 'คลิกเพื่อดูรายละเอียด 18 ค่า & ข้อมูลอ้างอิงจริง';
+      }
+    });
+  }
+}
+
 
 

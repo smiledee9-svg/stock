@@ -2354,3 +2354,278 @@ body {
   color: #fca5a5;
 }
 
+/* ==========================================================================
+   Dual-Run Switcher, Co-Pilot Briefing & 18-Metric Empirical Proof Drawer
+   ========================================================================== */
+.forecast-run-switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .forecast-run-switcher {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-run-tab {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.btn-run-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(56, 189, 248, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-run-tab.active {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border-color: #38bdf8;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.2);
+}
+
+.run-tab-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.run-tab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+}
+
+.run-tab-text strong {
+  font-size: 1.05rem;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.run-tab-text span {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.run-tab-badge {
+  font-size: 0.70rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  white-space: nowrap;
+}
+
+.btn-run-tab.active .run-tab-badge {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+/* Friendly Co-Pilot Briefing Card */
+.copilot-briefing-card {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.85) 0%, rgba(30, 41, 59, 0.7) 100%);
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  border-left: 4px solid #38bdf8;
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.copilot-avatar {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.4));
+}
+
+.copilot-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.copilot-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.copilot-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.copilot-role-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #93c5fd;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.copilot-message {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.copilot-message strong {
+  color: #38bdf8;
+}
+
+/* 18-Metric Quant Proof Accordion Drawer */
+.proof-drawer-card {
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.proof-drawer-card:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.proof-drawer-header {
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+}
+
+.proof-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #d8b4fe;
+}
+
+.proof-header-toggle {
+  font-size: 0.84rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.proof-drawer-body {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 18 Metrics Grid */
+.metrics-18-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .metrics-18-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metrics-group-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.metrics-group-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.84rem;
+}
+
+.metric-label {
+  color: #94a3b8;
+}
+
+.metric-val {
+  font-family: var(--font-code);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Empirical Proof Table */
+.empirical-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.empirical-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.empirical-table th {
+  background: rgba(30, 41, 59, 0.8);
+  color: #94a3b8;
+  padding: 10px 14px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.empirical-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+
+.empirical-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+
