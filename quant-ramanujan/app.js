@@ -93,6 +93,22 @@ function renderSummaryMetrics(sm) {
 
   const elCalmar = document.getElementById('mCalmar');
   if (elCalmar) elCalmar.textContent = `Calmar Ratio: ${(sm.calmar || 2.31).toFixed(2)} (ปลอดภัยกว่า B&H ครึ่งหนึ่ง)`;
+
+  // Dynamic Navigation & TOC Card Badges
+  const elBadgeNav = document.getElementById('navCycleCountBadge');
+  if (elBadgeNav) elBadgeNav.textContent = `${sm.totalCycles || 27} รอบ`;
+
+  const elTOC2Title = document.getElementById('tocCard2Title');
+  if (elTOC2Title) elTOC2Title.textContent = `บันทึกประวัติการเทรด ${sm.totalCycles || 27} รอบ`;
+
+  const elTOC2Desc = document.getElementById('tocCard2Desc');
+  if (elTOC2Desc) elTOC2Desc.textContent = `รายละเอียดผลการเทรดจริงย้อนหลัง ${sm.period || '4 ปี'} ครบทั้ง ${sm.totalCycles || 27} รอบ (ชนะ ${sm.winCycles || 17} รอบ / ตัดขาดทุน ${sm.lossCycles || 10} รอบ, Win Rate ${(sm.winRatePct || 63).toFixed(1)}%)`;
+
+  const elTOC2Badge = document.getElementById('tocCard2Badge');
+  if (elTOC2Badge) elTOC2Badge.textContent = `ชนะ ${sm.winCycles || 17} / แพ้ ${sm.lossCycles || 10}`;
+
+  const elTOCTagCandles = document.getElementById('tocTagCandles');
+  if (elTOCTagCandles) elTOCTagCandles.textContent = `แท่งเทียน ${sm.period || '4 ปี'} (${(sm.totalCandles || 971).toLocaleString()} วัน)`;
 }
 
 function renderActiveState(activePos, candles) {

@@ -661,10 +661,15 @@ class RamanujanConfidenceCycleTrader:
         p_end = float(data['Close'].iloc[-1])
         bnh_ret = ((p_end - p0) / p0) * 100.0
 
+        bnh_equity = (data['Close'] / p0) * self.initial_capital
+        bnh_peak = np.maximum.accumulate(bnh_equity)
+        bnh_dd = (bnh_equity - bnh_peak) / bnh_peak * 100.0
+        bnh_max_dd = float(np.min(bnh_dd))
+
         return {
             "summary": {
                 "symbol": "SCB.BK",
-                "period": "2 Years (Daily SET)",
+                "period": "4 Years (Daily SET)",
                 "totalCandles": n,
                 "initialCapital": self.initial_capital,
                 "finalEquity": round(float(equity_curve[-1]), 2),
@@ -681,7 +686,7 @@ class RamanujanConfidenceCycleTrader:
                 "profitFactor": round(profit_factor, 2),
                 "totalFeesPaid": round(total_commissions, 2),
                 "bnhReturnPct": round(bnh_ret, 2),
-                "bnhMaxDrawdownPct": -12.73,
+                "bnhMaxDrawdownPct": round(bnh_max_dd, 2),
                 "currentPrice": p_end
             },
             "predictiveIntelligence": self.compute_predictive_intelligence(df),
