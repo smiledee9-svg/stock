@@ -767,6 +767,18 @@ function renderPredictiveIntelligence(pred) {
   const elFloor = document.getElementById('predFloorVal');
   if (elFloor && expRange.floor) elFloor.textContent = `฿${expRange.floor.toFixed(2)}`;
 
+  // Dynamic Weather Temperature Gauge Marker positioning
+  if (pred.lastPrice && expRange.ceiling && expRange.floor) {
+    const range = expRange.ceiling - expRange.floor;
+    if (range > 0) {
+      const posPct = Math.max(10, Math.min(90, ((pred.lastPrice - expRange.floor) / range) * 100));
+      const elMarkerCurr = document.querySelector('.gauge-marker.marker-current');
+      if (elMarkerCurr) elMarkerCurr.style.left = `${posPct}%`;
+      const elProg = document.querySelector('.gauge-progress');
+      if (elProg) elProg.style.width = `${posPct}%`;
+    }
+  }
+
   const scens = pred.scenarios || {};
 
   // 1. Inflection

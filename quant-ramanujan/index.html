@@ -388,40 +388,179 @@
         </div>
       </div>
 
-      <!-- Part 1: Predictive Scenario Intelligence Box (แผนทำนายล่วงหน้า & ราคาจุดชนวน) -->
-      <div class="predict-hero-box" style="margin-bottom: 20px;">
-        <div class="predict-hero-header">
-          <div>
-            <span class="predict-badge-pill">⚡ HARMONIC EXTRAPOLATION ENGINE</span>
-            <h3 style="color: #fff; font-size: 1.25rem; margin-top: 8px;">
-              กรอบการคาดการณ์พฤติกรรมราคาหุ้น SCB.BK รอบถัดไป
-            </h3>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
-              ประเมินผ่านทฤษฎีรามานุจัน RPT และ Hardy-Ramanujan Partitioning เพื่อกำหนดราคาแอคชั่นล่วงหน้าก่อนตลาดเปิด
+      <!-- Part 3: SCB Market Weather Forecast & Open-Ended Tactical Roadmap (พยากรณ์อากาศตลาด & ผังแผนปลายเปิด) -->
+      <div class="weather-forecast-card">
+        <!-- Weather Card Header -->
+        <div class="weather-header">
+          <div class="weather-header-left">
+            <div class="weather-pill-tag">🌤️ SCB MARKET WEATHER FORECAST</div>
+            <h3 class="weather-title">ศูนย์พยากรณ์สภาพอากาศตลาด SCB & เข็มทิศกลยุทธ์ปลายเปิด</h3>
+            <p class="weather-subtitle">
+              วิเคราะห์คลื่นลมและความกดอากาศตลาดฮาร์มอนิก 2 ช่วงเวลา เพื่อวางแผนรับมือล่วงหน้าก่อนตลาดเปิด (รอบบ่าย 12:45 น. | รอบวันพรุ่งนี้ 17:30 น.)
             </p>
           </div>
-          <div style="text-align: right;">
-            <div style="font-size: 0.78rem; color: #94a3b8;">ราคาปิดล่าสุด (อิงฐานคำนวณ):</div>
-            <div style="font-family: var(--font-code); font-size: 1.6rem; font-weight: 800; color: #38bdf8;" id="predLastPrice">฿146.50</div>
+          <div class="weather-dual-clock">
+            <div class="weather-clock-item">
+              <span class="clock-label">☀️ พยากรณ์ช่วงบ่าย</span>
+              <span class="clock-time">12:45 น.</span>
+            </div>
+            <div class="weather-clock-item">
+              <span class="clock-label">🌙 พยากรณ์วันพรุ่งนี้</span>
+              <span class="clock-time">17:30 น.</span>
+            </div>
           </div>
         </div>
 
-        <div class="predict-meta-grid">
-          <div class="predict-meta-item">
-            <div class="predict-meta-label">กรอบความผันผวนไดนามิก (&plusmn;&delta;<sub>t</sub>):</div>
-            <div class="predict-meta-val text-brand" id="predDeltaVal">&plusmn;3.56%</div>
+        <!-- Weather Status Main Banner: Atmosphere + Temperature Gauge -->
+        <div class="weather-atmosphere-box">
+          <!-- Atmosphere Condition -->
+          <div class="weather-main-condition">
+            <div class="weather-huge-icon">⛅</div>
+            <div class="weather-condition-info">
+              <div class="weather-condition-badge">สภาวะอากาศปัจจุบัน</div>
+              <div class="weather-condition-heading">มีเมฆสะสม คลื่นลมแปรปรวนรอเลือกทิศ (Consolidation)</div>
+              <div class="weather-condition-summary">
+                คลื่นสั้น V5 ชะลอตัว (-0.042) สวนทางคลื่นใหญ่ V20 (+0.038) ความสอดคล้องคลื่นยังไม่ตัดขึ้นคู่ ตลาดอยู่ในช่วงสะสมพลัง
+              </div>
+            </div>
           </div>
-          <div class="predict-meta-item">
-            <div class="predict-meta-label">แนวต้านกรอบบน (Expected Ceiling):</div>
-            <div class="predict-meta-val text-green" id="predCeilingVal">฿151.72</div>
+
+          <!-- Price Temperature & Wave Gauge -->
+          <div class="weather-temp-gauge-card">
+            <div class="gauge-header">
+              <span class="gauge-title">🌡️ อุณหภูมิราคาและกรอบคลื่น (Wave Temperature Range)</span>
+              <span class="gauge-current-tag">ราคาปัจจุบัน: <strong id="predLastPrice">฿146.50</strong></span>
+            </div>
+            <div class="gauge-bar-wrapper">
+              <div class="gauge-track">
+                <div class="gauge-progress" style="left: 0%; width: 50%;"></div>
+                <div class="gauge-marker marker-floor" style="left: 0%;">
+                  <span class="marker-dot"></span>
+                  <span class="marker-text">❄️ พื้น Floor<br><strong id="predFloorVal">฿141.28</strong></span>
+                </div>
+                <div class="gauge-marker marker-current" style="left: 50%;">
+                  <span class="marker-dot pin-pulse"></span>
+                  <span class="marker-text">📍 ปัจจุบัน<br><strong>฿146.50</strong></span>
+                </div>
+                <div class="gauge-marker marker-ceiling" style="left: 100%;">
+                  <span class="marker-dot"></span>
+                  <span class="marker-text">🔥 เพดาน Ceiling<br><strong id="predCeilingVal">฿151.72</strong></span>
+                </div>
+              </div>
+            </div>
+            <div class="gauge-footer-meta">
+              <span>กรอบแกว่งตัวไดนามิก: <strong class="text-brand" id="predDeltaVal">±3.56%</strong></span>
+              <span>สถานะพอร์ต: <strong class="text-green">ปลอดภัย 100% (ถือเงินสดรอรอบ)</strong></span>
+            </div>
           </div>
-          <div class="predict-meta-item">
-            <div class="predict-meta-label">แนวรับกรอบล่าง (Expected Floor):</div>
-            <div class="predict-meta-val text-amber" id="predFloorVal">฿141.28</div>
+        </div>
+
+        <!-- Open-Ended Tactical Roadmap: ถ้าไปต่อ / ถ้าไม่ไปต่อ / ถ้าพายุเข้า -->
+        <div class="tactical-branches-section">
+          <div class="branches-section-header">
+            <span class="branches-icon">🧭</span>
+            <div>
+              <h4 class="branches-title">ผังแผนกลยุทธ์ปลายเปิด (Open-Ended Tactical Decision Tree)</h4>
+              <p class="branches-sub">ครอบคลุมทุกสถานการณ์ ไม่ว่าตลาดจะเลือกทางไหน เรามีแผนรับมือที่ชัดเจนเสมอ</p>
+            </div>
           </div>
-          <div class="predict-meta-item">
-            <div class="predict-meta-label">รอบอัปเดตอัตโนมัติบนคลาวด์:</div>
-            <div class="predict-meta-val" style="font-size: 0.95rem; color: #c084fc;">เที่ยง 12:45 / เย็น 17:30</div>
+
+          <div class="branches-grid">
+            <!-- Branch 1: ถ้าไปต่อ -->
+            <div class="branch-card branch-bull">
+              <div class="branch-card-header">
+                <div class="branch-icon-pill icon-bull">☀️</div>
+                <div class="branch-heading-wrap">
+                  <span class="branch-tag tag-bull">กรณีที่ 1: ฟ้าเปิดแดดจัด</span>
+                  <h4 class="branch-name">🚀 ถ้าไปต่อ (Bullish Continuation)</h4>
+                </div>
+              </div>
+              <div class="branch-trigger-box">
+                <span class="branch-trigger-label">เงื่อนไขยืนยัน (Trigger Condition):</span>
+                <span class="branch-trigger-val">ราคาข้าม ฿146.82 และยืนเหนือ ฿150.49 พร้อมคลื่น V5 พลิกตัดขึ้นบวกคู่ V20</span>
+              </div>
+              <div class="branch-plans-list">
+                <div class="branch-plan-item">
+                  <span class="plan-period-badge badge-midday">☀️ รอบบ่าย (12:45 น.)</span>
+                  <p class="plan-text">
+                    <strong>ควรจะ:</strong> แบ่งเปิดไม้แรกหยั่งเชิงทันที 30% ไม่ต้องรอปิดตลาด เพราะเป็นจุดกลับตัวคลื่นสอดคล้อง (Phase Coherence &ge; 0.25)
+                  </p>
+                </div>
+                <div class="branch-plan-item">
+                  <span class="plan-period-badge badge-evening">🌙 รอบวันพรุ่งนี้ (17:30 น.)</span>
+                  <p class="plan-text">
+                    <strong>ควรจะ:</strong> ถือข้ามวัน (Let Profit Run) และหากวันพรุ่งนี้เปิดพุ่งทะลุ ฿151.72 ให้เริ่มเติมไม้ที่ 2 (Pyramid) พร้อมดึง Chandelier Trailing Stop ล็อกจุดคุ้มทุน Breakeven ทันที ห้ามปล่อยให้กำไรกลายเป็นขาดทุน
+                  </p>
+                </div>
+              </div>
+              <div class="branch-target-pill pill-target-bull">
+                <span>🎯 เป้า Take Profit: <strong>฿150.49 (+2.50%)</strong> | เป้าขยาย Trailing: <strong>฿160.10+</strong></span>
+              </div>
+            </div>
+
+            <!-- Branch 2: ถ้าไม่ไปต่อ / นิ่งซึม -->
+            <div class="branch-card branch-neutral">
+              <div class="branch-card-header">
+                <div class="branch-icon-pill icon-neutral">⛅</div>
+                <div class="branch-heading-wrap">
+                  <span class="branch-tag tag-neutral">กรณีที่ 2: เมฆสะสมตัว</span>
+                  <h4 class="branch-name">⚖️ ถ้าไม่ไปต่อ / พักฐาน (Sideway Neutral)</h4>
+                </div>
+              </div>
+              <div class="branch-trigger-box">
+                <span class="branch-trigger-label">เงื่อนไขยืนยัน (Trigger Condition):</span>
+                <span class="branch-trigger-val">ราคายังแกว่งวนในกรอบ ฿141.28 - ฿146.82 หรือคลื่น V5, V20 ยังทับซ้อนไม่ยอมตัดคู่</span>
+              </div>
+              <div class="branch-plans-list">
+                <div class="branch-plan-item">
+                  <span class="plan-period-badge badge-midday">☀️ รอบบ่าย (12:45 น.)</span>
+                  <p class="plan-text">
+                    <strong>ควรจะ:</strong> "นั่งทับมือ 100%" นิ่งเฉยและถือเงินสด ห้ามใจร้อนเข้าซื้อเด็ดขาด เพราะคลื่นยังไม่มีพลังโมเมนตัม จะเสียโอกาสและโดนแกว่งกินทุน
+                  </p>
+                </div>
+                <div class="branch-plan-item">
+                  <span class="plan-period-badge badge-evening">🌙 รอบวันพรุ่งนี้ (17:30 น.)</span>
+                  <p class="plan-text">
+                    <strong>ควรจะ:</strong> ถือเงินสด 100% สบายใจ ไม่มีภาระความเสี่ยงข้ามคืน รอโมเดลคำนวณรอบใหม่จนกว่าคลื่นจะสะสมพลังสมบูรณ์
+                  </p>
+                </div>
+              </div>
+              <div class="branch-target-pill pill-target-neutral">
+                <span>🛡️ ระดับความเสี่ยงพอร์ต: <strong>0.00% (ความเสี่ยงเป็นศูนย์ ปล่อยตลาดผันผวนไป)</strong></span>
+              </div>
+            </div>
+
+            <!-- Branch 3: ถ้าลมพายุหักหัวลง / หลุดแนวรับ -->
+            <div class="branch-card branch-bear">
+              <div class="branch-card-header">
+                <div class="branch-icon-pill icon-bear">⛈️</div>
+                <div class="branch-heading-wrap">
+                  <span class="branch-tag tag-bear">กรณีที่ 3: พายุฝนฟ้าคะนอง</span>
+                  <h4 class="branch-name">🚨 ถ้าผิดทาง / หลุดแนวรับ (Storm Breakdown)</h4>
+                </div>
+              </div>
+              <div class="branch-trigger-box">
+                <span class="branch-trigger-label">เงื่อนไขยืนยัน (Trigger Condition):</span>
+                <span class="branch-trigger-val">ราคาปิดหลุดต่ำกว่า ฿141.28 หรือคลื่นความเร็ว V5, V20 หักหัวทิ่มลงคู่</span>
+              </div>
+              <div class="branch-plans-list">
+                <div class="branch-plan-item">
+                  <span class="plan-period-badge badge-midday">☀️ รอบบ่าย (12:45 น.)</span>
+                  <p class="plan-text">
+                    <strong>ควรจะ:</strong> สั่งตัดขาดทุนฉุกเฉิน (Emergency Cut 100%) ทันทีในภาคบ่าย ห้ามต่อรองราคาหรือรอรีบาวด์ ปิดประตูความเสียหายทันที
+                  </p>
+                </div>
+                <div class="branch-plan-item">
+                  <span class="plan-period-badge badge-evening">🌙 รอบวันพรุ่งนี้ (17:30 น.)</span>
+                  <p class="plan-text">
+                    <strong>ควรจะ:</strong> นำเรือเทียบท่า ถือเงินสด 100% ห้ามตั้งรับมีดหล่น (Avoid Catching Falling Knives) เด็ดขาด รอจนกว่าพายุคลื่นจะสงบตัวลง
+                  </p>
+                </div>
+              </div>
+              <div class="branch-target-pill pill-target-bear">
+                <span>🚨 เกณฑ์ตัดขาดทุนฉุกเฉิน (SL): <strong>หลุด ฿141.28 ขายทิ้ง 100% ทันที</strong></span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
