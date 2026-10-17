@@ -222,12 +222,26 @@ function renderCyclesTable(cycles, filter = null) {
     const sign = c.net_return_pct > 0 ? '+' : '';
 
     let modeClass = 'mode-breakout';
-    if (c.mode === 'INFLECTION_TURN') modeClass = 'mode-inflection';
-    else if (c.mode === 'IMPULSE_3BAR') modeClass = 'mode-impulse';
+    let modeText = c.mode;
+    if (c.mode === 'SUPER_TREND_RIDE') {
+      modeClass = 'mode-supertrend';
+      modeText = '🚀 SUPER_TREND';
+    } else if (c.mode === 'FIXED_TP_LOCKED') {
+      modeClass = 'mode-tp';
+      modeText = '🎯 TP_LOCKED';
+    } else if (c.mode === 'INFLECTION_TURN') {
+      modeClass = 'mode-inflection';
+    } else if (c.mode === 'IMPULSE_3BAR') {
+      modeClass = 'mode-impulse';
+    }
 
     let exitReasonThai = c.exit_reason;
-    if (c.exit_reason === 'StopLoss_or_TrailingStop') {
-      exitReasonThai = isWin ? 'Trailing Stop ล็อกกำไร' : 'Stop Loss ตัดขาดทุน';
+    if (c.exit_reason === 'TakeProfit_Target_2.5%') {
+      exitReasonThai = '🎯 ชนเป้า TP +2.5% ล็อกกำไรเร็ว';
+    } else if (c.exit_reason === 'SuperTrend_Trailing_Exit') {
+      exitReasonThai = '🚀 รันซูเปอร์เทรนด์เต็มรอบ (Trailing Exit)';
+    } else if (c.exit_reason === 'Structural_StopLoss' || c.exit_reason === 'StopLoss_or_TrailingStop') {
+      exitReasonThai = isWin ? 'Trailing Stop ล็อกกำไร' : '🛡️ Structural Cut (คลื่นเสียทรงหนีดอย)';
     } else if (c.exit_reason === 'Harmonic_Phase_Breakdown_TP') {
       exitReasonThai = 'Harmonic Breakdown TP (คลื่นหักหัวลง)';
     } else if (c.exit_reason === 'FailSafe_Early_Cut') {
@@ -250,7 +264,7 @@ function renderCyclesTable(cycles, filter = null) {
       <td style="font-weight: 700; color: #94a3b8;">#${c.cycle_id || (idx + 1)}</td>
       <td><strong>${c.entry_date}</strong></td>
       <td>${c.exit_date}</td>
-      <td><span class="mode-badge ${modeClass}">${c.mode}</span></td>
+      <td><span class="mode-badge ${modeClass}">${modeText}</span></td>
       <td><span class="badge-tier ${tierClass}">${tierLabel}</span></td>
       <td style="text-align: center;"><span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; font-weight: 700;">${c.layers_used} ไม้</span></td>
       <td style="font-family: var(--font-code);">${c.total_shares.toLocaleString()}</td>

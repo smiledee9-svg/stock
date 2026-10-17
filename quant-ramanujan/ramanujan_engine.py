@@ -296,6 +296,10 @@ class RamanujanConfidenceCycleTrader:
         cycle_entry_confidence = 0.0
         cycle_allowed_layers = 1
         cycle_be_trigger_mult = 0.80
+        cycle_tp_target = 0.0
+        cycle_tp_hit = False
+        cycle_super_trend = False
+        cycle_guaranteed_floor = 0.0
         last_loss_close_bar = -999
         completed_cycles = []
         cycle_cash_before_entry = self.initial_capital
@@ -327,38 +331,62 @@ class RamanujanConfidenceCycleTrader:
                 exit_price = c_t
                 exit_reason = ""
 
-                # 1. Stop Loss or Trailing Stop
-                if l_t <= cycle_sl:
-                    exit_triggered = True
-                    exit_price = min(o_t, cycle_sl) if o_t < cycle_sl else cycle_sl
-                    exit_reason = "StopLoss_or_TrailingStop"
+                # 1. EVALUATE TP +2.5% & DYNAMIC SUPER TREND SWITCHER
+                if not cycle_tp_hit and h_t >= cycle_tp_target:
+                    cycle_tp_hit = True
+                    is_super_trend = (
+                        row['er'] >= 0.30
+                        and row['rho_ram'] >= 0.25
+                        and row['v_micro'] > 0.0
+                        and row['v_macro'] > 0.0
+                        and c_t > row['ema_trend']
+                    )
 
-                # 2. Structural Fail-Safe Early Cut (Tier C cuts earlier)
-                elif bars_held <= 2 and cycle_sl < avg_entry:
-                    unrealized_pct = (c_t - avg_entry) / avg_entry
-                    cut_factor = 0.40 if cycle_tier == "TIER_C_PROBE_SMALL" else 0.55
-                    if c_t < o_t and row['v_micro'] < 0.0 and unrealized_pct <= -cut_factor * delta_t:
+                    if is_super_trend:
+                        cycle_super_trend = True
+                        cycle_mode = "SUPER_TREND_RIDE"
+                        cycle_guaranteed_floor = avg_entry * 1.020
+                        cycle_sl = max(cycle_sl, cycle_guaranteed_floor)
+                    else:
                         exit_triggered = True
-                        exit_price = c_t
-                        exit_reason = "FailSafe_Early_Cut"
+                        exit_price = max(o_t, cycle_tp_target)
+                        exit_reason = "TakeProfit_Target_2.5%"
+                        cycle_mode = "FIXED_TP_LOCKED"
 
-                # 3. Harmonic Phase Breakdown
-                elif not exit_triggered and c_t > avg_entry * (1.0 + self.roundtrip_tau):
-                    if row['v_micro'] < 0.0 and row['v_macro'] < 0.0 and c_t < row['ema_fast']:
-                        exit_triggered = True
-                        exit_price = c_t
-                        exit_reason = "Harmonic_Phase_Breakdown_TP"
+                # 2. EVALUATE EXITS IF NOT EXITED AT TP
+                if not exit_triggered:
+                    if cycle_super_trend:
+                        trail_mult = 1.0
+                        cand_trail = cycle_highest_high * (1.0 - trail_mult * delta_t)
+                        if cand_trail > cycle_sl:
+                            cycle_sl = cand_trail
+                        cycle_sl = max(cycle_sl, cycle_guaranteed_floor)
 
-                # 4. Impulse 3-Bar / Stagnation Exit
-                elif not exit_triggered:
-                    if cycle_mode == "IMPULSE_3BAR" and bars_held >= 3 and row['v_micro'] <= prev['v_micro']:
-                        exit_triggered = True
-                        exit_price = c_t
-                        exit_reason = "Impulse_3Day_Target_Exit"
-                    elif bars_held >= self.max_stagnant_bars and cycle_sl < avg_entry and row['er'] < 0.20:
-                        exit_triggered = True
-                        exit_price = c_t
-                        exit_reason = "Stagnation_TimeDecay_Exit"
+                        if l_t <= cycle_sl:
+                            exit_triggered = True
+                            exit_price = max(min(o_t, cycle_sl), cycle_guaranteed_floor)
+                            exit_reason = "SuperTrend_Trailing_Exit"
+                    else:
+                        if l_t <= cycle_sl:
+                            exit_triggered = True
+                            exit_price = min(o_t, cycle_sl) if o_t < cycle_sl else cycle_sl
+                            exit_reason = "Structural_StopLoss"
+                        elif bars_held <= 2 and cycle_sl < avg_entry:
+                            unrealized_pct = (c_t - avg_entry) / avg_entry
+                            cut_factor = 0.40 if cycle_tier == "TIER_C_PROBE_SMALL" else 0.55
+                            if c_t < o_t and row['v_micro'] < 0.0 and unrealized_pct <= -cut_factor * delta_t:
+                                exit_triggered = True
+                                exit_price = c_t
+                                exit_reason = "FailSafe_Early_Cut"
+                        elif c_t > avg_entry * (1.0 + self.roundtrip_tau):
+                            if row['v_micro'] < 0.0 and row['v_macro'] < 0.0 and c_t < row['ema_fast']:
+                                exit_triggered = True
+                                exit_price = c_t
+                                exit_reason = "Harmonic_Phase_Breakdown_TP"
+                        elif bars_held >= self.max_stagnant_bars and cycle_sl < avg_entry and row['er'] < 0.20:
+                            exit_triggered = True
+                            exit_price = c_t
+                            exit_reason = "Stagnation_TimeDecay_Exit"
 
                 if exit_triggered:
                     gross_proceeds = total_shares * exit_price
@@ -405,15 +433,10 @@ class RamanujanConfidenceCycleTrader:
                     continue
 
                 # B. Breakeven by Conviction + Dynamic Trailing + Risk-Free Pyramiding
-                be_price = avg_entry * (1.0 + self.roundtrip_tau + 0.002)
-                if h_t >= avg_entry * (1.0 + cycle_be_trigger_mult * delta_t) and cycle_sl < be_price:
-                    cycle_sl = be_price
-
-                if cycle_sl >= be_price:
-                    trail_mult = 0.75 if (row['z_t'] > self.climax_z or row['bbe_ratio'] > 1.85) else 1.35
-                    candidate_trail = cycle_highest_high * (1.0 - trail_mult * delta_t)
-                    if candidate_trail > cycle_sl and candidate_trail < c_t:
-                        cycle_sl = candidate_trail
+                if not cycle_super_trend:
+                    be_price = avg_entry * (1.0 + self.roundtrip_tau + 0.002)
+                    if h_t >= avg_entry * (1.0 + cycle_be_trigger_mult * delta_t) and cycle_sl < be_price:
+                        cycle_sl = be_price
 
                 trailing_stops[t] = round(cycle_sl, 2)
 
@@ -547,6 +570,10 @@ class RamanujanConfidenceCycleTrader:
                     cycle_entry_confidence = conf_info['confidence_pct']
                     cycle_allowed_layers = conf_info['allowed_layers']
                     cycle_be_trigger_mult = conf_info['be_trigger_mult']
+                    cycle_tp_target = c_t * 1.025
+                    cycle_tp_hit = False
+                    cycle_super_trend = False
+                    cycle_guaranteed_floor = 0.0
 
                     if sig_impulse_burst and not sig_harmonic_breakout:
                         cycle_mode = "IMPULSE_3BAR"
