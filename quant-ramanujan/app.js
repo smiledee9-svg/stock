@@ -665,8 +665,7 @@ function syncTabFromHash() {
     'trades': 'viewTrades',
     'simulator': 'viewSimulator',
     'blueprint': 'viewBlueprint',
-    'predict': 'viewPredict',
-    'mt4': 'viewMt4Terminal'
+    'predict': 'viewPredict'
   };
   if (hashMap[hash]) {
     switchTab(hashMap[hash], false);
@@ -675,18 +674,9 @@ function syncTabFromHash() {
 
 function switchTab(targetTabId, updateHash = true) {
   if (targetTabId === 'viewMt4Terminal') {
-    if (typeof MT4_CONTROLLER !== 'undefined') {
-      MT4_CONTROLLER.switchViewMode('mt4');
-    }
-    if (updateHash) history.replaceState(null, '', '#mt4');
+    window.location.href = 'mt4.html';
     return;
   }
-
-  // Ensure Quant Main View is visible when not in MT4 mode
-  const quantMain = document.getElementById('quantMainView');
-  const mt4Root = document.getElementById('mt4TerminalRoot');
-  if (quantMain) quantMain.style.display = 'block';
-  if (mt4Root) mt4Root.style.display = 'none';
 
   const tabViews = document.querySelectorAll('.tab-view');
   const navBtns = document.querySelectorAll('.nav-tab-btn');
