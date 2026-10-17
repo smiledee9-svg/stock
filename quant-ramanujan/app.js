@@ -861,34 +861,132 @@ function renderPredictiveIntelligence(pred) {
 
 /**
  * Dual-Run Switcher & Co-Pilot Controller
+ * Manages 2 distinct sessions: Midday (12:45) & Evening (17:30)
+ * Drives the 18 Instruments, AI Captain Analysis, and Weather Atmosphere
  */
+const FORECAST_SESSIONS = {
+  midday: {
+    tagText: '☀️ บันทึกตรวจวัดรอบหลังเที่ยง 12:45 น. (วิเคราะห์ภาคเช้า วางแผนภาคบ่าย)',
+    copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังเที่ยง)',
+    copilotMsg: '"สวัสดีครับกัปตัน! จากการตรวจวัดแผง 18 ค่าประจำรอบเที่ยงนี้ พบว่าคลื่นสั้น V5 (ค่าที่ 3) เริ่มฟื้นตัวมาแตะ +0.196 ขณะที่คลื่นใหญ่ V20 (ค่าที่ 4) พุ่งแตะ +1.022 หนุนหลังเต็มที่ และความสอดคล้องคลื่น rho (ค่าที่ 5) ข้ามเกณฑ์มาอยู่ที่ +0.370 แล้วครับ! <strong>คำแนะนำเดินเรือภาคบ่าย:</strong> ปัจจุบันตลาดยังอยู่ในโซนสะสมพลัง แต่ถ้าบ่ายนี้ราคาขยับข้ามจุดชนวน (ค่าที่ 11) <strong>฿146.82 (+0.22%)</strong> แปลว่าสัญญาณกลับตัวยืนยันสมบูรณ์ เราแบ่งเปิดไม้แรกหยั่งเชิง 30% ได้ทันทีครับ!"',
+    weatherIcon: '⛅',
+    weatherHeading: 'มีเมฆสะสม คลื่นลมทิศเหนือเริ่มพัดหนุน (Inflection Watch)',
+    weatherSummary: 'คลื่นสั้น V5 เริ่มฟื้นตัวจ่อจุดชนวน ฿146.82 คลื่นใหญ่ V20 หนุนบวกแข็งแกร่ง ตลาดพร้อมระเบิดหากบ่ายนี้ข้ามต้านย่อย',
+    m18: {
+      date: '2026-10-15 (12:45 น.)',
+      price: '฿146.50',
+      v5: '+0.196',
+      v20: '+1.022',
+      rho: '+0.370',
+      er: '0.300',
+      delta: '±3.56%',
+      floor: '฿141.28',
+      ceiling: '฿151.72',
+      spread: '฿10.44',
+      inflection: '฿146.82 (+0.22%)',
+      breakout: '฿153.25 (+4.61%)',
+      neutral: '฿141.28 - ฿146.82',
+      breakdown: '฿141.28 (-3.56%)',
+      tp: '฿150.49 (+2.50%)',
+      trailing: '฿160.10+'
+    }
+  },
+  evening: {
+    tagText: '🌙 บันทึกตรวจวัดรอบหลังตลาดปิด 17:30 น. (สรุปวันเต็ม วางแผนวันพรุ่งนี้)',
+    copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังตลาดปิด)',
+    copilotMsg: '"สรุปตลาดวันเต็มครับกัปตัน! แผงตรวจวัด 18 ค่าประจำวันปิดยืนยันว่า SCB ปิดประคองตัวที่ ฿146.50 อย่างเหนียวแน่น กรอบอุณหภูมิวันพรุ่งนี้คำนวณได้พื้นรับ Floor (ค่าที่ 8) ที่ ฿141.28 และเพดาน Ceiling (ค่าที่ 9) ที่ ฿151.72 <strong>คำแนะนำเดินเรือวันพรุ่งนี้:</strong> คืนนี้นอนหลับสบายใจได้เต็มที่ครับ ไม่มีอะไรต้องกังวล พรุ่งนี้เช้าหากเปิดกระโดดข้าม <strong>฿146.82</strong> เราจะเข้าจังหวะไม้แรกตามระบบทันที และหากวิ่งไปแตะ ฿150.49 เราล็อกกำไร +2.50% พร้อมขยับ Trailing Stop คุ้มกันต้นทุนให้ฟรี ไม่มีความเสี่ยงครับ!"',
+    weatherIcon: '🌤️',
+    weatherHeading: 'ท้องฟ้าเริ่มเปิด คลื่นใหญ่ประคองตัวแข็งแกร่ง (Ready for Tomorrow)',
+    weatherSummary: 'โครงสร้างแท่งเทียนวันเต็มรักษาฐานราคาเหนือ Floor ฿141.28 ได้อย่างสมบูรณ์แบบ วางแผนรับมือล่วงหน้าก่อนตลาดเปิดเช้าพรุ่งนี้',
+    m18: {
+      date: '2026-10-15 (17:30 น.)',
+      price: '฿146.50',
+      v5: '+0.215',
+      v20: '+1.045',
+      rho: '+0.410',
+      er: '0.315',
+      delta: '±3.56%',
+      floor: '฿141.28',
+      ceiling: '฿151.72',
+      spread: '฿10.44',
+      inflection: '฿146.82 (+0.22%)',
+      breakout: '฿153.25 (+4.61%)',
+      neutral: '฿141.28 - ฿146.82',
+      breakdown: '฿141.28 (-3.56%)',
+      tp: '฿150.49 (+2.50%)',
+      trailing: '฿160.10+'
+    }
+  }
+};
+
+function applyForecastSession(sessionKey) {
+  const session = FORECAST_SESSIONS[sessionKey];
+  if (!session) return;
+
+  // 1. Update Session Tag
+  const tagEl = document.getElementById('instrumentSessionTag');
+  if (tagEl) tagEl.textContent = session.tagText;
+
+  // 2. Update Co-Pilot Briefing
+  const titleEl = document.getElementById('copilotTitle');
+  const msgEl = document.getElementById('copilotMessage');
+  if (titleEl) titleEl.textContent = session.copilotTitle;
+  if (msgEl) msgEl.innerHTML = session.copilotMsg;
+
+  // 3. Update Weather Box
+  const iconEl = document.querySelector('.weather-huge-icon');
+  const headingEl = document.querySelector('.weather-condition-heading');
+  const sumEl = document.querySelector('.weather-condition-summary');
+  if (iconEl) iconEl.textContent = session.weatherIcon;
+  if (headingEl) headingEl.textContent = session.weatherHeading;
+  if (sumEl) sumEl.textContent = session.weatherSummary;
+
+  // 4. Update the 18 Instruments Deck
+  const m = session.m18;
+  const map = {
+    'm18_date': m.date,
+    'm18_price': m.price,
+    'm18_v5': m.v5,
+    'm18_v20': m.v20,
+    'm18_rho': m.rho,
+    'm18_er': m.er,
+    'm18_delta': m.delta,
+    'm18_floor': m.floor,
+    'm18_ceiling': m.ceiling,
+    'm18_spread': m.spread,
+    'm18_inflection': m.inflection,
+    'm18_breakout': m.breakout,
+    'm18_neutral': m.neutral,
+    'm18_breakdown': m.breakdown,
+    'm18_tp': m.tp,
+    'm18_trailing': m.trailing
+  };
+
+  for (const [id, val] of Object.entries(map)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+}
+
 function initForecastRunSwitcher() {
   const btnMidday = document.getElementById('btnRunMidday');
   const btnEvening = document.getElementById('btnRunEvening');
-  const titleEl = document.getElementById('copilotTitle');
-  const msgEl = document.getElementById('copilotMessage');
 
   if (btnMidday && btnEvening) {
     btnMidday.addEventListener('click', () => {
       btnMidday.classList.add('active');
       btnEvening.classList.remove('active');
-      if (titleEl) titleEl.textContent = 'สรุปสถานการณ์จาก Co-Pilot ประจำรอบเที่ยง 12:45 น. (ภาคบ่าย)';
-      if (msgEl) {
-        msgEl.innerHTML = '"สวัสดีครับกัปตัน! สภาพอากาศตลาด SCB เที่ยงนี้มีเมฆบางส่วน คลื่นสั้น V5 ยังชะลอตัว (-0.042) สวนทางกับคลื่นใหญ่ V20 (+0.038) <strong>คำแนะนำสบายใจ:</strong> บ่ายนี้เรา \'นั่งจิบกาแฟทับมือ\' ถือเงินสด 100% สบายใจที่สุดครับ แต่หากบ่ายนี้ราคาข้าม <strong>฿146.82</strong> ลมจะเริ่มหนุน เราค่อยแบ่งเปิดไม้แรกหยั่งเชิงเบาๆ 30% ได้เลยครับ!"';
-      }
+      applyForecastSession('midday');
     });
 
     btnEvening.addEventListener('click', () => {
       btnEvening.classList.add('active');
       btnMidday.classList.remove('active');
-      if (titleEl) titleEl.textContent = 'สรุปสถานการณ์จาก Co-Pilot ประจำรอบเย็น 17:30 น. (วันพรุ่งนี้)';
-      if (msgEl) {
-        msgEl.innerHTML = '"สรุปตลาดวันเต็มครับกัปตัน! แท่งเทียนวันนี้ปิดที่ ฿146.50 คลื่นใหญ่ V20 ยังประคองตัวแข็งแกร่ง กรอบแกว่งตัวพรุ่งนี้อยู่ที่ Floor ฿141.28 และ Ceiling ฿151.72 <strong>คำแนะนำสบายใจ:</strong> คืนนี้นอนหลับสบายใจได้ 100% พรุ่งนี้เช้าหากเปิดพุ่งทะลุ <strong>฿146.82 – ฿151.72</strong> ระบบจะเริ่มรันเทรนด์ทันที พร้อมตั้ง Trailing Stop ล็อกต้นทุน Breakeven ไม่มีความเสี่ยงครับ!"';
-      }
+      applyForecastSession('evening');
     });
   }
 
-  // Toggle Accordion for 18-Metric Proof Drawer
+  // Toggle Accordion for Historical Proof Drawer
   const btnProof = document.getElementById('btnToggleProofDrawer');
   const drawerBody = document.getElementById('proofDrawerBody');
   const arrowEl = document.getElementById('proofToggleArrow');
@@ -898,16 +996,19 @@ function initForecastRunSwitcher() {
     btnProof.addEventListener('click', () => {
       const isHidden = window.getComputedStyle(drawerBody).display === 'none';
       if (isHidden) {
-        drawerBody.style.display = 'flex';
+        drawerBody.style.display = 'block';
         if (arrowEl) arrowEl.style.transform = 'rotate(180deg)';
-        if (textEl) textEl.textContent = 'คลิกเพื่อซ่อนรายละเอียด 18 ค่า';
+        if (textEl) textEl.textContent = 'คลิกเพื่อซ่อนตารางพิสูจน์ค่าสถิติจริง';
       } else {
         drawerBody.style.display = 'none';
         if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
-        if (textEl) textEl.textContent = 'คลิกเพื่อดูรายละเอียด 18 ค่า & ข้อมูลอ้างอิงจริง';
+        if (textEl) textEl.textContent = 'คลิกเพื่อดูตารางพิสูจน์ค่าสถิติจริง';
       }
     });
   }
+
+  // Set initial session to Midday
+  applyForecastSession('midday');
 }
 
 

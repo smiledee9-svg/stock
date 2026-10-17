@@ -431,16 +431,126 @@
           </button>
         </div>
 
+        <!-- Instruments First: แผงหน้าปัดตรวจวัด 18 ค่าประจำรอบ (Flight Instruments Deck) -->
+        <div class="instruments-board-card">
+          <div class="instruments-board-header">
+            <div class="instruments-board-title">
+              <span>🧭</span>
+              <span>แผงหน้าปัดตรวจวัด 18 ค่าคณิตศาสตร์รามานุจัน (Flight Instruments Deck)</span>
+            </div>
+            <span class="session-active-pill" id="instrumentSessionTag">☀️ บันทึกตรวจวัดรอบหลังเที่ยง 12:45 น. (ภาคบ่าย)</span>
+          </div>
+
+          <!-- 18 Metrics in 3 Groups -->
+          <div class="metrics-18-grid">
+            <!-- Group 1: 6 Live Telemetry Metrics -->
+            <div class="metrics-group-card">
+              <div class="metrics-group-title">
+                <span>เซนเซอร์คลื่นสด (Telemetry)</span>
+                <span class="text-brand">6 ค่า</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">1. วันที่สแกน (lastDate):</span>
+                <span class="metric-val text-brand" id="m18_date">2026-10-15 (12:45 น.)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">2. ราคาอ้างอิง (lastPrice):</span>
+                <span class="metric-val text-brand" id="m18_price">฿146.50</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">3. คลื่นสัปดาห์ (V5 Micro):</span>
+                <span class="metric-val text-brand" id="m18_v5">+0.196</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">4. คลื่นเดือน (V20 Macro):</span>
+                <span class="metric-val text-purple" id="m18_v20">+1.022</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">5. ความสอดคล้อง (rho):</span>
+                <span class="metric-val text-green" id="m18_rho">+0.370</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">6. ตัวกรองเทรนด์ (ER):</span>
+                <span class="metric-val text-amber" id="m18_er">0.300</span>
+              </div>
+            </div>
+
+            <!-- Group 2: 4 Dynamic Wave Boundaries -->
+            <div class="metrics-group-card">
+              <div class="metrics-group-title">
+                <span>กรอบความผันผวน (Boundaries)</span>
+                <span class="text-green">4 ค่า</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">7. กรอบไดนามิก (&plusmn;&delta;t):</span>
+                <span class="metric-val text-brand" id="m18_delta">±3.56%</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">8. แนวรับพื้นคลื่น (Floor):</span>
+                <span class="metric-val text-amber" id="m18_floor">฿141.28</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">9. แนวต้านเพดาน (Ceiling):</span>
+                <span class="metric-val text-green" id="m18_ceiling">฿151.72</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">10. ความกว้างกรอบ (Spread):</span>
+                <span class="metric-val text-purple" id="m18_spread">฿10.44</span>
+              </div>
+            </div>
+
+            <!-- Group 3: 8 Scenario Targets -->
+            <div class="metrics-group-card">
+              <div class="metrics-group-title">
+                <span>ราคาจุดชนวน & พิกัดเป้าหมาย</span>
+                <span class="text-purple">8 ค่า</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">11. จุดกลับตัว (Inflection):</span>
+                <span class="metric-val text-green" id="m18_inflection">฿146.82 (+0.22%)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">12. จุดระเบิด (Breakout):</span>
+                <span class="metric-val text-brand" id="m18_breakout">฿153.25 (+4.61%)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">13. โซนเงินสด (Neutral Range):</span>
+                <span class="metric-val" style="color: #cbd5e1;" id="m18_neutral">฿141.28 - ฿146.82</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">14. จุดเตือนภัยหนีตาย (Breakdown):</span>
+                <span class="metric-val text-red" id="m18_breakdown">฿141.28 (-3.56%)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">15. เป้ากำไร Take Profit (TP):</span>
+                <span class="metric-val text-green" id="m18_tp">฿150.49 (+2.50%)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">16. เป้า Super Trend Trailing:</span>
+                <span class="metric-val text-brand" id="m18_trailing">฿160.10+</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">17. ตัดขาดทุนคลื่น (SL Inflection):</span>
+                <span class="metric-val text-red">฿144.20 (-1.78%)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">18. ตัดขาดทุนเบรกเอาท์ (SL Breakout):</span>
+                <span class="metric-val text-red">฿150.60 (-1.73%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Friendly Co-Pilot Briefing Card (คำแนะนำอย่างเป็นมิตร สบายใจ ชัดเจน) -->
         <div class="copilot-briefing-card" id="copilotBriefingCard">
           <div class="copilot-avatar">👨‍✈️</div>
           <div class="copilot-content">
             <div class="copilot-title-row">
-              <h4 class="copilot-title" id="copilotTitle">สรุปสถานการณ์จาก Co-Pilot ประจำรอบเที่ยง 12:45 น. (ภาคบ่าย)</h4>
+              <h4 class="copilot-title" id="copilotTitle">บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่าประจำรอบเที่ยง)</h4>
               <span class="copilot-role-pill">AI กัปตันร่วมทาง</span>
             </div>
             <p class="copilot-message" id="copilotMessage">
-              "สวัสดีครับกัปตัน! สภาพอากาศตลาด SCB เที่ยงนี้มีเมฆบางส่วน คลื่นสั้น V5 ยังชะลอตัว (-0.042) สวนทางกับคลื่นใหญ่ V20 (+0.038) <strong>คำแนะนำสบายใจ:</strong> บ่ายนี้เรา 'นั่งจิบกาแฟทับมือ' ถือเงินสด 100% สบายใจที่สุดครับ แต่หากบ่ายนี้ราคาข้าม <strong>฿146.82</strong> ลมจะเริ่มหนุน เราค่อยแบ่งเปิดไม้แรกหยั่งเชิงเบาๆ 30% ได้เลยครับ!"
+              "สวัสดีครับกัปตัน! จากการตรวจวัดแผง 18 ค่าประจำรอบเที่ยงนี้ พบว่าคลื่นสั้น V5 (ค่าที่ 3) เริ่มฟื้นตัวมาแตะ +0.196 ขณะที่คลื่นใหญ่ V20 (ค่าที่ 4) พุ่งแตะ +1.022 หนุนหลังเต็มที่ และความสอดคล้องคลื่น rho (ค่าที่ 5) ข้ามเกณฑ์มาอยู่ที่ +0.370 แล้วครับ! <strong>คำแนะนำเดินเรือภาคบ่าย:</strong> ปัจจุบันตลาดยังอยู่ในโซนสะสมพลัง แต่ถ้าบ่ายนี้ราคาขยับข้ามจุดชนวน (ค่าที่ 11) <strong>฿146.82 (+0.22%)</strong> แปลว่าสัญญาณกลับตัวยืนยันสมบูรณ์ เราแบ่งเปิดไม้แรกหยั่งเชิง 30% ได้ทันทีครับ!"
             </p>
           </div>
         </div>
@@ -598,122 +708,23 @@
           </div>
         </div>
 
-        <!-- 18-Metric Quant Proof Drawer (แผง 18 ค่าตรวจวัดจริง พร้อมตารางหลักฐานอิงประวัติศาสตร์ 4 ปี) -->
+        <!-- Historical Empirical Proof Drawer (ตารางหลักฐานอิงประวัติศาสตร์ 4 ปี) -->
         <div class="proof-drawer-card">
           <div class="proof-drawer-header" id="btnToggleProofDrawer">
             <div class="proof-header-title">
-              <span>🔬</span>
-              <span>แผงตรวจวัด 18 ค่าคณิตศาสตร์รามานุจัน & หลักฐานเชิงประจักษ์ (Empirical Proof)</span>
+              <span>📜</span>
+              <span>บันทึกหลักฐานเชิงประจักษ์ 4 ปี (Empirical Historical Proof Reference: ปราศจากการมโน)</span>
             </div>
             <div class="proof-header-toggle">
-              <span id="proofToggleText">คลิกเพื่อดูรายละเอียด 18 ค่า & ข้อมูลอ้างอิงจริง</span>
+              <span id="proofToggleText">คลิกเพื่อดูตารางพิสูจน์ค่าสถิติจริง</span>
               <span id="proofToggleArrow" style="display: inline-block; transition: transform 0.2s ease;">▼</span>
             </div>
           </div>
-          <div class="proof-drawer-body" id="proofDrawerBody">
-            <!-- 18 Metrics in 3 Groups -->
-            <div class="metrics-18-grid">
-              <!-- Group 1: 6 Live Telemetry Metrics -->
-              <div class="metrics-group-card">
-                <div class="metrics-group-title">
-                  <span>เซนเซอร์คลื่นสด (Telemetry)</span>
-                  <span class="text-brand">6 ค่า</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">1. วันที่ล่าสุด (lastDate):</span>
-                  <span class="metric-val text-brand" id="m18_date">2026-10-15</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">2. ราคาอ้างอิง (lastPrice):</span>
-                  <span class="metric-val text-brand" id="m18_price">฿146.50</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">3. คลื่นสั้น (V5 Micro):</span>
-                  <span class="metric-val text-brand" id="m18_v5">+0.196</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">4. คลื่นยาว (V20 Macro):</span>
-                  <span class="metric-val text-purple" id="m18_v20">+1.022</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">5. ความสอดคล้อง (rho):</span>
-                  <span class="metric-val text-green" id="m18_rho">+0.370</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">6. ตัวกรองเทรนด์ (ER):</span>
-                  <span class="metric-val text-amber" id="m18_er">0.300</span>
-                </div>
-              </div>
-
-              <!-- Group 2: 4 Dynamic Wave Boundaries -->
-              <div class="metrics-group-card">
-                <div class="metrics-group-title">
-                  <span>กรอบความผันผวน (Boundaries)</span>
-                  <span class="text-green">4 ค่า</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">7. กรอบไดนามิก (&plusmn;&delta;t):</span>
-                  <span class="metric-val text-brand" id="m18_delta">±3.56%</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">8. แนวรับพื้นคลื่น (Floor):</span>
-                  <span class="metric-val text-amber" id="m18_floor">฿141.28</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">9. แนวต้านเพดาน (Ceiling):</span>
-                  <span class="metric-val text-green" id="m18_ceiling">฿151.72</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">10. ความกว้างกรอบ (Spread):</span>
-                  <span class="metric-val text-purple" id="m18_spread">฿10.44</span>
-                </div>
-              </div>
-
-              <!-- Group 3: 8 Scenario Targets -->
-              <div class="metrics-group-card">
-                <div class="metrics-group-title">
-                  <span>ราคาจุดชนวน & เป้าหมาย</span>
-                  <span class="text-purple">8 ค่า</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">11. จุดกลับตัว (Inflection):</span>
-                  <span class="metric-val text-green">฿146.82 (+0.22%)</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">12. จุดระเบิดเบรกเอาท์ (Breakout):</span>
-                  <span class="metric-val text-brand">฿153.25 (+4.61%)</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">13. โซนเงินสด (Neutral Range):</span>
-                  <span class="metric-val" style="color: #cbd5e1;">฿141.28 - ฿146.82</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">14. จุดเตือนภัยหนีตาย (Breakdown):</span>
-                  <span class="metric-val text-red">฿141.28 (-3.56%)</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">15. เป้ากำไร Take Profit (TP):</span>
-                  <span class="metric-val text-green">฿150.49 (+2.50%)</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">16. เป้า Super Trend Trailing:</span>
-                  <span class="metric-val text-brand">฿160.10+</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">17. ตัดขาดทุนคลื่น (SL Inflection):</span>
-                  <span class="metric-val text-red">฿144.20 (-1.78%)</span>
-                </div>
-                <div class="metric-row">
-                  <span class="metric-label">18. ตัดขาดทุนเบรกเอาท์ (SL Breakout):</span>
-                  <span class="metric-val text-red">฿150.60 (-1.73%)</span>
-                </div>
-              </div>
-            </div>
-
+          <div class="proof-drawer-body" id="proofDrawerBody" style="display: none;">
             <!-- Empirical Proof Comparison Table -->
             <div>
               <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff; margin-bottom: 8px;">
-                📜 หลักฐานตัวเลขที่วัดได้จริงในประวัติศาสตร์ (Empirical Proof: ปราศจากการมโน)
+                📜 ตัวเลขที่วัดได้จริงในแต่ละรอบเทรด SCB.BK (ยืนยันความสัมพันธ์ $V_5, V_{20}, \rho$ และผลลัพธ์ต่อพอร์ต)
               </div>
               <div class="empirical-table-wrap">
                 <table class="empirical-table">

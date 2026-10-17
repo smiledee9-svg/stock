@@ -2628,4 +2628,51 @@ body {
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* ==========================================================================
+   Instruments First: 18-Metric Flight Cockpit Deck Styles
+   ========================================================================== */
+.instruments-board-card {
+  background: linear-gradient(145deg, rgba(13, 22, 41, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.instruments-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.instruments-board-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.session-active-pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
 
