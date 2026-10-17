@@ -889,6 +889,16 @@ const FORECAST_SESSIONS = {
       breakdown: '฿141.28 (-3.56%)',
       tp: '฿150.49 (+2.50%)',
       trailing: '฿160.10+'
+    },
+    cheatBadge: '☀️ โพยประจำรอบเที่ยง 12:45 น. (ภาคบ่ายวันนี้)',
+    cheat: {
+      entry: '฿146.82',
+      entrySub: 'รอราคาข้ามจุดชนวน + คลื่น V5, V20 พุ่งคู่',
+      shieldTrigger: '฿147.92',
+      shieldSl: '฿147.33 (+0.35%)',
+      tp: '฿150.49',
+      trailing: '฿160.10+',
+      cut: '฿144.20'
     }
   },
   evening: {
@@ -915,6 +925,16 @@ const FORECAST_SESSIONS = {
       breakdown: '฿141.28 (-3.56%)',
       tp: '฿150.49 (+2.50%)',
       trailing: '฿160.10+'
+    },
+    cheatBadge: '🌙 โพยประจำรอบเย็น 17:30 น. (วางแผนวันพรุ่งนี้)',
+    cheat: {
+      entry: '฿146.82',
+      entrySub: 'รอราคาเปิดข้ามจุดชนวน + สัญญาณคลื่นเช้าพรุ่งนี้',
+      shieldTrigger: '฿147.92',
+      shieldSl: '฿147.33 (+0.35%)',
+      tp: '฿150.49',
+      trailing: '฿160.10+',
+      cut: '฿144.20'
     }
   }
 };
@@ -966,6 +986,29 @@ function applyForecastSession(sessionKey) {
     const el = document.getElementById(id);
     if (el) el.textContent = val;
   }
+
+  // 5. Update Manual Trader Execution Cheat Sheet
+  const cheat = session.cheat;
+  if (cheat) {
+    const badgeEl = document.getElementById('manualCheatSessionTag');
+    if (badgeEl) badgeEl.textContent = session.cheatBadge;
+
+    const entryPriceEl = document.getElementById('cheatEntryPrice');
+    const entrySubEl = document.getElementById('cheatEntrySub');
+    const shieldTriggerEl = document.getElementById('cheatShieldTrigger');
+    const shieldSlEl = document.getElementById('cheatShieldSl');
+    const tpPriceEl = document.getElementById('cheatTpPrice');
+    const trailingPriceEl = document.getElementById('cheatTrailingPrice');
+    const cutPriceEl = document.getElementById('cheatCutPrice');
+
+    if (entryPriceEl) entryPriceEl.textContent = cheat.entry;
+    if (entrySubEl) entrySubEl.textContent = cheat.entrySub;
+    if (shieldTriggerEl) shieldTriggerEl.innerHTML = `${cheat.shieldTrigger} <span class="pct-tag">(+0.75%)</span>`;
+    if (shieldSlEl) shieldSlEl.textContent = cheat.shieldSl;
+    if (tpPriceEl) tpPriceEl.innerHTML = `${cheat.tp} <span class="pct-tag">(+2.50%)</span>`;
+    if (trailingPriceEl) trailingPriceEl.textContent = cheat.trailing;
+    if (cutPriceEl) cutPriceEl.innerHTML = `${cheat.cut} <span class="pct-tag">(-1.78%)</span>`;
+  }
 }
 
 function initForecastRunSwitcher() {
@@ -1003,6 +1046,43 @@ function initForecastRunSwitcher() {
         drawerBody.style.display = 'none';
         if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
         if (textEl) textEl.textContent = 'คลิกเพื่อดูตารางพิสูจน์ค่าสถิติจริง';
+      }
+    });
+  }
+
+  // Copy Cheat Sheet Button Handler
+  const btnCopy = document.getElementById('btnCopyCheatSheet');
+  const copyIcon = document.getElementById('copyCheatIcon');
+  const copyText = document.getElementById('copyCheatText');
+
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const activeTab = document.getElementById('btnRunEvening')?.classList.contains('active') ? 'evening' : 'midday';
+      const s = FORECAST_SESSIONS[activeTab];
+      const textToCopy = [
+        `🎯 โพยตั้งราคาเทรดมือ SCB.BK (รามานุจัน Discrete Cycle)`,
+        `📅 รอบ: ${s.cheatBadge}`,
+        `----------------------------------------`,
+        `1. จุดเข้าซื้อไม้แรก (Entry): ${s.cheat.entry} (แบ่ง 30% ของพอร์ต)`,
+        `2. กั้นหน้าทุน (+0.75%): แตะ ${s.cheat.shieldTrigger} ➔ ขยับ Stop Loss ตั้งที่ ${s.cheat.shieldSl} ล็อกทุนฟรี 100%!`,
+        `3. เป้ากำไรแรก (First TP): ${s.cheat.tp} (+2.50%) (แบ่งขายล็อกกำไร 50%)`,
+        `4. เป้ารันเทรนด์ใหญ่: ${s.cheat.trailing} (ถือไม้ที่เหลือ 50% รันตาม Trailing)`,
+        `5. จุดยอมแพ้ฉุกเฉิน (Cut Loss): ${s.cheat.cut} (-1.78%) (กรณีไม่แตะ +0.75% แต่หลุดแนวรับ)`,
+        `----------------------------------------`,
+        `★ พิสูจน์ 4 ปี: ชนะ+เสมอ 89.66% ด้วยเทคนิคเกราะคุ้มทุน (ลดไม้แพ้เหลือเพียง 3 ไม้)`
+      ].join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          if (copyIcon) copyIcon.textContent = '✅';
+          if (copyText) copyText.textContent = 'คัดลอกโพยสำเร็จ!';
+          setTimeout(() => {
+            if (copyIcon) copyIcon.textContent = '📋';
+            if (copyText) copyText.textContent = 'คัดลอกโพยไปตั้ง Order';
+          }, 2200);
+        }).catch(err => {
+          console.error('Clipboard copy failed:', err);
+        });
       }
     });
   }

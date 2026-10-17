@@ -374,7 +374,10 @@ class RamanujanConfidenceCycleTrader:
                         if l_t <= cycle_sl:
                             exit_triggered = True
                             exit_price = min(o_t, cycle_sl) if o_t < cycle_sl else cycle_sl
-                            exit_reason = "Structural_StopLoss"
+                            if cycle_sl >= avg_entry * (1.0 + self.roundtrip_tau):
+                                exit_reason = "Breakeven_Shield_Exit"
+                            else:
+                                exit_reason = "Structural_StopLoss"
                         elif bars_held <= 2 and cycle_sl < avg_entry:
                             unrealized_pct = (c_t - avg_entry) / avg_entry
                             cut_factor = 0.40 if cycle_tier == "TIER_C_PROBE_SMALL" else 0.55
@@ -436,8 +439,13 @@ class RamanujanConfidenceCycleTrader:
                     trailing_stops[t] = exit_price
                     continue
 
-                # B. Breakeven by Conviction + Dynamic Trailing + Risk-Free Pyramiding
+                # B. Early Breakeven Shield (+0.75% trigger) + SuperTrend Switcher (+2.50%)
                 if not cycle_super_trend:
+                    # Early Breakeven Shield at +0.75%
+                    fee_breakeven_price = avg_entry * (1.0 + self.roundtrip_tau + 0.0005) # covers 0.336% fee
+                    if h_t >= avg_entry * 1.0075 and cycle_sl < fee_breakeven_price:
+                        cycle_sl = fee_breakeven_price
+                    
                     be_price = avg_entry * (1.0 + self.roundtrip_tau + 0.002)
                     if h_t >= avg_entry * (1.0 + cycle_be_trigger_mult * delta_t) and cycle_sl < be_price:
                         cycle_sl = be_price

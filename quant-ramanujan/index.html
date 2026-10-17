@@ -555,6 +555,97 @@
           </div>
         </div>
 
+        <!-- Manual Trader Execution Cheat Sheet: โพยตั้งราคาสำหรับเทรดมือ 5 สเต็ป -->
+        <div class="manual-cheatsheet-card" id="manualCheatSheetCard">
+          <div class="cheatsheet-header">
+            <div class="cheatsheet-header-left">
+              <div class="cheatsheet-title-wrap">
+                <span class="cheatsheet-icon">🎯</span>
+                <h4 class="cheatsheet-title">โพยตั้งราคาสำหรับเทรดมือ (Manual Trader Execution Cheat Sheet)</h4>
+                <span class="cheatsheet-badge" id="manualCheatSessionTag">☀️ โพยประจำรอบเที่ยง (12:45 น.)</span>
+              </div>
+              <p class="cheatsheet-desc">
+                ไม่ต้องคิดเลขเองในใจ! สรุปพิกัดราคา 5 สเต็ปนำไปตั้ง Order บน Streaming ได้ทันที พร้อมเทคนิค <strong>"เกราะกั้นหน้าทุน +0.75%"</strong> สถิติชนะ+เสมอ 89.66%
+              </p>
+            </div>
+            <button type="button" class="btn-copy-cheat" id="btnCopyCheatSheet" title="คัดลอกโพยนี้ไปส่ง LINE หรือบันทึกโน้ต">
+              <span id="copyCheatIcon">📋</span>
+              <span id="copyCheatText">คัดลอกโพยไปตั้ง Order</span>
+            </button>
+          </div>
+
+          <!-- 5-Step Order Grid -->
+          <div class="cheatsheet-steps-grid">
+            <!-- Step 1: Entry Point -->
+            <div class="cheat-step-box step-entry">
+              <div class="cheat-step-badge">สเต็ป 1 &bull; จุดเข้าซื้อไม้แรก</div>
+              <div class="cheat-step-label">ราคาเข้าซื้อเป้าหมาย (Entry):</div>
+              <div class="cheat-step-price text-brand" id="cheatEntryPrice">฿146.82</div>
+              <div class="cheat-step-sub" id="cheatEntrySub">รอราคาข้ามจุดชนวน + คลื่น V5, V20 พุ่งคู่</div>
+              <div class="cheat-step-action">
+                <span class="action-tag tag-buy">BUY 30% ของพอร์ต</span>
+              </div>
+            </div>
+
+            <!-- Step 2: Early Breakeven Shield (The Breakthrough Technique!) -->
+            <div class="cheat-step-box step-shield">
+              <div class="cheat-step-badge badge-shield">สเต็ป 2 &bull; ล็อกเกราะคุ้มทุน (Early Shield)</div>
+              <div class="cheat-step-label">เมื่อราคาวิ่งแตะ +0.75%:</div>
+              <div class="cheat-step-price text-cyan" id="cheatShieldTrigger">฿147.92 <span class="pct-tag">(+0.75%)</span></div>
+              <div class="cheat-step-sub">
+                👉 <strong>ขยับ Stop Loss ตั้งที่:</strong> <span class="text-green font-bold" id="cheatShieldSl">฿147.33 (+0.35%)</span>
+              </div>
+              <div class="cheat-step-action">
+                <span class="action-tag tag-shield">🛡️ ล็อกทุนฟรี (การันตีไม่แพ้ 100%)</span>
+              </div>
+            </div>
+
+            <!-- Step 3: First Take Profit Target -->
+            <div class="cheat-step-box step-tp">
+              <div class="cheat-step-badge badge-tp">สเต็ป 3 &bull; ชนเป้ากำไรแรก (First TP)</div>
+              <div class="cheat-step-label">ราคาเป้าหมายทำกำไรแรก:</div>
+              <div class="cheat-step-price text-green" id="cheatTpPrice">฿150.49 <span class="pct-tag">(+2.50%)</span></div>
+              <div class="cheat-step-sub">ชนเป้าความผันผวนคลื่นสั้นรามานุจัน</div>
+              <div class="cheat-step-action">
+                <span class="action-tag tag-tp">แบ่งขายทำกำไร 50%</span>
+              </div>
+            </div>
+
+            <!-- Step 4: Super Trend Trailing Ride -->
+            <div class="cheat-step-box step-trailing">
+              <div class="cheat-step-badge badge-trailing">สเต็ป 4 &bull; รันเทรนด์ใหญ่ (Super Trend)</div>
+              <div class="cheat-step-label">เป้ารันเทรนด์คลื่นใหญ่ $V_{20}$:</div>
+              <div class="cheat-step-price text-purple" id="cheatTrailingPrice">฿160.10+</div>
+              <div class="cheat-step-sub">ถือส่วนที่เหลือ 50% รันตาม Chandelier Trailing</div>
+              <div class="cheat-step-action">
+                <span class="action-tag tag-run">🚀 รันกำไรคำใหญ่สุดรอบ</span>
+              </div>
+            </div>
+
+            <!-- Step 5: Emergency Cut Loss -->
+            <div class="cheat-step-box step-emergency">
+              <div class="cheat-step-badge badge-danger">สเต็ป 5 &bull; จุดตัดขาดทุนฉุกเฉิน</div>
+              <div class="cheat-step-label">จุดยอมแพ้กรณีพายุเข้า (Cut Loss):</div>
+              <div class="cheat-step-price text-red" id="cheatCutPrice">฿144.20 <span class="pct-tag">(-1.78%)</span></div>
+              <div class="cheat-step-sub">เฉพาะกรณีเข้าซื้อแล้วราคาไม่แตะ +0.75% แต่หลุดแนวรับ</div>
+              <div class="cheat-step-action">
+                <span class="action-tag tag-danger">🚨 คัททิ้ง 100% ปิดความเสี่ยง</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Comparative Advantage Footer -->
+          <div class="cheatsheet-stat-footer">
+            <div class="stat-footer-icon">💡</div>
+            <div class="stat-footer-text">
+              <strong>ทำไมเทคนิคกั้นหน้าทุน +0.75% ถึงได้เปรียบสูงสุด?</strong>
+              <span>
+                จากการทดสอบจริง 29 รอบในรอบ 4 ปี SCB.BK มีแรงส่งวิ่งแตะ +0.75% ถึง <strong>26 ใน 29 รอบ</strong> การดึง Stop Loss มาที่จุดคุ้มทุน +0.35% ทันที ช่วยเปลี่ยนไม้แพ้ในอดีต 7 ไม้ให้กลายเป็นเสมอทุน พลิกอัตราชนะ+เสมอพุ่งเป็น <strong>89.66%</strong> และดันกำไรสะสมโตทะยาน <strong>+178%</strong> โดยไม่ปิดกั้นโอกาสรันเทรนด์ใหญ่!
+              </span>
+            </div>
+          </div>
+        </div>
+
         <!-- Weather Status Main Banner: Atmosphere + Temperature Gauge -->
         <div class="weather-atmosphere-box">
           <!-- Atmosphere Condition -->
