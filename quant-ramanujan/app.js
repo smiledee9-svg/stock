@@ -673,11 +673,6 @@ function syncTabFromHash() {
 }
 
 function switchTab(targetTabId, updateHash = true) {
-  if (targetTabId === 'viewMt4Terminal') {
-    window.location.href = 'mt4.html';
-    return;
-  }
-
   const tabViews = document.querySelectorAll('.tab-view');
   const navBtns = document.querySelectorAll('.nav-tab-btn');
 
@@ -704,8 +699,7 @@ function switchTab(targetTabId, updateHash = true) {
       'viewTrades': 'trades',
       'viewSimulator': 'simulator',
       'viewBlueprint': 'blueprint',
-      'viewPredict': 'predict',
-      'viewMt4Terminal': 'mt4'
+      'viewPredict': 'predict'
     };
     if (tabToHashMap[targetTabId]) {
       history.replaceState(null, '', `#${tabToHashMap[targetTabId]}`);
