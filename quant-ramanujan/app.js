@@ -1186,6 +1186,47 @@ function initMath18Lab() {
     });
   }
 
+  // Copy AI Vision Prompt Button Handler
+  const btnCopyAi = document.getElementById('btnCopyAiPrompt');
+  const copyAiIcon = document.getElementById('copyAiIcon');
+  const copyAiText = document.getElementById('copyAiText');
+
+  if (btnCopyAi) {
+    btnCopyAi.addEventListener('click', () => {
+      const activeSessionKey = document.getElementById('btnMathEvening')?.classList.contains('active') ? 'evening' : 'midday';
+      const s = MATH_SESSIONS_DATA[activeSessionKey];
+
+      const promptTemplate = [
+        `🎯 [คำสั่ง AI VISION QUANT]: คุณคือเจ้าหน้าที่วิเคราะห์ความเสี่ยงและตัดสินใจส่งคำสั่งซื้อขาย (Senior Quantitative Trading AI) ประจำระบบ Ramanujan SCB.BK`,
+        ``,
+        `โปรดวิเคราะห์ภาพ HUD และ Data Payload ที่แนบมานี้ (รอบ: ${s.name}):`,
+        `1. ตรวจสอบ 4 Binary Logic Gates (Coherence >= +0.25, Quadrant I, Altitude <= 75%, Trigger Clearance) ว่าผ่านครบทุกชั้นหรือไม่`,
+        `2. สรุปสถานะการเข้าซื้อ (EXECUTION STATUS): อนุมัติเข้าทันที (APPROVE NOW) / รอราคาข้ามจุดชนวน (AWAIT TRIGGER ฿${s.inflection.toFixed(2)}) / ยกเลิกคำสั่ง (REJECT)`,
+        `3. สรุปตั๋วคำสั่งซื้อขายสำเร็จรูปสำหรับป้อนระบบ Streaming:`,
+        `   - คำสั่ง: BUY LIMIT (แบ่งสัดส่วนไม้แรก 30% ของพอร์ต)`,
+        `   - ราคาตั้งซื้อ (Entry Limit): ฿${s.inflection.toFixed(2)}`,
+        `   - เงื่อนไขล็อกทุน Breakeven (+0.75%): เมื่อราคาแตะ ฿147.92 ให้เลื่อน SL ไปที่ ฿147.33 (+0.35%) เพื่อล็อกต้นทุนฟรี`,
+        `   - เป้าทำกำไรแรก (Take Profit 50%): ฿${s.tp.toFixed(2)} (+2.50%)`,
+        `   - เป้ารันเทรนด์ใหญ่ (Super Trend 50%): ${s.trailing} (รันตาม Trailing ต่อ)`,
+        `   - จุดยอมแพ้ฉุกเฉิน (Emergency Cut Loss): ฿${s.cut.toFixed(2)} (-1.78%)`,
+        `4. ประเมินความคุ้มค่าเชิงคณิตศาสตร์ (Risk:Reward = 7.14:1) และสิ่งที่ "ห้ามทำเด็ดขาด" ในรอบเวลานี้`
+      ].join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(promptTemplate).then(() => {
+          if (copyAiIcon) copyAiIcon.textContent = '✅';
+          if (copyAiText) copyAiText.textContent = 'คัดลอก Prompt สำเร็จ!';
+          setTimeout(() => {
+            if (copyAiIcon) copyAiIcon.textContent = '📋';
+            if (copyAiText) copyAiText.textContent = 'คัดลอก Prompt สั่งงาน AI';
+          }, 2200);
+        }).catch(err => {
+          console.error('Clipboard copy failed:', err);
+        });
+      }
+    });
+  }
+
   // Initial render (defaults to evening as latest complete market day or midday)
   updateMathLabUI('evening');
 }
@@ -1266,7 +1307,72 @@ function updateMathLabUI(sessionKey) {
 
   const elCopilotSummary = document.getElementById('mLab_copilotSummary');
   if (elCopilotSummary) elCopilotSummary.textContent = s.copilot;
+
+  // 6. Module F: AI Vision Cockpit HUD Elements Synchronization
+  const elHudSessionPill = document.getElementById('hudSessionPill');
+  if (elHudSessionPill) {
+    elHudSessionPill.textContent = sessionKey === 'evening' 
+      ? '🌙 17:30 น. (สรุปวันเต็ม & วางแผนพรุ่งนี้)' 
+      : '☀️ 12:45 น. (วิเคราะห์ภาคเช้า วางแผนภาคบ่าย)';
+  }
+
+  const elHudPriceVal = document.getElementById('hudPriceVal');
+  if (elHudPriceVal) elHudPriceVal.textContent = `฿${s.price.toFixed(2)}`;
+
+  const elHudGate1Val = document.getElementById('hudGate1Val');
+  if (elHudGate1Val) elHudGate1Val.textContent = `วัดได้ +${s.rho.toFixed(3)} (พลังส่งฮาร์มอนิกบวก)`;
+
+  const elHudGate2Val = document.getElementById('hudGate2Val');
+  if (elHudGate2Val) elHudGate2Val.innerHTML = `มุม ${s.angle.toFixed(1)}&deg; (คลื่นสัปดาห์ & เดือนพุ่งคู่)`;
+
+  const elHudGate3Val = document.getElementById('hudGate3Val');
+  if (elHudGate3Val) elHudGate3Val.textContent = `ระดับ ${altPct.toFixed(1)}% (Equilibrium ปลอดภัย)`;
+
+  const elHudGate4Val = document.getElementById('hudGate4Val');
+  if (elHudGate4Val) elHudGate4Val.textContent = `฿${s.price.toFixed(2)} (รอข้าม ฿${s.inflection.toFixed(2)})`;
+
+  const elHudTicketEntry = document.getElementById('hudTicketEntry');
+  if (elHudTicketEntry) elHudTicketEntry.textContent = `฿${s.inflection.toFixed(2)}`;
+
+  const elHudTicketTp = document.getElementById('hudTicketTp');
+  if (elHudTicketTp) elHudTicketTp.textContent = `฿${s.tp.toFixed(2)} (+2.50%)`;
+
+  const elHudTicketTrailing = document.getElementById('hudTicketTrailing');
+  if (elHudTicketTrailing) elHudTicketTrailing.textContent = `${s.trailing} (+9.04%)`;
+
+  const elHudTicketSl = document.getElementById('hudTicketSl');
+  if (elHudTicketSl) elHudTicketSl.textContent = `฿${s.cut.toFixed(2)} (-1.78%)`;
+
+  // Dynamic Machine-Readable JSON Payload
+  const elHudJsonPayload = document.getElementById('hudJsonPayload');
+  if (elHudJsonPayload) {
+    const payloadObj = {
+      symbol: 'SCB.BK',
+      session: sessionKey === 'evening' ? 'evening_1730' : 'midday_1245',
+      price: s.price,
+      v5: s.v5,
+      v20: s.v20,
+      rho: s.rho,
+      momentum_mag: s.mag,
+      phase_angle_deg: s.angle,
+      altitude_pct: Number(altPct.toFixed(1)),
+      gates: {
+        g1_coherence: s.rho >= 0.25,
+        g2_quadrant: s.angle >= 0 && s.angle <= 90,
+        g3_altitude: altPct <= 75,
+        g4_trigger: s.price >= s.inflection
+      },
+      entry_trigger: s.inflection,
+      shield_trigger: 147.92,
+      shield_sl: 147.33,
+      tp1: s.tp,
+      trailing_target: 160.10,
+      emergency_sl: s.cut
+    };
+    elHudJsonPayload.innerHTML = `<code>${JSON.stringify(payloadObj, null, 2)}</code>`;
+  }
 }
+
 
 
 

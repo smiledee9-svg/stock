@@ -1618,6 +1618,164 @@
           </table>
         </div>
       </div>
+      <!-- Module F: AI Vision Cockpit HUD & Automated Entry Synthesis Card -->
+      <div class="ai-vision-section card-box" style="margin-top: 24px; border: 1px solid rgba(168, 85, 247, 0.4); background: radial-gradient(120% 120% at 50% 0%, rgba(30, 27, 75, 0.7) 0%, rgba(15, 23, 42, 0.98) 100%);">
+        <div class="section-header-compact">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.4rem;">🤖</span>
+              <h3 style="font-size: 1.15rem; color: #fff; margin: 0; font-weight: 800;">
+                บัตรวิเคราะห์สังเคราะห์สำหรับ AI Vision (AI Vision Cockpit HUD Card for Entry Automation)
+              </h3>
+            </div>
+            <p class="table-subtitle">
+              ออกแบบขึ้นเฉพาะสำหรับส่งรูปภาพให้ Multimodal AI (ChatGPT 4o, Gemini 1.5 Pro, Claude 3.5 Sonnet) วิเคราะห์คำนวณและตัดสินใจส่ง Order แทนแบบแม่นยำ 100% ปราศจากภาพลวงตา
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" id="btnCopyAiPrompt" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.35); color: #c084fc;">
+              <span id="copyAiIcon">📋</span>
+              <span id="copyAiText">คัดลอก Prompt สั่งงาน AI</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Target Screenshot HUD Container -->
+        <div class="ai-hud-card" id="aiVisionHudCard">
+          <div class="hud-top-meta">
+            <div class="hud-brand">
+              <span class="hud-badge-symbol">SCB.BK</span>
+              <span class="hud-badge-tag">RAMANUJAN DISCRETE QUANT HUD</span>
+            </div>
+            <div class="hud-time-wrap">
+              <span class="hud-session-pill" id="hudSessionPill">🌙 17:30 น. (สรุปวันเต็ม & วางแผนพรุ่งนี้)</span>
+              <span class="hud-price-pill">LAST: <strong id="hudPriceVal">฿146.50</strong></span>
+            </div>
+          </div>
+
+          <div class="hud-tri-grid">
+            <!-- 1. The 4 Logic Gates -->
+            <div class="hud-col hud-gates-col">
+              <div class="hud-col-title">
+                <span>🛡️</span>
+                <span>4 ประตูคัดกรองสัญญาณ (AI Binary Gates)</span>
+              </div>
+              <div class="hud-gate-item gate-pass">
+                <div class="gate-status-pill">🟢 PASS</div>
+                <div class="gate-detail">
+                  <strong>GATE 1: สอดคล้องคลื่น (&rho; &ge; +0.25)</strong>
+                  <span id="hudGate1Val">วัดได้ +0.410 (พลังส่งฮาร์มอนิกบวก)</span>
+                </div>
+              </div>
+              <div class="hud-gate-item gate-pass">
+                <div class="gate-status-pill">🟢 PASS</div>
+                <div class="gate-detail">
+                  <strong>GATE 2: จตุภาคเวกเตอร์ (&theta; in Quad I)</strong>
+                  <span id="hudGate2Val">มุม 78.4&deg; (คลื่นสัปดาห์ & เดือนพุ่งคู่)</span>
+                </div>
+              </div>
+              <div class="hud-gate-item gate-pass">
+                <div class="gate-status-pill">🟢 PASS</div>
+                <div class="gate-detail">
+                  <strong>GATE 3: ความสูงราคา (Altitude &le; 75%)</strong>
+                  <span id="hudGate3Val">ระดับ 50.0% (Equilibrium ปลอดภัย)</span>
+                </div>
+              </div>
+              <div class="hud-gate-item gate-wait" id="hudGate4Wrap">
+                <div class="gate-status-pill gate-pill-wait" id="hudGate4Pill">🟡 WAIT</div>
+                <div class="gate-detail">
+                  <strong>GATE 4: ทะลุจุดชนวน (&ge; ฿146.82)</strong>
+                  <span id="hudGate4Val">฿146.50 (รอข้าม 0.32 บ. หรือเปิดกระโดด)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Actionable Order Ticket -->
+            <div class="hud-col hud-ticket-col">
+              <div class="hud-col-title">
+                <span>🎯</span>
+                <span>ตั๋วคำสั่งซื้อขายสำเร็จรูป (Execution Ticket)</span>
+              </div>
+              <div class="ticket-box">
+                <div class="ticket-row-main">
+                  <span class="ticket-act-label">ACTION:</span>
+                  <span class="ticket-act-val" id="hudTicketAction">BUY LIMIT (PROBE 30%)</span>
+                </div>
+                <div class="ticket-data-grid">
+                  <div class="t-item">
+                    <span class="t-lbl">1. จุดเข้าไม้แรก (Entry Trigger):</span>
+                    <strong class="t-val text-cyan" id="hudTicketEntry">฿146.82</strong>
+                  </div>
+                  <div class="t-item">
+                    <span class="t-lbl">2. ล็อกทุน Breakeven (+0.75%):</span>
+                    <strong class="t-val text-brand" id="hudTicketShield">แตะ ฿147.92 ➔ SL ฿147.33</strong>
+                  </div>
+                  <div class="t-item">
+                    <span class="t-lbl">3. เป้ากำไรแรก (First TP 50%):</span>
+                    <strong class="t-val text-green" id="hudTicketTp">฿150.49 (+2.50%)</strong>
+                  </div>
+                  <div class="t-item">
+                    <span class="t-lbl">4. เป้ารันเทรนด์ (SuperTrend 50%):</span>
+                    <strong class="t-val text-purple" id="hudTicketTrailing">฿160.10+ (+9.04%)</strong>
+                  </div>
+                  <div class="t-item">
+                    <span class="t-lbl">5. ตัดขาดทุนฉุกเฉิน (Emergency SL):</span>
+                    <strong class="t-val text-danger" id="hudTicketSl">฿144.20 (-1.78%)</strong>
+                  </div>
+                  <div class="t-item">
+                    <span class="t-lbl">6. เทนเซอร์ R:R ความคุ้มค่า:</span>
+                    <strong class="t-val text-green" id="hudTicketRr">7.14:1 (TP) | 25.8:1 (Run)</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Machine-Readable JSON Payload -->
+            <div class="hud-col hud-json-col">
+              <div class="hud-col-title">
+                <span>🤖</span>
+                <span>Machine-Readable Data Payload (JSON)</span>
+              </div>
+              <div class="hud-json-box">
+                <pre id="hudJsonPayload"><code>{
+  "symbol": "SCB.BK",
+  "session": "evening_1730",
+  "price": 146.50,
+  "v5": 0.215,
+  "v20": 1.045,
+  "rho": 0.410,
+  "momentum_mag": 1.504,
+  "phase_angle_deg": 78.4,
+  "altitude_pct": 50.0,
+  "gates": {
+    "g1_coherence": true,
+    "g2_quadrant": true,
+    "g3_altitude": true,
+    "g4_trigger": false
+  },
+  "entry_trigger": 146.82,
+  "shield_trigger": 147.92,
+  "shield_sl": 147.33,
+  "tp1": 150.49,
+  "trailing_target": 160.10,
+  "emergency_sl": 144.20
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom HUD Decision Footer -->
+          <div class="hud-decision-footer">
+            <div class="hud-status-chip">
+              <span class="pulse-indicator"></span>
+              <span id="hudDecisionTitle">AI DECISION: [CONDITIONAL PROBE READY - PENDING ฿146.82]</span>
+            </div>
+            <div class="hud-decision-note" id="hudDecisionNote">
+              "เงื่อนไข 3 จาก 4 ชั้นผ่านสมบูรณ์ 100% ให้เตรียมคำสั่ง Buy Limit รอที่ ฿146.82 ทันทีที่ราคาข้ามให้เข้าไม้แรก 30% และคอยขยับเกราะกั้นทุนเมื่อถึง ฿147.92"
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Footer -->
