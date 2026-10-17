@@ -70,6 +70,7 @@ function initDashboard(data) {
     renderPredictiveIntelligence(data.predictiveIntelligence);
   }
   initForecastRunSwitcher();
+  initMath18Lab();
 }
 
 function renderSummaryMetrics(sm) {
@@ -684,7 +685,10 @@ function syncTabFromHash() {
     'predict': 'viewChartsPredict',
     'trades': 'viewTrades',
     'simulator': 'viewSimulator',
-    'blueprint': 'viewBlueprint'
+    'blueprint': 'viewBlueprint',
+    'mathlab': 'viewMath18Lab',
+    'math': 'viewMath18Lab',
+    'math18': 'viewMath18Lab'
   };
   if (hashMap[hash]) {
     switchTab(hashMap[hash], false);
@@ -717,7 +721,8 @@ function switchTab(targetTabId, updateHash = true) {
       'viewChartsPredict': 'charts',
       'viewTrades': 'trades',
       'viewSimulator': 'simulator',
-      'viewBlueprint': 'blueprint'
+      'viewBlueprint': 'blueprint',
+      'viewMath18Lab': 'mathlab'
     };
     if (tabToHashMap[targetTabId]) {
       history.replaceState(null, '', `#${tabToHashMap[targetTabId]}`);
@@ -1102,6 +1107,165 @@ function initForecastRunSwitcher() {
 
   // Set initial session to Midday
   applyForecastSession('midday');
+}
+
+/**
+ * MODULE 05: 18-Vector Mathematical Synthesis Engine Controller
+ * Pure custom quantitative mathematics applied directly to SCB telemetry data
+ */
+const MATH_SESSIONS_DATA = {
+  midday: {
+    name: 'รอบเที่ยง 12:45 น.',
+    lastDate: '2026-10-15 (12:45 น.)',
+    price: 146.50,
+    v5: 0.196,
+    v20: 1.022,
+    rho: 0.370,
+    er: 0.300,
+    floor: 141.28,
+    ceiling: 151.72,
+    spread: 10.44,
+    delta: 3.56,
+    inflection: 146.82,
+    breakout: 153.25,
+    tp: 150.49,
+    trailing: '฿160.10+',
+    cut: 144.20,
+    mag: 1.426,
+    angle: 79.1,
+    energy: 0.305,
+    magPct: 71.3,
+    comp: 0.690,
+    confScore: 80.5,
+    matrixStatus: '🟢 พร้อมเปิดไม้หยั่งเชิงบ่ายนี้ (PROBE 30% AT ฿146.82)',
+    copilot: '"สวัสดีครับกัปตัน! จากการตรวจวัด 18 ค่ารอบเที่ยง โมเดลคำนวณขนาดแรงส่งสุทธิ |M| ได้ 1.426 และองศาคลื่น θ อยู่ที่ 79.1° (ชี้ขึ้นคู่) ระดับราคา H_alt = 50.0% ยังไม่อยู่ในโซน Overbought หากบ่ายนี้ราคาข้ามจุดชนวน ฿146.82 เปิดไม้หยั่งเชิง 30% ตามระบบได้ทันทีครับ!"'
+  },
+  evening: {
+    name: 'รอบเย็น 17:30 น.',
+    lastDate: '2026-10-15 (17:30 น.)',
+    price: 146.50,
+    v5: 0.215,
+    v20: 1.045,
+    rho: 0.410,
+    er: 0.315,
+    floor: 141.28,
+    ceiling: 151.72,
+    spread: 10.44,
+    delta: 3.56,
+    inflection: 146.82,
+    breakout: 153.25,
+    tp: 150.49,
+    trailing: '฿160.10+',
+    cut: 144.20,
+    mag: 1.504,
+    angle: 78.4,
+    energy: 0.356,
+    magPct: 75.2,
+    comp: 0.712,
+    confScore: 82.5,
+    matrixStatus: '🟢 ยืนยันสัญญาณสะสมพลัง (READY TO PROBE 30% ON OPEN)',
+    copilot: '"สรุปตลาดวันเต็มครับกัปตัน! แรงส่งสุทธิเร่งตัวขึ้นมาเป็น |M| = 1.504 (+5.47%) ค่าความสอดคล้องคลื่นกระโดดแตะ +0.410 และพลังงานจลน์แตะ 0.356 J โครงสร้างราคารักษาฐานเหนือ Floor ฿141.28 ได้อย่างสวยงาม พรุ่งนี้เช้าหากเปิดข้าม ฿146.82 ลุยไม้แรกตามแผนได้เลยครับ!"'
+  }
+};
+
+function initMath18Lab() {
+  const btnMidday = document.getElementById('btnMathMidday');
+  const btnEvening = document.getElementById('btnMathEvening');
+
+  if (btnMidday && btnEvening) {
+    btnMidday.addEventListener('click', () => {
+      btnMidday.classList.add('active');
+      btnEvening.classList.remove('active');
+      updateMathLabUI('midday');
+    });
+
+    btnEvening.addEventListener('click', () => {
+      btnEvening.classList.add('active');
+      btnMidday.classList.remove('active');
+      updateMathLabUI('evening');
+    });
+  }
+
+  // Initial render (defaults to evening as latest complete market day or midday)
+  updateMathLabUI('evening');
+}
+
+function updateMathLabUI(sessionKey) {
+  const s = MATH_SESSIONS_DATA[sessionKey] || MATH_SESSIONS_DATA.evening;
+
+  // 1. Hero Big Stats
+  const elDispMomentum = document.getElementById('mathDispMomentum');
+  if (elDispMomentum) elDispMomentum.textContent = s.mag.toFixed(3);
+
+  const elDispPhaseAngle = document.getElementById('mathDispPhaseAngle');
+  if (elDispPhaseAngle) elDispPhaseAngle.textContent = `${s.angle.toFixed(1)}°`;
+
+  // 2. Dimension 01: Momentum Vector & Energy
+  const elV5 = document.getElementById('mLab_v5');
+  if (elV5) elV5.textContent = `+${s.v5.toFixed(3)}`;
+
+  const elV20 = document.getElementById('mLab_v20');
+  if (elV20) elV20.textContent = `+${s.v20.toFixed(3)}`;
+
+  const elRho = document.getElementById('mLab_rho');
+  if (elRho) elRho.textContent = `+${s.rho.toFixed(3)}`;
+
+  const elMag = document.getElementById('mLab_mag');
+  if (elMag) elMag.textContent = `${s.mag.toFixed(3)} (แรงส่งบวกสูง)`;
+
+  const elAngle = document.getElementById('mLab_angle');
+  if (elAngle) elAngle.innerHTML = `${s.angle.toFixed(1)}&deg; (Quadrant I: พุ่งคู่)`;
+
+  const elEnergy = document.getElementById('mLab_energy');
+  if (elEnergy) elEnergy.textContent = `${s.energy.toFixed(3)} J (มีเนื้องาน ไม่ใช่ Noise)`;
+
+  const elMagPct = document.getElementById('mLab_magPct');
+  if (elMagPct) elMagPct.textContent = `${s.magPct.toFixed(1)}% (ระดับสูง)`;
+
+  const elProgressBar = document.getElementById('mLab_progressBar');
+  if (elProgressBar) elProgressBar.style.width = `${s.magPct}%`;
+
+  // 3. Dimension 02: Dynamic Altitude & Compression
+  const elPrice = document.getElementById('mLab_price');
+  if (elPrice) elPrice.textContent = `฿${s.price.toFixed(2)}`;
+
+  const elFloorCeil = document.getElementById('mLab_floorCeil');
+  if (elFloorCeil) elFloorCeil.textContent = `฿${s.floor.toFixed(2)} - ฿${s.ceiling.toFixed(2)}`;
+
+  const elSpread = document.getElementById('mLab_spread');
+  if (elSpread) elSpread.textContent = `฿${s.spread.toFixed(2)} (±${s.delta.toFixed(2)}%)`;
+
+  const altPct = ((s.price - s.floor) / (s.ceiling - s.floor)) * 100;
+  const elAlt = document.getElementById('mLab_alt');
+  if (elAlt) elAlt.textContent = `${altPct.toFixed(1)}% (Equilibrium Ground Zero)`;
+
+  const proxPct = ((s.inflection - s.price) / s.price) * 100;
+  const proxDiff = (s.inflection - s.price).toFixed(2);
+  const elProx = document.getElementById('mLab_prox');
+  if (elProx) elProx.textContent = `+${proxPct.toFixed(2)}% (เพียง ${proxDiff} บาท!)`;
+
+  const elComp = document.getElementById('mLab_comp');
+  if (elComp) elComp.textContent = `${s.comp.toFixed(3)} (สปริงกำลังสะสมพลังรอดีด)`;
+
+  const elAltBar = document.getElementById('mLab_altBar');
+  if (elAltBar) elAltBar.style.width = `${altPct}%`;
+
+  // 4. Dimension 03: Asymmetry R:R Tensor
+  const elTpVal = document.getElementById('mLab_tpVal');
+  if (elTpVal) elTpVal.textContent = `฿${s.tp.toFixed(2)} (+2.50%)`;
+
+  const elTrailingVal = document.getElementById('mLab_trailingVal');
+  if (elTrailingVal) elTrailingVal.textContent = `${s.trailing} (+9.04%)`;
+
+  // 5. Dimension 04: Tactical Matrix & Status
+  const elMatrixStatus = document.getElementById('mLab_matrixStatus');
+  if (elMatrixStatus) elMatrixStatus.textContent = s.matrixStatus;
+
+  const elConfScore = document.getElementById('mLab_confScore');
+  if (elConfScore) elConfScore.textContent = `${s.confScore.toFixed(1)}% (Tier A)`;
+
+  const elCopilotSummary = document.getElementById('mLab_copilotSummary');
+  if (elCopilotSummary) elCopilotSummary.textContent = s.copilot;
 }
 
 
