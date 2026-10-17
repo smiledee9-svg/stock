@@ -88,36 +88,57 @@
         </div>
       </div>
 
-      <!-- Live Active Signal Card -->
-      <div class="live-signal-banner card-box" id="liveSignalBanner">
-        <div class="signal-badge-wrap">
-          <span class="pulse-indicator" id="sigPulse"></span>
-          <span class="signal-tag" id="sigBadge">⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
+      <!-- Live Active Telemetry Cockpit (สถานะพอร์ต & สัญญาณคลื่นสด SCB.BK) -->
+      <div class="telemetry-cockpit-card" id="liveSignalBanner">
+        <!-- Top Bar: Status Badge + Live Market Indicator -->
+        <div class="cockpit-top-bar">
+          <div class="cockpit-status-pill" id="sigBadge">
+            <span class="cockpit-pulse" id="sigPulse"></span>
+            <span>⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
+          </div>
+          <div class="cockpit-market-tag">
+            <span class="live-indicator-dot"></span>
+            <span>SCB.BK • SET Data Feed</span>
+          </div>
         </div>
-        <div class="signal-details-grid">
-          <div class="sig-col">
-            <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
-            <strong class="sig-val" id="sigCurrPrice">฿145.50</strong>
+
+        <!-- 4-Card Main Telemetry Grid (ตัวอักษรใหญ่ ชัดเจน เป็นระเบียบ) -->
+        <div class="cockpit-grid">
+          <!-- Tile 1: ราคาตลาดล่าสุด -->
+          <div class="cockpit-tile tile-price">
+            <div class="cockpit-tile-label">ราคาตลาด SCB ล่าสุด</div>
+            <div class="cockpit-tile-value text-brand" id="sigCurrPrice">฿146.50</div>
+            <div class="cockpit-tile-sub">ราคาปิดอ้างอิงล่าสุด</div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">คลื่นไมโคร $V_5$ (สัปดาห์):</span>
-            <strong class="sig-val text-brand" id="sigVMicro">-0.042 (ชะลอตัว)</strong>
+
+          <!-- Tile 2: คลื่นสัปดาห์ V5 -->
+          <div class="cockpit-tile tile-wave5">
+            <div class="cockpit-tile-label">คลื่นสัปดาห์ V5 (Micro)</div>
+            <div class="cockpit-tile-value text-brand" id="sigVMicroVal">-0.042</div>
+            <div class="cockpit-tile-sub" id="sigVMicroSub">ชะลอตัว (ต่ำกว่า 0)</div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">คลื่นแมโคร $V_{20}$ (เดือน):</span>
-            <strong class="sig-val text-purple" id="sigVMacro">+0.038 (ประคองตัว)</strong>
+
+          <!-- Tile 3: คลื่นเดือน V20 -->
+          <div class="cockpit-tile tile-wave20">
+            <div class="cockpit-tile-label">คลื่นเดือน V20 (Macro)</div>
+            <div class="cockpit-tile-value text-purple" id="sigVMacroVal">+0.038</div>
+            <div class="cockpit-tile-sub" id="sigVMacroSub">ประคองตัว (แรงส่งบวก)</div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">Phase Coherence ($\rho_{ram}$):</span>
-            <strong class="sig-val text-amber" id="sigRho">-0.598 (คลื่นแยกทาง)</strong>
+
+          <!-- Tile 4: ความสอดคล้องคลื่น & กรอบแกว่งตัว -->
+          <div class="cockpit-tile tile-coherence">
+            <div class="cockpit-tile-label">ความสอดคล้องคลื่น (Coherence)</div>
+            <div class="cockpit-tile-value text-green" id="sigRhoVal">-0.598</div>
+            <div class="cockpit-tile-sub">กรอบแกว่ง: <strong id="sigDeltaVal" style="color: #38bdf8;">±3.56%</strong></div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">กรอบไดนามิกประจำตัว ($\delta_t$):</span>
-            <strong class="sig-val text-green" id="sigDelta">&plusmn;1.20%</strong>
-          </div>
-          <div class="sig-col">
-            <span class="sig-label">แผนกลยุทธ์:</span>
-            <strong class="sig-val text-brand" id="sigActionPlan">ถือเงินสดปลอดภัย รอ $V_5, V_{20} &gt; 0$</strong>
+        </div>
+
+        <!-- Bottom Action Strip (เด่น ชัดเจน ไม่รก) -->
+        <div class="cockpit-action-strip">
+          <div class="cockpit-action-icon">🎯</div>
+          <div class="cockpit-action-content">
+            <div class="cockpit-action-title">แผนกลยุทธ์ตามสัญญาณปัจจุบัน</div>
+            <div class="cockpit-action-text" id="sigActionPlan">ถือเงินสดปลอดภัย 100% (รอคลื่นสัปดาห์ V5 และคลื่นเดือน V20 พุ่งขึ้นพร้อมกัน)</div>
           </div>
         </div>
       </div>
@@ -287,36 +308,57 @@
         </div>
       </div>
 
-      <!-- Live Active Telemetry Banner (สถานะพอร์ต & สัญญาณคลื่นสด SCB.BK) -->
-      <div class="live-signal-banner card-box" style="margin-bottom: 20px; border-color: rgba(56, 189, 248, 0.25);">
-        <div class="signal-badge-wrap">
-          <span class="pulse-indicator" id="sigPulse_c"></span>
-          <span class="signal-tag" id="sigBadge_c">⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
+      <!-- Live Active Telemetry Cockpit (สถานะพอร์ต & สัญญาณคลื่นสด SCB.BK) -->
+      <div class="telemetry-cockpit-card">
+        <!-- Top Bar: Status Badge + Live Market Indicator -->
+        <div class="cockpit-top-bar">
+          <div class="cockpit-status-pill" id="sigBadge_c">
+            <span class="cockpit-pulse" id="sigPulse_c"></span>
+            <span>⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
+          </div>
+          <div class="cockpit-market-tag">
+            <span class="live-indicator-dot"></span>
+            <span>SCB.BK • SET Data Feed</span>
+          </div>
         </div>
-        <div class="signal-details-grid">
-          <div class="sig-col">
-            <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
-            <strong class="sig-val" id="sigCurrPrice_c">฿146.50</strong>
+
+        <!-- 4-Card Main Telemetry Grid (ตัวอักษรใหญ่ ชัดเจน เป็นระเบียบ) -->
+        <div class="cockpit-grid">
+          <!-- Tile 1: ราคาตลาดล่าสุด -->
+          <div class="cockpit-tile tile-price">
+            <div class="cockpit-tile-label">ราคาตลาด SCB ล่าสุด</div>
+            <div class="cockpit-tile-value text-brand" id="sigCurrPrice_c">฿146.50</div>
+            <div class="cockpit-tile-sub">ราคาปิดอ้างอิงล่าสุด</div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">คลื่นไมโคร $V_5$ (สัปดาห์):</span>
-            <strong class="sig-val text-brand" id="sigVMicro_c">-0.042 (ชะลอตัว)</strong>
+
+          <!-- Tile 2: คลื่นสัปดาห์ V5 -->
+          <div class="cockpit-tile tile-wave5">
+            <div class="cockpit-tile-label">คลื่นสัปดาห์ V5 (Micro)</div>
+            <div class="cockpit-tile-value text-brand" id="sigVMicroVal_c">-0.042</div>
+            <div class="cockpit-tile-sub" id="sigVMicroSub_c">ชะลอตัว (ต่ำกว่า 0)</div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">คลื่นแมโคร $V_{20}$ (เดือน):</span>
-            <strong class="sig-val text-purple" id="sigVMacro_c">+0.038 (ประคองตัว)</strong>
+
+          <!-- Tile 3: คลื่นเดือน V20 -->
+          <div class="cockpit-tile tile-wave20">
+            <div class="cockpit-tile-label">คลื่นเดือน V20 (Macro)</div>
+            <div class="cockpit-tile-value text-purple" id="sigVMacroVal_c">+0.038</div>
+            <div class="cockpit-tile-sub" id="sigVMacroSub_c">ประคองตัว (แรงส่งบวก)</div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">Phase Coherence ($\rho_{ram}$):</span>
-            <strong class="sig-val text-amber" id="sigRho_c">-0.598 (คลื่นแยกทาง)</strong>
+
+          <!-- Tile 4: ความสอดคล้องคลื่น & กรอบแกว่งตัว -->
+          <div class="cockpit-tile tile-coherence">
+            <div class="cockpit-tile-label">ความสอดคล้องคลื่น (Coherence)</div>
+            <div class="cockpit-tile-value text-green" id="sigRhoVal_c">-0.598</div>
+            <div class="cockpit-tile-sub">กรอบแกว่ง: <strong id="sigDeltaVal_c" style="color: #38bdf8;">±3.56%</strong></div>
           </div>
-          <div class="sig-col">
-            <span class="sig-label">กรอบไดนามิกประจำตัว ($\delta_t$):</span>
-            <strong class="sig-val text-green" id="sigDelta_c">&plusmn;1.20%</strong>
-          </div>
-          <div class="sig-col">
-            <span class="sig-label">แผนกลยุทธ์:</span>
-            <strong class="sig-val text-brand" id="sigActionPlan_c">ถือเงินสดปลอดภัย รอ $V_5, V_{20} &gt; 0$</strong>
+        </div>
+
+        <!-- Bottom Action Strip (เด่น ชัดเจน ไม่รก) -->
+        <div class="cockpit-action-strip">
+          <div class="cockpit-action-icon">🎯</div>
+          <div class="cockpit-action-content">
+            <div class="cockpit-action-title">แผนกลยุทธ์ตามสัญญาณปัจจุบัน</div>
+            <div class="cockpit-action-text" id="sigActionPlan_c">ถือเงินสดปลอดภัย 100% (รอคลื่นสัปดาห์ V5 และคลื่นเดือน V20 พุ่งขึ้นพร้อมกัน)</div>
           </div>
         </div>
       </div>

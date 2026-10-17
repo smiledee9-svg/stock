@@ -128,19 +128,29 @@ function renderActiveState(activePos, candles) {
   setAllText(['sigCurrPrice', 'sigCurrPrice_c'], `฿${currP.toFixed(2)}`);
 
   const vM = lastBar.v_micro || -0.042;
-  const vMText = `${vM > 0 ? '+' : ''}${vM.toFixed(3)} (${vM > 0 ? 'กำลังขึ้น' : 'ชะลอตัว'})`;
-  setAllText(['sigVMicro', 'sigVMicro_c'], vMText, vM > 0 ? '#38bdf8' : '#f87171');
+  const vMVal = `${vM > 0 ? '+' : ''}${vM.toFixed(3)}`;
+  const vMStatus = vM > 0 ? 'กำลังขึ้น (เหนือ 0)' : 'ชะลอตัว (ต่ำกว่า 0)';
+  setAllText(['sigVMicro', 'sigVMicro_c'], `${vMVal} (${vMStatus})`, vM > 0 ? '#38bdf8' : '#f87171');
+  setAllText(['sigVMicroVal', 'sigVMicroVal_c'], vMVal, vM > 0 ? '#38bdf8' : '#f87171');
+  setAllText(['sigVMicroSub', 'sigVMicroSub_c'], vMStatus, vM > 0 ? '#38bdf8' : '#f87171');
 
   const vMac = lastBar.v_macro || 0.038;
-  const vMacText = `${vMac > 0 ? '+' : ''}${vMac.toFixed(3)} (${vMac > 0 ? 'ประคองตัว' : 'ทิ้งดิ่ง'})`;
-  setAllText(['sigVMacro', 'sigVMacro_c'], vMacText, vMac > 0 ? '#c084fc' : '#f87171');
+  const vMacVal = `${vMac > 0 ? '+' : ''}${vMac.toFixed(3)}`;
+  const vMacStatus = vMac > 0 ? 'ประคองตัว (แรงส่งบวก)' : 'ทิ้งดิ่ง (ขาลง)';
+  setAllText(['sigVMacro', 'sigVMacro_c'], `${vMacVal} (${vMacStatus})`, vMac > 0 ? '#c084fc' : '#f87171');
+  setAllText(['sigVMacroVal', 'sigVMacroVal_c'], vMacVal, vMac > 0 ? '#c084fc' : '#f87171');
+  setAllText(['sigVMacroSub', 'sigVMacroSub_c'], vMacStatus, vMac > 0 ? '#c084fc' : '#f87171');
 
   const rho = lastBar.rho_ram || -0.598;
-  const rhoText = `${rho > 0 ? '+' : ''}${rho.toFixed(3)} (${rho > 0.2 ? 'ประสานเฟส' : 'คลื่นแยกทาง'})`;
-  setAllText(['sigRho', 'sigRho_c'], rhoText, rho > 0 ? '#34d399' : '#fbbf24');
+  const rhoVal = `${rho > 0 ? '+' : ''}${rho.toFixed(3)}`;
+  const rhoStatus = rho > 0.2 ? 'คลื่นประสานเฟส (Coherent)' : 'คลื่นแยกทาง (Divergent)';
+  setAllText(['sigRho', 'sigRho_c'], `${rhoVal} (${rhoStatus})`, rho > 0 ? '#34d399' : '#fbbf24');
+  setAllText(['sigRhoVal', 'sigRhoVal_c'], rhoVal, rho > 0 ? '#34d399' : '#fbbf24');
+  setAllText(['sigRhoSub', 'sigRhoSub_c'], rhoStatus, rho > 0 ? '#34d399' : '#fbbf24');
 
   const d = lastBar.dynamic_delta || 0.012;
   setAllText(['sigDelta', 'sigDelta_c'], `±${(d * 100).toFixed(2)}% (ก้าวไดนามิก)`);
+  setAllText(['sigDeltaVal', 'sigDeltaVal_c'], `±${(d * 100).toFixed(2)}%`);
 
   const badgeEls = [document.getElementById('sigBadge'), document.getElementById('sigBadge_c')].filter(Boolean);
   const pulseEls = [document.getElementById('sigPulse'), document.getElementById('sigPulse_c')].filter(Boolean);
@@ -157,7 +167,7 @@ function renderActiveState(activePos, candles) {
       p.style.background = '#10b981';
       p.style.boxShadow = '0 0 10px #10b981';
     });
-    setAllText(['sigActionPlan', 'sigActionPlan_c'], `Trailing Stop: ฿${activePos.trailingStopPrice.toFixed(2)} | ทุนเฉลี่ย: ฿${activePos.avgEntryPrice.toFixed(2)}`);
+    setAllText(['sigActionPlan', 'sigActionPlan_c'], `Trailing Stop: ฿${activePos.trailingStopPrice.toFixed(2)} | ทุนเฉลี่ย: ฿${activePos.avgEntryPrice.toFixed(2)} (ล็อกกำไรตามโครงสร้างคลื่น)`);
   } else {
     const badgeText = '⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่';
     badgeEls.forEach(b => {
@@ -170,7 +180,7 @@ function renderActiveState(activePos, candles) {
       p.style.background = '#38bdf8';
       p.style.boxShadow = '0 0 10px #38bdf8';
     });
-    setAllText(['sigActionPlan', 'sigActionPlan_c'], 'เงินสดปลอดภัย 100% รอคลื่น $V_5, V_{20} > 0$ พร้อมกัน');
+    setAllText(['sigActionPlan', 'sigActionPlan_c'], 'ถือเงินสดปลอดภัย 100% (รอคลื่นสัปดาห์ V5 และคลื่นเดือน V20 พุ่งขึ้นพร้อมกัน)');
   }
 }
 
