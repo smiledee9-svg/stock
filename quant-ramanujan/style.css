@@ -1643,6 +1643,34 @@ body {
   border-left-color: #ef4444;
 }
 
+.scenario-targets-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin: 10px 0 12px 0;
+}
+
+.scen-target-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scen-target-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.scen-target-item strong {
+  font-family: var(--font-code);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 /* Automation Info Box */
 .automation-status-bar {
   background: rgba(17, 24, 39, 0.7);

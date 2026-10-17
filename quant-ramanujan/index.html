@@ -287,6 +287,40 @@
         </div>
       </div>
 
+      <!-- Live Active Telemetry Banner (สถานะพอร์ต & สัญญาณคลื่นสด SCB.BK) -->
+      <div class="live-signal-banner card-box" style="margin-bottom: 20px; border-color: rgba(56, 189, 248, 0.25);">
+        <div class="signal-badge-wrap">
+          <span class="pulse-indicator" id="sigPulse_c"></span>
+          <span class="signal-tag" id="sigBadge_c">⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่</span>
+        </div>
+        <div class="signal-details-grid">
+          <div class="sig-col">
+            <span class="sig-label">ราคาตลาด SCB ล่าสุด:</span>
+            <strong class="sig-val" id="sigCurrPrice_c">฿146.50</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">คลื่นไมโคร $V_5$ (สัปดาห์):</span>
+            <strong class="sig-val text-brand" id="sigVMicro_c">-0.042 (ชะลอตัว)</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">คลื่นแมโคร $V_{20}$ (เดือน):</span>
+            <strong class="sig-val text-purple" id="sigVMacro_c">+0.038 (ประคองตัว)</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">Phase Coherence ($\rho_{ram}$):</span>
+            <strong class="sig-val text-amber" id="sigRho_c">-0.598 (คลื่นแยกทาง)</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">กรอบไดนามิกประจำตัว ($\delta_t$):</span>
+            <strong class="sig-val text-green" id="sigDelta_c">&plusmn;1.20%</strong>
+          </div>
+          <div class="sig-col">
+            <span class="sig-label">แผนกลยุทธ์:</span>
+            <strong class="sig-val text-brand" id="sigActionPlan_c">ถือเงินสดปลอดภัย รอ $V_5, V_{20} &gt; 0$</strong>
+          </div>
+        </div>
+      </div>
+
       <!-- Part 1: Predictive Scenario Intelligence Box (แผนทำนายล่วงหน้า & ราคาจุดชนวน) -->
       <div class="predict-hero-box" style="margin-bottom: 20px;">
         <div class="predict-hero-header">
@@ -342,6 +376,16 @@
             <p class="scenario-desc" id="scen1Desc">
               ราคาปิดยืนเหนือ ฿146.82 คลื่นสัปดาห์ V5 และเดือน V20 จะตัดขึ้นบวกพร้อมกัน (Phase Coherence &ge; 0.25)
             </p>
+            <div class="scenario-targets-row">
+              <div class="scen-target-item">
+                <span class="scen-target-label">🎯 เป้ากำไร TP กลาง:</span>
+                <strong class="text-green">฿150.49 (+2.50%)</strong>
+              </div>
+              <div class="scen-target-item">
+                <span class="scen-target-label">🛡️ ตัดขาดทุนตามคลื่น (SL):</span>
+                <strong class="text-red">฿144.20 (-1.78%)</strong>
+              </div>
+            </div>
           </div>
           <div class="scenario-action-box action-bull">
             <strong>คำแนะนำ:</strong> <span id="scen1Action">จับตาใกล้ชิด เตรียมตั้งรับไม้แรกหยั่งเชิง (Ready to Probe)</span>
@@ -363,6 +407,16 @@
             <p class="scenario-desc" id="scen2Desc">
               ราคาปิดทะลุ ฿153.25 ทะลุกรอบไซด์เวย์ ER &ge; 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด เข้าสู่รอบใหญ่
             </p>
+            <div class="scenario-targets-row">
+              <div class="scen-target-item">
+                <span class="scen-target-label">🚀 เป้า Super Trend:</span>
+                <strong class="text-brand">Trailing ฿160.10+</strong>
+              </div>
+              <div class="scen-target-item">
+                <span class="scen-target-label">🛡️ ตัดขาดทุนเบรกเอาท์ (SL):</span>
+                <strong class="text-red">฿150.60 (-1.73%)</strong>
+              </div>
+            </div>
           </div>
           <div class="scenario-action-box action-resonance">
             <strong>คำแนะนำ:</strong> <span id="scen2Action">เปิดรอบซื้อไม้แรกตามระบบทันที (BUY Entry Stage 1)</span>
@@ -384,6 +438,16 @@
             <p class="scenario-desc" id="scen3Desc">
               คลื่นความเร็วยังไม่เข้าเกณฑ์คู่ ตลาดยังแกว่งตัวเลือกข้าง ไม่มีสัญญาณยืนยันการขึ้น
             </p>
+            <div class="scenario-targets-row">
+              <div class="scen-target-item">
+                <span class="scen-target-label">🛡️ ความเสี่ยงพอร์ต:</span>
+                <strong style="color: #cbd5e1;">0.00% (ถือเงินสด 100%)</strong>
+              </div>
+              <div class="scen-target-item">
+                <span class="scen-target-label">⚙️ เงื่อนไขเข้า:</span>
+                <strong class="text-amber">รอคลื่นตัดคู่เหนือ 0</strong>
+              </div>
+            </div>
           </div>
           <div class="scenario-action-box action-neutral">
             <strong>คำแนะนำ:</strong> <span id="scen3Action">ถือเงินสด 100% สบายใจ ไม่มีความเสี่ยง ปล่อยคนอื่นติดดอย</span>
@@ -405,6 +469,16 @@
             <p class="scenario-desc" id="scen4Desc">
               ราคาหลุดต่ำกว่า ฿141.28 (หลุดกรอบล่าง Delta_t ของรามานุจัน) บ่งบอกแรงเทขายรุนแรง
             </p>
+            <div class="scenario-targets-row">
+              <div class="scen-target-item">
+                <span class="scen-target-label">🚨 Emergency Exit:</span>
+                <strong class="text-red">หลุด ฿141.28 คัท 100%</strong>
+              </div>
+              <div class="scen-target-item">
+                <span class="scen-target-label">🛡️ ประโยชน์ระบบ:</span>
+                <strong class="text-green">หลบขาลงลึก 100%</strong>
+              </div>
+            </div>
           </div>
           <div class="scenario-action-box action-bear">
             <strong>คำแนะนำ:</strong> <span id="scen4Action">ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือรอคลื่นสงบ (AVOID DROP)</span>

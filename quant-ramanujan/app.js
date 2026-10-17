@@ -113,70 +113,64 @@ function renderSummaryMetrics(sm) {
 
 function renderActiveState(activePos, candles) {
   const lastBar = candles.length > 0 ? candles[candles.length - 1] : {};
-  const currP = lastBar.close || 145.50;
+  const currP = lastBar.close || 146.50;
 
-  const elCurrP = document.getElementById('sigCurrPrice');
-  if (elCurrP) elCurrP.textContent = `฿${currP.toFixed(2)}`;
+  const setAllText = (ids, val, color = null) => {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = val;
+        if (color) el.style.color = color;
+      }
+    });
+  };
 
-  const elVMicro = document.getElementById('sigVMicro');
-  if (elVMicro) {
-    const vM = lastBar.v_micro || -0.042;
-    elVMicro.textContent = `${vM > 0 ? '+' : ''}${vM.toFixed(3)} (${vM > 0 ? 'กำลังขึ้น' : 'ชะลอตัว'})`;
-    elVMicro.style.color = vM > 0 ? '#38bdf8' : '#f87171';
-  }
+  setAllText(['sigCurrPrice', 'sigCurrPrice_c'], `฿${currP.toFixed(2)}`);
 
-  const elVMacro = document.getElementById('sigVMacro');
-  if (elVMacro) {
-    const vMac = lastBar.v_macro || 0.038;
-    elVMacro.textContent = `${vMac > 0 ? '+' : ''}${vMac.toFixed(3)} (${vMac > 0 ? 'ประคองตัว' : 'ทิ้งดิ่ง'})`;
-    elVMacro.style.color = vMac > 0 ? '#c084fc' : '#f87171';
-  }
+  const vM = lastBar.v_micro || -0.042;
+  const vMText = `${vM > 0 ? '+' : ''}${vM.toFixed(3)} (${vM > 0 ? 'กำลังขึ้น' : 'ชะลอตัว'})`;
+  setAllText(['sigVMicro', 'sigVMicro_c'], vMText, vM > 0 ? '#38bdf8' : '#f87171');
 
-  const elRho = document.getElementById('sigRho');
-  if (elRho) {
-    const rho = lastBar.rho_ram || -0.598;
-    elRho.textContent = `${rho > 0 ? '+' : ''}${rho.toFixed(3)} (${rho > 0.2 ? 'ประสานเฟส' : 'คลื่นแยกทาง'})`;
-    elRho.style.color = rho > 0 ? '#34d399' : '#fbbf24';
-  }
+  const vMac = lastBar.v_macro || 0.038;
+  const vMacText = `${vMac > 0 ? '+' : ''}${vMac.toFixed(3)} (${vMac > 0 ? 'ประคองตัว' : 'ทิ้งดิ่ง'})`;
+  setAllText(['sigVMacro', 'sigVMacro_c'], vMacText, vMac > 0 ? '#c084fc' : '#f87171');
 
-  const elDelta = document.getElementById('sigDelta');
-  if (elDelta) {
-    const d = lastBar.dynamic_delta || 0.012;
-    elDelta.textContent = `±${(d * 100).toFixed(2)}% (ก้าวไดนามิก)`;
-  }
+  const rho = lastBar.rho_ram || -0.598;
+  const rhoText = `${rho > 0 ? '+' : ''}${rho.toFixed(3)} (${rho > 0.2 ? 'ประสานเฟส' : 'คลื่นแยกทาง'})`;
+  setAllText(['sigRho', 'sigRho_c'], rhoText, rho > 0 ? '#34d399' : '#fbbf24');
 
-  const elBadge = document.getElementById('sigBadge');
-  const elPulse = document.getElementById('sigPulse');
-  const elAction = document.getElementById('sigActionPlan');
+  const d = lastBar.dynamic_delta || 0.012;
+  setAllText(['sigDelta', 'sigDelta_c'], `±${(d * 100).toFixed(2)}% (ก้าวไดนามิก)`);
+
+  const badgeEls = [document.getElementById('sigBadge'), document.getElementById('sigBadge_c')].filter(Boolean);
+  const pulseEls = [document.getElementById('sigPulse'), document.getElementById('sigPulse_c')].filter(Boolean);
 
   if (activePos && activePos.inPosition) {
-    if (elBadge) {
-      elBadge.textContent = `🟢 กำลังถือสถานะ BUY (#${activePos.layers} ไม้, ${activePos.totalShares.toLocaleString()} หุ้น) กำไรลอยตัว: ${activePos.unrealizedPnLPct > 0 ? '+' : ''}${activePos.unrealizedPnLPct}%`;
-      elBadge.style.background = 'rgba(16, 185, 129, 0.15)';
-      elBadge.style.color = '#34d399';
-      elBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-    }
-    if (elPulse) {
-      elPulse.style.background = '#10b981';
-      elPulse.style.boxShadow = '0 0 10px #10b981';
-    }
-    if (elAction) {
-      elAction.textContent = `Trailing Stop: ฿${activePos.trailingStopPrice.toFixed(2)} | ทุนเฉลี่ย: ฿${activePos.avgEntryPrice.toFixed(2)}`;
-    }
+    const badgeText = `🟢 กำลังถือสถานะ BUY (#${activePos.layers} ไม้, ${activePos.totalShares.toLocaleString()} หุ้น) กำไรลอยตัว: ${activePos.unrealizedPnLPct > 0 ? '+' : ''}${activePos.unrealizedPnLPct}%`;
+    badgeEls.forEach(b => {
+      b.textContent = badgeText;
+      b.style.background = 'rgba(16, 185, 129, 0.15)';
+      b.style.color = '#34d399';
+      b.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+    });
+    pulseEls.forEach(p => {
+      p.style.background = '#10b981';
+      p.style.boxShadow = '0 0 10px #10b981';
+    });
+    setAllText(['sigActionPlan', 'sigActionPlan_c'], `Trailing Stop: ฿${activePos.trailingStopPrice.toFixed(2)} | ทุนเฉลี่ย: ฿${activePos.avgEntryPrice.toFixed(2)}`);
   } else {
-    if (elBadge) {
-      elBadge.textContent = '⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่';
-      elBadge.style.background = 'rgba(148, 163, 184, 0.15)';
-      elBadge.style.color = '#e2e8f0';
-      elBadge.style.borderColor = 'rgba(148, 163, 184, 0.3)';
-    }
-    if (elPulse) {
-      elPulse.style.background = '#38bdf8';
-      elPulse.style.boxShadow = '0 0 10px #38bdf8';
-    }
-    if (elAction) {
-      elAction.textContent = 'เงินสดปลอดภัย 100% รอคลื่น $V_5, V_{20} > 0$ พร้อมกัน';
-    }
+    const badgeText = '⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่';
+    badgeEls.forEach(b => {
+      b.textContent = badgeText;
+      b.style.background = 'rgba(148, 163, 184, 0.15)';
+      b.style.color = '#e2e8f0';
+      b.style.borderColor = 'rgba(148, 163, 184, 0.3)';
+    });
+    pulseEls.forEach(p => {
+      p.style.background = '#38bdf8';
+      p.style.boxShadow = '0 0 10px #38bdf8';
+    });
+    setAllText(['sigActionPlan', 'sigActionPlan_c'], 'เงินสดปลอดภัย 100% รอคลื่น $V_5, V_{20} > 0$ พร้อมกัน');
   }
 }
 
