@@ -29,7 +29,7 @@ def main():
 
     # Step 1: Fetch latest candles from Yahoo Finance
     try:
-        candles = fetch_scb_data(symbol="SCB.BK", period="2y", interval="1d")
+        candles = fetch_scb_data(symbol="SCB.BK", period="4y", interval="1d")
         print(f"[✓] Step 1 Complete: Fetched {len(candles)} candles up to {candles[-1]['date']}")
     except Exception as e:
         print(f"[!] Warning fetching fresh data: {e}. Falling back to cached scb_candles.json")

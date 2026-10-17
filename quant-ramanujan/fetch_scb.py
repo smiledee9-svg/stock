@@ -17,7 +17,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-def fetch_scb_data(symbol="SCB.BK", period="2y", interval="1d"):
+def fetch_scb_data(symbol="SCB.BK", period="4y", interval="1d"):
     output_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(output_dir, "scb_candles.json")
     csv_path = os.path.join(output_dir, "scb_candles.csv")
@@ -53,11 +53,20 @@ def fetch_scb_data(symbol="SCB.BK", period="2y", interval="1d"):
         dt = datetime.fromtimestamp(ts)
         date_str = dt.strftime("%Y-%m-%d")
 
-        o = round(float(opens[i]), 2)
-        h = round(float(highs[i]), 2)
-        l = round(float(lows[i]), 2)
-        c = round(float(closes[i]), 2)
+        raw_o = float(opens[i])
+        raw_h = float(highs[i]) if highs[i] is not None else raw_o
+        raw_l = float(lows[i]) if lows[i] is not None else raw_o
+        raw_c = float(closes[i])
         v = int(volumes[i]) if volumes[i] is not None else 0
+
+        # Sanitization: Ensure High >= max(Open, Close) and Low <= min(Open, Close)
+        clean_h = max(raw_h, raw_o, raw_c)
+        clean_l = min(raw_l, raw_o, raw_c)
+
+        o = round(raw_o, 2)
+        h = round(clean_h, 2)
+        l = round(clean_l, 2)
+        c = round(raw_c, 2)
 
         candles.append({
             "timestamp": ts,

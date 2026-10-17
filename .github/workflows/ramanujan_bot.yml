@@ -1,6 +1,9 @@
 name: Ramanujan SET Cycle Auto Pipeline
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # รอบพักเที่ยง: 12:45 น. เวลาไทย (05:45 UTC) ทุกวันจันทร์ - ศุกร์
     - cron: '45 5 * * 1-5'
