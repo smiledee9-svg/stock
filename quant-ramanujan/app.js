@@ -661,11 +661,12 @@ function syncTabFromHash() {
   const hash = window.location.hash.replace('#', '').toLowerCase();
   const hashMap = {
     'overview': 'viewOverview',
-    'charts': 'viewCharts',
+    'charts': 'viewChartsPredict',
+    'chartspredict': 'viewChartsPredict',
+    'predict': 'viewChartsPredict',
     'trades': 'viewTrades',
     'simulator': 'viewSimulator',
-    'blueprint': 'viewBlueprint',
-    'predict': 'viewPredict'
+    'blueprint': 'viewBlueprint'
   };
   if (hashMap[hash]) {
     switchTab(hashMap[hash], false);
@@ -695,19 +696,18 @@ function switchTab(targetTabId, updateHash = true) {
   if (updateHash) {
     const tabToHashMap = {
       'viewOverview': 'overview',
-      'viewCharts': 'charts',
+      'viewChartsPredict': 'charts',
       'viewTrades': 'trades',
       'viewSimulator': 'simulator',
-      'viewBlueprint': 'blueprint',
-      'viewPredict': 'predict'
+      'viewBlueprint': 'blueprint'
     };
     if (tabToHashMap[targetTabId]) {
       history.replaceState(null, '', `#${tabToHashMap[targetTabId]}`);
     }
   }
 
-  // If switched to charts, smoothly resize and fit lightweight charts
-  if (targetTabId === 'viewCharts') {
+  // If switched to charts & predict view, smoothly resize and fit lightweight charts
+  if (targetTabId === 'viewChartsPredict' || targetTabId === 'viewCharts') {
     setTimeout(() => {
       const priceContainer = document.getElementById('priceChartContainer');
       const waveContainer = document.getElementById('waveChartContainer');
