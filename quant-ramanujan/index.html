@@ -308,7 +308,32 @@
         </div>
       </div>
 
-      <!-- Live Active Telemetry Cockpit (สถานะพอร์ต & สัญญาณคลื่นสด SCB.BK) -->
+      <!-- Part 1: Interactive Candlestick & Wave Chart (กราฟราคา SCB & คลื่นรามานุจัน) -->
+      <div class="chart-section card-box" style="margin-bottom: 24px;">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <h2 id="chartSectionTitle" style="font-size: 1.05rem;">แท่งเทียนราคา SCB.BK, สัญญาณเปิดรอบ/เติมไม้ & Chandelier Trailing Stop</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+              <span class="chart-legend-badge legend-buy">▲ ซื้อไม้แรก (Entry)</span>
+              <span class="chart-legend-badge legend-pyramid">◆ เติมไม้งอก (Pyramid)</span>
+              <span class="chart-legend-badge legend-sell">▼ ขายปิดรอบ (Exit 100%)</span>
+              <span class="chart-legend-badge legend-trailing">─ Chandelier Trailing Stop</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Price Candlestick Chart -->
+        <div id="priceChartContainer" class="chart-container"></div>
+
+        <!-- Sub-Chart Container (Harmonic Waves & Coherence) -->
+        <div class="sub-chart-title">
+          <span>🌊 ความเร็วคลื่นรามานุจัน (Zero-Lag Harmonic Drift: V5 ฟ้า / V20 ม่วง)</span>
+          <span class="sub-note">เปิดรอบเมื่อทั้งสองเส้นพุ่งเหนือ 0 พร้อมกัน | ขายทำกำไรเมื่อหักหัวลงหลุด 0 พร้อมกัน</span>
+        </div>
+        <div id="waveChartContainer" class="sub-chart-container"></div>
+      </div>
+
+      <!-- Part 2: Live Active Telemetry Cockpit (สถานะพอร์ต & สัญญาณคลื่นสด SCB.BK) -->
       <div class="telemetry-cockpit-card">
         <!-- Top Bar: Status Badge + Live Market Indicator -->
         <div class="cockpit-top-bar">
@@ -526,31 +551,6 @@
             <strong>คำแนะนำ:</strong> <span id="scen4Action">ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือรอคลื่นสงบ (AVOID DROP)</span>
           </div>
         </div>
-      </div>
-
-      <!-- Part 2: Interactive Candlestick & Wave Chart -->
-      <div class="chart-section card-box">
-        <div class="section-header">
-          <div class="section-title-wrap">
-            <h2 id="chartSectionTitle" style="font-size: 1.05rem;">แท่งเทียนราคา SCB.BK, สัญญาณเปิดรอบ/เติมไม้ & Chandelier Trailing Stop</h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-              <span class="chart-legend-badge legend-buy">▲ ซื้อไม้แรก (Entry)</span>
-              <span class="chart-legend-badge legend-pyramid">◆ เติมไม้งอก (Pyramid)</span>
-              <span class="chart-legend-badge legend-sell">▼ ขายปิดรอบ (Exit 100%)</span>
-              <span class="chart-legend-badge legend-trailing">─ Chandelier Trailing Stop</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Price Candlestick Chart -->
-        <div id="priceChartContainer" class="chart-container"></div>
-
-        <!-- Sub-Chart Container (Harmonic Waves & Coherence) -->
-        <div class="sub-chart-title">
-          <span>🌊 ความเร็วคลื่นรามานุจัน (Zero-Lag Harmonic Drift: $V_5$ ฟ้า / $V_{20}$ ม่วง)</span>
-          <span class="sub-note">เปิดรอบเมื่อทั้งสองเส้นพุ่งเหนือ 0 พร้อมกัน | ขายทำกำไรเมื่อหักหัวลงหลุด 0 พร้อมกัน</span>
-        </div>
-        <div id="waveChartContainer" class="sub-chart-container"></div>
       </div>
 
       <!-- Automation Info Bar -->
