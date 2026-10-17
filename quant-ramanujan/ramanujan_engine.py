@@ -298,6 +298,7 @@ class RamanujanConfidenceCycleTrader:
         cycle_be_trigger_mult = 0.80
         cycle_tp_target = 0.0
         cycle_tp_hit = False
+        cycle_tp_hit_bar = -999
         cycle_super_trend = False
         cycle_guaranteed_floor = 0.0
         last_loss_close_bar = -999
@@ -334,9 +335,10 @@ class RamanujanConfidenceCycleTrader:
                 # 1. EVALUATE TP +2.5% & DYNAMIC SUPER TREND SWITCHER
                 if not cycle_tp_hit and h_t >= cycle_tp_target:
                     cycle_tp_hit = True
+                    cycle_tp_hit_bar = t
                     is_super_trend = (
-                        row['er'] >= 0.30
-                        and row['rho_ram'] >= 0.25
+                        row['er'] >= 0.28
+                        and row['rho_ram'] >= 0.20
                         and row['v_micro'] > 0.0
                         and row['v_macro'] > 0.0
                         and c_t > row['ema_trend']
@@ -356,16 +358,18 @@ class RamanujanConfidenceCycleTrader:
                 # 2. EVALUATE EXITS IF NOT EXITED AT TP
                 if not exit_triggered:
                     if cycle_super_trend:
-                        trail_mult = 1.0
-                        cand_trail = cycle_highest_high * (1.0 - trail_mult * delta_t)
-                        if cand_trail > cycle_sl:
-                            cycle_sl = cand_trail
-                        cycle_sl = max(cycle_sl, cycle_guaranteed_floor)
+                        # Only evaluate trailing stop on subsequent bars (avoid intraday same-bar low trap)
+                        if t > cycle_tp_hit_bar:
+                            trail_mult = 0.75 if (row['z_t'] > self.climax_z or row['bbe_ratio'] > 1.85) else 1.25
+                            cand_trail = cycle_highest_high * (1.0 - trail_mult * delta_t)
+                            if cand_trail > cycle_sl and cand_trail < c_t:
+                                cycle_sl = cand_trail
+                            cycle_sl = max(cycle_sl, cycle_guaranteed_floor)
 
-                        if l_t <= cycle_sl:
-                            exit_triggered = True
-                            exit_price = max(min(o_t, cycle_sl), cycle_guaranteed_floor)
-                            exit_reason = "SuperTrend_Trailing_Exit"
+                            if l_t <= cycle_sl:
+                                exit_triggered = True
+                                exit_price = max(min(o_t, cycle_sl) if o_t < cycle_sl else cycle_sl, cycle_guaranteed_floor)
+                                exit_reason = "SuperTrend_Trailing_Exit"
                     else:
                         if l_t <= cycle_sl:
                             exit_triggered = True
@@ -572,6 +576,7 @@ class RamanujanConfidenceCycleTrader:
                     cycle_be_trigger_mult = conf_info['be_trigger_mult']
                     cycle_tp_target = c_t * 1.025
                     cycle_tp_hit = False
+                    cycle_tp_hit_bar = -999
                     cycle_super_trend = False
                     cycle_guaranteed_floor = 0.0
 
