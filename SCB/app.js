@@ -105,11 +105,12 @@ function renderTelemetryCockpit(summary, activePos, pred, candles) {
   const toggleText = document.getElementById('toggleTopBarText');
 
   if (btnToggleTop && factGrid) {
-    let isHidden = localStorage.getItem('RAMANUJAN_HEADER_HIDDEN') === 'true';
+    // Default to HIDDEN (true) so the user gets clean, maximum chart space as requested
+    let isHidden = localStorage.getItem('RAMANUJAN_HEADER_HIDDEN') !== 'false';
     const applyState = () => {
       factGrid.style.display = isHidden ? 'none' : 'grid';
-      if (toggleIcon) toggleIcon.textContent = isHidden ? '🔽' : '🔼';
-      if (toggleText) toggleText.textContent = isHidden ? 'แสดงแถบสัจธรรม' : 'ซ่อนแถบหัว (เน้นกราฟ)';
+      if (toggleIcon) toggleIcon.textContent = isHidden ? '👁️' : '🔼';
+      if (toggleText) toggleText.textContent = isHidden ? 'แสดงข้อมูลสัจธรรม 6 มิติ' : 'ซ่อนแถบหัว (เน้นดูกราฟ)';
     };
     applyState();
 
@@ -118,8 +119,8 @@ function renderTelemetryCockpit(summary, activePos, pred, candles) {
       localStorage.setItem('RAMANUJAN_HEADER_HIDDEN', isHidden ? 'true' : 'false');
       applyState();
       // Refit charts smoothly after header layout shift
-      if (priceChart) priceChart.timeScale().fitContent();
-      if (waveChart) waveChart.timeScale().fitContent();
+      if (typeof priceChart !== 'undefined' && priceChart) priceChart.timeScale().fitContent();
+      if (typeof waveChart !== 'undefined' && waveChart) waveChart.timeScale().fitContent();
     };
   }
 
