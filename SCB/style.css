@@ -1204,6 +1204,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  --matrix-font-size: clamp(0.88rem, 1.05vw, 0.98rem);
 }
 
 .matrix-head {
@@ -1213,9 +1214,21 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: 8px;
   margin-bottom: 2px;
+  font-size: var(--matrix-font-size);
 }
 
-/* Vertical Decision Ladder (4 สภาวะราคาแนวตั้ง) */
+.matrix-title {
+  font-size: var(--matrix-font-size);
+  font-weight: 800;
+  color: #fff;
+}
+
+.matrix-meta {
+  font-size: var(--matrix-font-size);
+  color: var(--text-muted);
+}
+
+/* Vertical Decision Ladder (4 สภาวะราคาแนวตั้ง - ขนาดตัวอักษรเท่ากันทั้งส่วน) */
 .decision-ladder-list {
   display: flex;
   flex-direction: column;
@@ -1228,10 +1241,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 10px 16px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(210px, 230px) minmax(170px, 190px) 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
+  font-size: var(--matrix-font-size);
   transition: all 0.2s ease;
 }
 
@@ -1251,31 +1265,36 @@ body {
   box-shadow: 0 0 15px rgba(56, 189, 248, 0.12);
 }
 
-.ladder-tag-group {
+.ladder-col-status {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 320px;
-  flex-shrink: 0;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: var(--matrix-font-size);
+  font-weight: 700;
 }
 
-.ladder-price {
+.ladder-col-price {
+  white-space: nowrap;
+  font-size: var(--matrix-font-size);
   font-family: var(--font-num);
-  font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: 0.5px;
-  white-space: nowrap;
 }
 
-.ladder-desc {
-  flex: 1;
-  font-size: 0.82rem;
-  color: var(--text-muted);
+.ladder-col-desc {
+  font-size: var(--matrix-font-size);
+  color: #cbd5e1;
   line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ladder-action {
-  flex-shrink: 0;
+.ladder-col-action {
+  white-space: nowrap;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .action-pill {
@@ -1284,7 +1303,8 @@ body {
   gap: 6px;
   padding: 5px 12px;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: var(--matrix-font-size);
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -1313,33 +1333,36 @@ body {
 }
 
 .current-state-badge {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 1px 6px;
   border-radius: 4px;
   background: rgba(56, 189, 248, 0.2);
   color: #38bdf8;
   border: 1px solid rgba(56, 189, 248, 0.4);
+  white-space: nowrap;
 }
 
 /* Mobile & Portrait Screens (การแสดงผลแนวตั้ง) */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .scenario-ladder-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
     padding: 12px 14px;
   }
-  .ladder-tag-group {
-    width: 100%;
-    justify-content: space-between;
-    min-width: unset;
+  .ladder-col-status {
+    grid-column: 1 / 2;
   }
-  .ladder-desc {
-    width: 100%;
+  .ladder-col-price {
+    grid-column: 2 / 3;
+    text-align: right;
   }
-  .ladder-action {
-    width: 100%;
+  .ladder-col-desc {
+    grid-column: 1 / 3;
+    white-space: normal;
+  }
+  .ladder-col-action {
+    grid-column: 1 / 3;
   }
   .action-pill {
     width: 100%;
