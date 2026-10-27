@@ -92,7 +92,7 @@ function initDashboard(data) {
 // ==========================================
 function renderTelemetryCockpit(summary, activePos, pred, candles) {
   const lastBar = candles.length > 0 ? candles[candles.length - 1] : {};
-  const currPrice = pred.lastPrice || lastBar.close || 152.50;
+  const currPrice = pred.lastPrice || lastBar.close || 153.50;
   const lastDate = pred.lastDate || lastBar.time || '2026-10-27';
 
   // Live status pill in Hero
@@ -605,7 +605,7 @@ function initDailyArchive(candles, pred, summary) {
   if (elLastDate) elLastDate.textContent = records.length > 0 ? records[0].date : todayStr;
 
   const elLastPrice = document.getElementById('arcLastPrice');
-  if (elLastPrice) elLastPrice.textContent = records.length > 0 ? `฿${records[0].close.toFixed(2)}` : '฿152.50';
+  if (elLastPrice) elLastPrice.textContent = records.length > 0 ? `฿${records[0].close.toFixed(2)}` : '฿153.50';
 
   const elTotalDays = document.getElementById('arcTotalDays');
   if (elTotalDays) elTotalDays.textContent = `${records.length} วันทำการ`;
