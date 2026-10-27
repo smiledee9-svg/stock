@@ -31,24 +31,21 @@ let selectedWaveIdx = 5; // Default to V5 (Weekly Momentum)
 
 // Initialize when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof window.RAMANUJAN_DATA !== 'undefined' && window.RAMANUJAN_DATA) {
-    initDashboard(window.RAMANUJAN_DATA);
-  } else {
-    fetch('ramanujan_results.json')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        return res.json();
-      })
-      .then(data => initDashboard(data))
-      .catch(err => {
-        console.warn('Direct fetch failed, falling back to window.RAMANUJAN_DATA:', err);
-        if (typeof window.RAMANUJAN_DATA !== 'undefined') {
-          initDashboard(window.RAMANUJAN_DATA);
-        } else {
-          showToast('⚠️ ไม่สามารถโหลดข้อมูลได้ กรุณาเปิดผ่าน Web Server หรือตรวจสอบ ramanujan_data.js');
-        }
-      });
-  }
+  // 1. Try to fetch the absolute latest results with cache-busting query
+  fetch('ramanujan_results.json?_t=' + Date.now())
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return res.json();
+    })
+    .then(data => initDashboard(data))
+    .catch(err => {
+      // 2. Fallback to bundled window.RAMANUJAN_DATA (offline/local file support)
+      if (typeof window.RAMANUJAN_DATA !== 'undefined' && window.RAMANUJAN_DATA) {
+        initDashboard(window.RAMANUJAN_DATA);
+      } else {
+        showToast('⚠️ กำลังเปิดด้วยโหมดออฟไลน์');
+      }
+    });
 });
 
 /**
