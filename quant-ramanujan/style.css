@@ -1215,21 +1215,135 @@ body {
   margin-bottom: 2px;
 }
 
-.decision-scenarios-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+/* Vertical Decision Ladder (4 สภาวะราคาแนวตั้ง) */
+.decision-ladder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
-@media (max-width: 1024px) {
-  .decision-scenarios-grid {
-    grid-template-columns: repeat(2, 1fr);
+.scenario-ladder-item {
+  background: rgba(8, 13, 26, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.scenario-ladder-item:hover {
+  background: rgba(19, 29, 54, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.sc-breakout { border-left: 4px solid #fbbf24; }
+.sc-inflection { border-left: 4px solid #34d399; }
+.sc-neutral { border-left: 4px solid #38bdf8; }
+.sc-danger { border-left: 4px solid #f87171; }
+
+.active-state-ring {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.12);
+}
+
+.ladder-tag-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 320px;
+  flex-shrink: 0;
+}
+
+.ladder-price {
+  font-family: var(--font-num);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.ladder-desc {
+  flex: 1;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.ladder-action {
+  flex-shrink: 0;
+}
+
+.action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.pill-gold {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.pill-green {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.pill-cyan {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.pill-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.current-state-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+/* Mobile & Portrait Screens (การแสดงผลแนวตั้ง) */
+@media (max-width: 900px) {
+  .scenario-ladder-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
   }
-}
-
-@media (max-width: 640px) {
-  .decision-scenarios-grid {
-    grid-template-columns: 1fr;
+  .ladder-tag-group {
+    width: 100%;
+    justify-content: space-between;
+    min-width: unset;
+  }
+  .ladder-desc {
+    width: 100%;
+  }
+  .ladder-action {
+    width: 100%;
+  }
+  .action-pill {
+    width: 100%;
+    justify-content: center;
   }
 }
 

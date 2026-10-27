@@ -128,7 +128,7 @@
       color: #64748b;
       margin-top: 2px;
     }
-    /* Widescreen Full-Width Chart + Horizontal 4-Scenario Fact Matrix (Under Chart) */
+    /* Widescreen Full-Width Chart + Vertical Decision Ladder (Under Chart) */
     .chart-decision-split {
       display: flex;
       flex-direction: column;
@@ -154,19 +154,120 @@
       flex-direction: column;
       gap: 10px;
     }
-    .decision-scenarios-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+    /* Vertical Decision Ladder (4 สภาวะราคาแนวตั้ง) */
+    .decision-ladder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
     }
-    @media (max-width: 1024px) {
-      .decision-scenarios-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .scenario-ladder-item {
+      background: rgba(8, 13, 26, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.2s ease;
+    }
+    .scenario-ladder-item:hover {
+      background: rgba(19, 29, 54, 0.85);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    .sc-breakout { border-left: 4px solid #fbbf24; }
+    .sc-inflection { border-left: 4px solid #34d399; }
+    .sc-neutral { border-left: 4px solid #38bdf8; }
+    .sc-danger { border-left: 4px solid #f87171; }
+    .active-state-ring {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.12);
+    }
+    .ladder-tag-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 320px;
+      flex-shrink: 0;
+    }
+    .ladder-price {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .ladder-desc {
+      flex: 1;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    .ladder-action {
+      flex-shrink: 0;
+    }
+    .action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+    .pill-gold {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .pill-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .pill-cyan {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .pill-red {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+    .current-state-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    /* Mobile & Portrait Screens (การแสดงผลแนวตั้ง) */
+    @media (max-width: 900px) {
+      .scenario-ladder-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px 14px;
       }
-    }
-    @media (max-width: 640px) {
-      .decision-scenarios-grid {
-        grid-template-columns: 1fr;
+      .ladder-tag-group {
+        width: 100%;
+        justify-content: space-between;
+        min-width: unset;
+      }
+      .ladder-desc {
+        width: 100%;
+      }
+      .ladder-action {
+        width: 100%;
+      }
+      .action-pill {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -290,45 +391,64 @@
             </div>
           </div>
 
-          <div class="decision-scenarios-grid">
-            <!-- Scenario 1: Inflection -->
-            <div class="scenario-compact sc-inflection">
-              <div class="sc-top">
-                <span class="sc-tag sc-tag-green">🟢 HARMONIC INFLECTION</span>
-                <span class="sc-target" id="scInflectPrice">฿154.93</span>
+          <div class="decision-ladder-list">
+            <!-- Tier 1: Resonance Breakout (Highest Price Level) -->
+            <div class="scenario-ladder-item sc-breakout">
+              <div class="ladder-tag-group">
+                <span class="sc-tag sc-tag-gold" style="font-weight: 700;">⚡ RESONANCE BREAKOUT</span>
+                <span class="ladder-price text-gold" id="scBreakPrice">฿155.00</span>
               </div>
-              <div class="sc-info">ราคาปิดยืนเหนือแนวต้านระยะสั้น คลื่นสัปดาห์ V5 พลิกตัดบวก</div>
-              <div class="sc-exec">🎯 แผน: <strong>TRIGGER WATCH</strong> (เตรียมตั้งรับไม้แรก)</div>
+              <div class="ladder-desc">
+                ราคาปิดทะลุกรอบไซด์เวย์ ER &ge; 0.26 คลื่นสอดคล้องเต็มกำลัง
+              </div>
+              <div class="ladder-action">
+                <span class="action-pill pill-gold">🚀 แผน: <strong>BUY ENTRY #1</strong> (เปิดรอบซื้อไม้แรกทันที)</span>
+              </div>
             </div>
 
-            <!-- Scenario 2: Breakout -->
-            <div class="scenario-compact sc-breakout">
-              <div class="sc-top">
-                <span class="sc-tag sc-tag-gold">⚡ RESONANCE BREAKOUT</span>
-                <span class="sc-target" id="scBreakPrice">฿155.00</span>
+            <!-- Tier 2: Harmonic Inflection (Weekly Wave Trigger) -->
+            <div class="scenario-ladder-item sc-inflection">
+              <div class="ladder-tag-group">
+                <span class="sc-tag sc-tag-green" style="font-weight: 700;">🟢 HARMONIC INFLECTION</span>
+                <span class="ladder-price text-green" id="scInflectPrice">฿154.93</span>
               </div>
-              <div class="sc-info">ราคาปิดทะลุกรอบไซด์เวย์ ER ≥ 0.26 คลื่นสอดคล้องเต็มกำลัง</div>
-              <div class="sc-exec">🚀 แผน: <strong>BUY ENTRY #1</strong> (เปิดรอบซื้อไม้แรกทันที)</div>
+              <div class="ladder-desc">
+                ราคาปิดยืนเหนือแนวต้านระยะสั้น คลื่นสัปดาห์ V5 พลิกตัดบวก
+              </div>
+              <div class="ladder-action">
+                <span class="action-pill pill-green">🎯 แผน: <strong>TRIGGER WATCH</strong> (เตรียมตั้งรับไม้แรก)</span>
+              </div>
             </div>
 
-            <!-- Scenario 3: Neutral Sanctuary -->
-            <div class="scenario-compact sc-neutral">
-              <div class="sc-top">
-                <span class="sc-tag sc-tag-neutral">⚪ CASH SANCTUARY</span>
-                <span class="sc-target" id="scNeutralRange">฿144.05 - ฿154.93</span>
+            <!-- Tier 3: Cash Sanctuary (Neutral Sideways Corridor - CURRENT STATE) -->
+            <div class="scenario-ladder-item sc-neutral active-state-ring">
+              <div class="ladder-tag-group">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="sc-tag sc-tag-neutral" style="font-weight: 700;">⚪ CASH SANCTUARY</span>
+                  <span class="current-state-badge">📍 สภาวะปัจจุบัน</span>
+                </div>
+                <span class="ladder-price text-cyan" id="scNeutralRange">฿144.05 – ฿154.93</span>
               </div>
-              <div class="sc-info">ราคาสะสมพลังในกรอบ คลื่นยังไม่ครบเกณฑ์คู่ ปลอดภัย 100%</div>
-              <div class="sc-exec">🛡️ แผน: <strong>HOLD 100% CASH</strong> (ถือเงินสด ไม่ติดดอย)</div>
+              <div class="ladder-desc">
+                ราคาสะสมพลังในกรอบ คลื่นยังไม่ครบเกณฑ์คู่ ปลอดภัย 100% ไม่เสี่ยงติดดอย
+              </div>
+              <div class="ladder-action">
+                <span class="action-pill pill-cyan">🛡️ แผน: <strong>HOLD 100% CASH</strong> (ถือเงินสด 100%)</span>
+              </div>
             </div>
 
-            <!-- Scenario 4: Abyssal Drop -->
-            <div class="scenario-compact sc-danger">
-              <div class="sc-top">
-                <span class="sc-tag sc-tag-red">🔴 ABYSSAL FLOOR</span>
-                <span class="sc-target" id="scDangerPrice">฿144.05</span>
+            <!-- Tier 4: Abyssal Floor (Lower Bound Stop) -->
+            <div class="scenario-ladder-item sc-danger">
+              <div class="ladder-tag-group">
+                <span class="sc-tag sc-tag-red" style="font-weight: 700;">🔴 ABYSSAL FLOOR</span>
+                <span class="ladder-price text-red" id="scDangerPrice">฿144.05</span>
               </div>
-              <div class="sc-info">ราคาหลุดต่ำกว่า Floor (หลุดกรอบล่าง Delta ของรามานุจัน)</div>
-              <div class="sc-exec">⚠️ แผน: <strong>AVOID DROP</strong> (ห้ามรับมีดเด็ดขาด นั่งทับมือ)</div>
+              <div class="ladder-desc">
+                ราคาหลุดต่ำกว่า Floor (หลุดกรอบล่าง Delta ของรามานุจัน)
+              </div>
+              <div class="ladder-action">
+                <span class="action-pill pill-red">⚠️ แผน: <strong>AVOID DROP</strong> (ห้ามรับมีดเด็ดขาด นั่งทับมือ)</span>
+              </div>
             </div>
           </div>
         </div>
