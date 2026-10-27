@@ -17,48 +17,48 @@
     "winRatePct": 37.84,
     "profitFactor": 0.23,
     "totalFeesPaid": 15891.23,
-    "bnhReturnPct": 44.55,
+    "bnhReturnPct": 45.02,
     "bnhMaxDrawdownPct": -18.99,
-    "currentPrice": 152.5
+    "currentPrice": 153.0
   },
   "predictiveIntelligence": {
     "lastDate": "2026-10-27",
-    "lastPrice": 152.5,
-    "dynamicDeltaPct": 4.61,
+    "lastPrice": 153.0,
+    "dynamicDeltaPct": 5.05,
     "expectedRange": {
-      "floor": 145.47,
-      "ceiling": 159.53,
-      "spreadThb": 14.06
+      "floor": 145.27,
+      "ceiling": 160.73,
+      "spreadThb": 15.46
     },
     "scenarios": {
       "bullishInflection": {
         "name": "จุดกลับตัวคลื่นสอดคล้อง (Harmonic Inflection Trigger)",
-        "triggerPrice": 154.45,
-        "changePct": "+1.28%",
-        "description": "ราคาปิดยืนเหนือ ฿154.45 คลื่นสัปดาห์ V5 และเดือน V20 ตัดขึ้นบวกพร้อมกัน (Phase Coherence >= 0.25)",
+        "triggerPrice": 154.69,
+        "changePct": "+1.1%",
+        "description": "ราคาปิดยืนเหนือ ฿154.69 คลื่นสัปดาห์ V5 และเดือน V20 ตัดขึ้นบวกพร้อมกัน (Phase Coherence >= 0.25)",
         "actionPlan": "จับตาใกล้ชิด เตรียมตั้งรับไม้แรกหยั่งเชิง (Watchlist / Ready to Probe)",
         "statusBadge": "🟢 TRIGGER WATCH"
       },
       "resonanceBreakout": {
         "name": "จุดระเบิดเบรกเอาท์เต็มสูบ (Full Resonance Breakout)",
-        "triggerPrice": 154.5,
-        "changePct": "+1.31%",
-        "description": "ราคาปิดทะลุ ฿154.50 ทะลุกรอบไซด์เวย์ ER >= 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด",
+        "triggerPrice": 154.75,
+        "changePct": "+1.14%",
+        "description": "ราคาปิดทะลุ ฿154.75 ทะลุกรอบไซด์เวย์ ER >= 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด",
         "actionPlan": "เปิดรอบซื้อไม้แรกตามระบบทันที (BUY Entry Stage 1)",
         "statusBadge": "⚡ FULL BUY"
       },
       "neutralHolding": {
         "name": "โซนถือเงินสดปลอดภัย (Neutral Cash Zone)",
-        "rangeText": "฿145.47 - ฿154.45",
+        "rangeText": "฿145.27 - ฿154.69",
         "description": "คลื่นความเร็วยังไม่เข้าเกณฑ์คู่ ตลาดยังแกว่งตัวรอเลือกข้าง",
         "actionPlan": "ถือเงินสด 100% สบายใจ ปล่อยคนอื่นติดดอย ไม่มีความเสี่ยง (HOLD 100% CASH)",
         "statusBadge": "⚪ HOLD CASH"
       },
       "bearishRisk": {
         "name": "จุดเตือนระวังพักฐานลึก (Dynamic Floor Breakdown)",
-        "triggerPrice": 145.47,
-        "changePct": "-4.61%",
-        "description": "ราคาหลุดต่ำกว่า ฿145.47 (หลุดกรอบล่าง Delta_t ของรามานุจัน)",
+        "triggerPrice": 145.27,
+        "changePct": "-5.05%",
+        "description": "ราคาหลุดต่ำกว่า ฿145.27 (หลุดกรอบล่าง Delta_t ของรามานุจัน)",
         "actionPlan": "ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือรอคลื่นสงบ (AVOID DROP)",
         "statusBadge": "🔴 DANGER AVOID"
       }
@@ -22026,17 +22026,17 @@
       "open": 153.0,
       "high": 154.5,
       "low": 152.5,
-      "close": 152.5,
-      "volume": 14345276.0,
-      "v_micro": 0.2651,
-      "v_macro": 1.2265,
-      "rho_ram": 0.413,
-      "er": 0.68,
-      "dynamic_delta": 0.0461,
+      "close": 153.0,
+      "volume": 15293764.0,
+      "v_micro": 0.4327,
+      "v_macro": 1.3275,
+      "rho_ram": 0.589,
+      "er": 0.692,
+      "dynamic_delta": 0.0505,
       "r_q": 0.3942,
-      "z_t": 0.0,
-      "ema_trend": 149.9,
-      "confidence_pct": 75.6,
+      "z_t": 0.213,
+      "ema_trend": 149.92,
+      "confidence_pct": 79.1,
       "signal": "CYCLE_EXIT",
       "signal_detail": "ขาย 600 หุ้น @ ฿153.00 (Breakeven_Shield_Exit) กำไร -0.00%",
       "trailing_stop": 153.0,
