@@ -37,15 +37,15 @@
           <div class="status-pill status-div">
             <span>💰 ปันผล 1 ปี: <strong>฿11.28 (7.35%)</strong></span>
           </div>
-          <div class="status-pill status-cloud">
-            <span>☁️ ออโต้บอท 13:00 / 17:30 น.</span>
-          </div>
+          <button type="button" id="btnToggleTopBar" class="btn btn-outline-sm" title="ซ่อน/แสดงแผงสัจธรรมเพื่อเพิ่มพื้นที่ดูกราฟเต็มจอ" style="border-color: var(--gold); color: var(--gold-glow);">
+            <span id="toggleTopBarIcon">🔼</span> <span id="toggleTopBarText">ซ่อนแถบหัว (เน้นกราฟ)</span>
+          </button>
           <a href="https://github.com/smiledee9-svg/stock" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm">⭐ GitHub Repo</a>
         </div>
       </div>
 
-      <!-- Live 6-Fact Telemetry Strip -->
-      <div class="fact-telemetry-grid">
+      <!-- Live 6-Fact Telemetry Strip (Collapsible for Maximum Screen Space) -->
+      <div class="fact-telemetry-grid" id="factTelemetryGrid">
         <div class="telemetry-card card-cyan">
           <div class="tel-label">ราคาปิดตลาดล่าสุด</div>
           <div class="tel-val" id="kpiPrice">฿153.50</div>

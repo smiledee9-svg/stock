@@ -98,6 +98,31 @@ function renderTelemetryCockpit(summary, activePos, pred, candles) {
     elStatus.textContent = `ตลาดปิดเย็น ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
   }
 
+  // Header Collapse Toggle (Maximized Screen Focus)
+  const btnToggleTop = document.getElementById('btnToggleTopBar');
+  const factGrid = document.getElementById('factTelemetryGrid');
+  const toggleIcon = document.getElementById('toggleTopBarIcon');
+  const toggleText = document.getElementById('toggleTopBarText');
+
+  if (btnToggleTop && factGrid) {
+    let isHidden = localStorage.getItem('RAMANUJAN_HEADER_HIDDEN') === 'true';
+    const applyState = () => {
+      factGrid.style.display = isHidden ? 'none' : 'grid';
+      if (toggleIcon) toggleIcon.textContent = isHidden ? '🔽' : '🔼';
+      if (toggleText) toggleText.textContent = isHidden ? 'แสดงแถบสัจธรรม' : 'ซ่อนแถบหัว (เน้นกราฟ)';
+    };
+    applyState();
+
+    btnToggleTop.onclick = () => {
+      isHidden = !isHidden;
+      localStorage.setItem('RAMANUJAN_HEADER_HIDDEN', isHidden ? 'true' : 'false');
+      applyState();
+      // Refit charts smoothly after header layout shift
+      if (priceChart) priceChart.timeScale().fitContent();
+      if (waveChart) waveChart.timeScale().fitContent();
+    };
+  }
+
   // Telemetry Tiles
   const elPrice = document.getElementById('kpiPrice');
   if (elPrice) elPrice.textContent = `฿${currPrice.toFixed(2)}`;
