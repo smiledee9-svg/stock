@@ -110,24 +110,30 @@ export default {
           if (toolName === 'ichimoku_get_regime') {
             toolResult = {
               symbol: args.symbol || 'SCB.BK',
-              tenkanSen_9: 146.00,
-              kijunSen_26: 145.25,
-              senkouSpanA: 144.50,
-              senkouSpanB: 143.00,
-              chikouSpan: 146.50,
+              asOfDate: '2026-10-27',
+              currentPrice: 153.00,
+              tenkanSen_9: 149.50,
+              kijunSen_26: 150.75,
+              senkouSpanA: 150.12,
+              senkouSpanB: 150.75,
+              chikouSpan: 153.00,
               sanyakuKouten: {
                 aboveKumo: true,
                 aboveKijun: true,
                 chikouFree: true,
-                passStatus: 'SANYAKU_KOUTEN_CONFIRMED'
+                tenkanAboveKijun: false,
+                passStatus: 'KUMO_BREAKOUT_BULLISH_EQUILIBRIUM'
               }
             };
           } else if (toolName === 'ichimoku_calculate_nehaba') {
             const a = Number(args.pointA || 138.0);
-            const b = Number(args.pointB || 147.0);
-            const c = Number(args.pointC || 143.0);
+            const b = Number(args.pointB || 154.5);
+            const c = Number(args.pointC || 150.0);
 
             toolResult = {
+              symbol: args.symbol || 'SCB.BK',
+              asOfDate: '2026-10-27',
+              wavePoints: { pointA: a, pointB: b, pointC: c },
               targets: {
                 targetN: Number((c + (b - a)).toFixed(2)),
                 targetV: Number(((2 * b) - c).toFixed(2)),
