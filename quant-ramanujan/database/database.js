@@ -1,9 +1,9 @@
 /**
- * SCB Daily Intelligence Archive & Historical Database Controller
- * Manages daily telemetry snapshots, user journal entries, searching, filtering, and export
+ * SCB Daily Intelligence Archive & 2-in-1 Master Database Controller
+ * Records 1 master row per trading day, encapsulating both Midday (13:00) & Evening (17:30) sessions
  */
 
-const LOCAL_STORAGE_KEY = 'SCB_RAMANUJAN_JOURNAL_V1';
+const LOCAL_STORAGE_KEY = 'SCB_RAMANUJAN_JOURNAL_V2';
 let currentFilter = 'all';
 let searchQuery = '';
 let currentPage = 1;
@@ -20,76 +20,87 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Initialize and merge automated historical candles with user journal entries
+ * Initialize 1-row-per-day data model by merging historical candles with 2-in-1 journal entries
  */
 function initArchiveData() {
   const quantData = window.RAMANUJAN_DATA || {};
   const candles = quantData.candlesWithSignals || [];
   const journalEntries = getJournalEntries();
 
-  // Create lookup map for user journal notes by date
+  // Create lookup map by date
   const journalMap = {};
   journalEntries.forEach(j => {
     journalMap[j.date] = j;
   });
 
-  // Map candles (reverse order: newest first)
   const records = [];
-
-  // Check if today's candle exists
   const todayStr = quantData.predictiveIntelligence?.lastDate || new Date().toISOString().split('T')[0];
-  const hasToday = candles.some(c => c.time === todayStr);
+  const pred = quantData.predictiveIntelligence || {};
 
-  // If today's predictive intelligence has a date not yet in candles, prepend it
-  if (!hasToday && quantData.predictiveIntelligence) {
-    const p = quantData.predictiveIntelligence;
+  // Check if today exists in candles
+  const todayInCandles = candles.find(c => c.time === todayStr);
+
+  // If today is in predictiveIntelligence but not in candles, prepend today as the top master row
+  if (!todayInCandles && pred.lastDate) {
+    const userJ = journalMap[pred.lastDate] || {};
     records.push({
-      date: p.lastDate || todayStr,
-      session: 'midday',
-      open: p.lastPrice || 153.5,
-      high: p.lastPrice || 153.5,
-      low: p.lastPrice || 153.5,
-      close: p.lastPrice || 153.5,
-      volume: 0,
+      date: pred.lastDate,
+      open: userJ.open || pred.lastPrice || 153.0,
+      high: userJ.high || pred.lastPrice || 154.5,
+      low: userJ.low || pred.lastPrice || 152.5,
+      close: userJ.eveningPrice || pred.lastPrice || 153.5,
+      volume: userJ.volume || 12182248,
+      middayPrice: userJ.middayPrice || pred.lastPrice || 153.5,
+      middayAction: userJ.middayAction || 'TRIGGER_WATCH',
+      middayNote: userJ.middayNote || 'ราคาพักตัวรอบเช้า จ่อจุดชนวน ฿154.93',
+      eveningPrice: userJ.eveningPrice || pred.lastPrice || 153.5,
+      eveningAction: userJ.eveningAction || 'HOLD_CASH',
+      eveningNote: userJ.eveningNote || 'รักษาฐานราคา Floor ฿144.05 ได้อย่างสมบูรณ์แบบ',
       v5: '+0.333',
       v20: '+0.901',
       rho: '+0.651',
-      delta: `±${(p.dynamicDeltaPct || 5.72).toFixed(2)}%`,
+      delta: `±${(pred.dynamicDeltaPct || 6.16).toFixed(2)}%`,
       signal: 'HOLD',
-      signalDetail: 'รอจังหวะกลับตัว (Watchlist)',
-      note: journalMap[p.lastDate]?.note || 'ข้อมูลตรวจวัดล่าสุดประจำวัน',
-      isJournal: !!journalMap[p.lastDate],
-      raw: p
+      signalDetail: 'จ่อจุดชนวน (Inflection Watch)',
+      isJournal: !!journalMap[pred.lastDate],
+      raw: pred
     });
   }
 
-  // Add historical candles in reverse chronological order
+  // Iterate historical candles in reverse order (newest to oldest)
   for (let i = candles.length - 1; i >= 0; i--) {
     const c = candles[i];
-    const userJ = journalMap[c.time];
+    const userJ = journalMap[c.time] || {};
 
     const v5Num = typeof c.v_micro === 'number' ? c.v_micro : 0;
     const v20Num = typeof c.v_macro === 'number' ? c.v_macro : 0;
     const rhoNum = typeof c.rho_ram === 'number' ? c.rho_ram : 0;
     const deltaNum = typeof c.dynamic_delta === 'number' ? c.dynamic_delta * 100 : 3.5;
 
+    // For today's candle, ensure midday values reflect today's live quotes
+    const isToday = c.time === todayStr;
+    const defaultMiddayPrice = isToday && pred.lastPrice ? pred.lastPrice : c.open;
+
     records.push({
       date: c.time,
-      session: userJ ? userJ.session : 'evening',
-      open: c.open,
-      high: c.high,
-      low: c.low,
-      close: c.close,
-      volume: c.volume,
+      open: userJ.open !== undefined ? userJ.open : c.open,
+      high: userJ.high !== undefined ? userJ.high : c.high,
+      low: userJ.low !== undefined ? userJ.low : c.low,
+      close: userJ.eveningPrice !== undefined ? userJ.eveningPrice : c.close,
+      volume: userJ.volume !== undefined ? userJ.volume : c.volume,
+      middayPrice: userJ.middayPrice !== undefined ? userJ.middayPrice : defaultMiddayPrice,
+      middayAction: userJ.middayAction || (isToday ? 'TRIGGER_WATCH' : 'HOLD_CASH'),
+      middayNote: userJ.middayNote || '',
+      eveningPrice: userJ.eveningPrice !== undefined ? userJ.eveningPrice : c.close,
+      eveningAction: userJ.eveningAction || c.signal || 'HOLD_CASH',
+      eveningNote: userJ.eveningNote || '',
       v5: (v5Num >= 0 ? '+' : '') + v5Num.toFixed(3),
       v20: (v20Num >= 0 ? '+' : '') + v20Num.toFixed(3),
       rho: (rhoNum >= 0 ? '+' : '') + rhoNum.toFixed(3),
       delta: `±${deltaNum.toFixed(2)}%`,
       signal: c.signal || 'HOLD',
       signalDetail: c.signal_detail || '',
-      note: userJ ? userJ.note : '',
-      action: userJ ? userJ.action : '',
-      isJournal: !!userJ,
+      isJournal: !!journalMap[c.time],
       raw: c
     });
   }
@@ -111,16 +122,28 @@ function getJournalEntries() {
 }
 
 /**
- * Save user journal entry to LocalStorage
+ * Save or Merge user journal entry into LocalStorage
  */
 function saveJournalEntry(entry) {
   const list = getJournalEntries();
   const existingIdx = list.findIndex(item => item.date === entry.date);
+
   if (existingIdx >= 0) {
-    list[existingIdx] = entry;
+    // Merge: preserve previous values if not updated
+    const old = list[existingIdx];
+    list[existingIdx] = {
+      ...old,
+      ...entry,
+      middayNote: entry.middayNote || old.middayNote,
+      eveningNote: entry.eveningNote || old.eveningNote,
+      middayPrice: entry.middayPrice || old.middayPrice,
+      eveningPrice: entry.eveningPrice || old.eveningPrice,
+      updatedAt: new Date().toISOString()
+    };
   } else {
     list.unshift(entry);
   }
+
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
 }
 
@@ -145,7 +168,7 @@ function updateKpiSummary() {
     elRange.textContent = `Floor ฿${pred.expectedRange.floor.toFixed(2)} - Ceiling ฿${pred.expectedRange.ceiling.toFixed(2)}`;
   }
   if (elTotal) elTotal.textContent = `${allDataRecords.length} วัน`;
-  if (elJournal) elJournal.textContent = `รวมบันทึกส่วนตัว ${journalEntries.length} รายการ`;
+  if (elJournal) elJournal.textContent = `รวมบันทึกไดอารี่ ${journalEntries.length} วัน`;
 
   // Set default date in form to today
   const inputDate = document.getElementById('entryDate');
@@ -158,7 +181,7 @@ function updateKpiSummary() {
  * Bind all DOM Event Handlers
  */
 function bindEventHandlers() {
-  // 1. Auto-fill button handler
+  // 1. Auto-fill button handler (detects today's 2 sessions)
   const btnAutoFill = document.getElementById('btnAutoFillToday');
   if (btnAutoFill) {
     btnAutoFill.addEventListener('click', () => {
@@ -168,55 +191,73 @@ function bindEventHandlers() {
       const lastC = candles.length > 0 ? candles[candles.length - 1] : {};
 
       const inputDate = document.getElementById('entryDate');
-      const inputPrice = document.getElementById('entryPrice');
+      const inputOpen = document.getElementById('entryOpen');
+      const inputHigh = document.getElementById('entryHigh');
+      const inputLow = document.getElementById('entryLow');
       const inputVolume = document.getElementById('entryVolume');
-      const inputV5 = document.getElementById('entryV5');
-      const inputV20 = document.getElementById('entryV20');
-      const inputNote = document.getElementById('entryNote');
 
-      if (inputDate) inputDate.value = pred.lastDate || lastC.time || new Date().toISOString().split('T')[0];
-      if (inputPrice) inputPrice.value = pred.lastPrice || lastC.close || 153.50;
+      const inputMidPrice = document.getElementById('entryPriceMidday');
+      const inputEvePrice = document.getElementById('entryPriceEvening');
+      const inputMidNote = document.getElementById('entryNoteMidday');
+      const inputEveNote = document.getElementById('entryNoteEvening');
+
+      const todayDate = pred.lastDate || lastC.time || new Date().toISOString().split('T')[0];
+      const todayPrice = pred.lastPrice || lastC.close || 153.50;
+
+      if (inputDate) inputDate.value = todayDate;
+      if (inputOpen) inputOpen.value = lastC.open || 153.0;
+      if (inputHigh) inputHigh.value = lastC.high || 154.5;
+      if (inputLow) inputLow.value = lastC.low || 152.5;
       if (inputVolume) inputVolume.value = lastC.volume || 12182248;
 
-      const v5Val = typeof lastC.v_micro === 'number' ? (lastC.v_micro >= 0 ? '+' : '') + lastC.v_micro.toFixed(3) : '+0.333';
-      const v20Val = typeof lastC.v_macro === 'number' ? (lastC.v_macro >= 0 ? '+' : '') + lastC.v_macro.toFixed(3) : '+0.901';
-      if (inputV5) inputV5.value = v5Val;
-      if (inputV20) inputV20.value = v20Val;
+      if (inputMidPrice) inputMidPrice.value = todayPrice;
+      if (inputEvePrice) inputEvePrice.value = todayPrice;
 
-      if (inputNote && !inputNote.value) {
-        inputNote.value = `ตรวจวัดรอบวัน: ราคา ฿${(pred.lastPrice || 153.50).toFixed(2)} ยืนเหนือ Floor ฿${pred.expectedRange?.floor.toFixed(2) || '144.05'} คลื่นสัปดาห์ V5 เป็นบวกหนุนการฟื้นตัว`;
+      if (inputMidNote && !inputMidNote.value) {
+        inputMidNote.value = `รอบเที่ยง: SCB ยืน ฿${todayPrice.toFixed(2)} ยืนเหนือ Floor ฿${pred.expectedRange?.floor.toFixed(2) || '144.05'} คลื่น V5 บวกแข็งแกร่ง จ่อเบรก ฿154.93`;
+      }
+      if (inputEveNote && !inputEveNote.value) {
+        inputEveNote.value = `รอบเย็น: ปิดตลาดรักษาฐานราคาสมบูรณ์แบบ วางแผนรับมือรอบเช้าวันพรุ่งนี้`;
       }
     });
   }
 
-  // 2. Form Submit (Save Journal)
+  // 2. Form Submit: Save 2-in-1 Entry
   const form = document.getElementById('dailyEntryForm');
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const date = document.getElementById('entryDate').value;
-      const session = document.getElementById('entrySession').value;
-      const price = parseFloat(document.getElementById('entryPrice').value) || 0;
-      const volume = parseInt(document.getElementById('entryVolume').value) || 0;
-      const v5 = document.getElementById('entryV5').value;
-      const v20 = document.getElementById('entryV20').value;
-      const action = document.getElementById('entryAction').value;
-      const note = document.getElementById('entryNote').value;
+      const open = parseFloat(document.getElementById('entryOpen').value) || undefined;
+      const high = parseFloat(document.getElementById('entryHigh').value) || undefined;
+      const low = parseFloat(document.getElementById('entryLow').value) || undefined;
+      const volume = parseInt(document.getElementById('entryVolume').value) || undefined;
+
+      const middayPrice = parseFloat(document.getElementById('entryPriceMidday').value) || undefined;
+      const middayAction = document.getElementById('entryActionMidday').value;
+      const middayNote = document.getElementById('entryNoteMidday').value;
+
+      const eveningPrice = parseFloat(document.getElementById('entryPriceEvening').value) || undefined;
+      const eveningAction = document.getElementById('entryActionEvening').value;
+      const eveningNote = document.getElementById('entryNoteEvening').value;
 
       saveJournalEntry({
         date,
-        session,
-        price,
+        open,
+        high,
+        low,
         volume,
-        v5,
-        v20,
-        action,
-        note,
+        middayPrice,
+        middayAction,
+        middayNote,
+        eveningPrice,
+        eveningAction,
+        eveningNote,
         updatedAt: new Date().toISOString()
       });
 
-      alert(`✅ บันทึกข้อมูลวันที่ ${date} ลงในคลังเรียบร้อยแล้ว!`);
+      alert(`✅ บันทึกข้อมูล 2-in-1 ประจำวันที่ ${date} สำเร็จเรียบร้อย!`);
       initArchiveData();
       updateKpiSummary();
       renderTable();
@@ -292,7 +333,7 @@ function bindEventHandlers() {
 }
 
 /**
- * Filter records based on current filter & search query
+ * Filter records based on current tab & search query
  */
 function getFilteredRecords() {
   return allDataRecords.filter(item => {
@@ -306,10 +347,11 @@ function getFilteredRecords() {
     // 2. Text Search Query
     if (searchQuery) {
       const matchDate = item.date.toLowerCase().includes(searchQuery);
-      const matchPrice = item.close.toString().includes(searchQuery);
-      const matchNote = item.note ? item.note.toLowerCase().includes(searchQuery) : false;
+      const matchClose = (item.close || '').toString().includes(searchQuery);
+      const matchMidNote = item.middayNote ? item.middayNote.toLowerCase().includes(searchQuery) : false;
+      const matchEveNote = item.eveningNote ? item.eveningNote.toLowerCase().includes(searchQuery) : false;
       const matchSignal = item.signal.toLowerCase().includes(searchQuery);
-      return matchDate || matchPrice || matchNote || matchSignal;
+      return matchDate || matchClose || matchMidNote || matchEveNote || matchSignal;
     }
 
     return true;
@@ -317,7 +359,7 @@ function getFilteredRecords() {
 }
 
 /**
- * Render Data Table & Pagination
+ * Render 1-Row-Per-Day Interactive Table
  */
 function renderTable() {
   const tbody = document.getElementById('dbTableBody');
@@ -339,62 +381,150 @@ function renderTable() {
   const btnPrev = document.getElementById('btnPrevPage');
   const btnNext = document.getElementById('btnNextPage');
 
-  if (elInfo) elInfo.textContent = total > 0 ? `แสดงรายการที่ ${startIndex + 1} - ${endIndex} จากทั้งหมด ${total} รายการ` : 'ไม่พบข้อมูลที่ตรงกับเงื่อนไข';
+  if (elInfo) elInfo.textContent = total > 0 ? `แสดงรายการที่ ${startIndex + 1} - ${endIndex} จากทั้งหมด ${total} วัน` : 'ไม่พบข้อมูลที่ตรงกับเงื่อนไข';
   if (elCurrent) elCurrent.textContent = `หน้า ${currentPage} / ${maxPage}`;
   if (btnPrev) btnPrev.disabled = currentPage <= 1;
   if (btnNext) btnNext.disabled = currentPage >= maxPage;
 
   if (pageItems.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 30px; color: var(--text-muted);">🔍 ไม่พบรายการข้อมูลที่ตรงกับการค้นหา</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 30px; color: var(--text-muted);">🔍 ไม่พบรายการข้อมูลที่ตรงกับการค้นหา</td></tr>`;
     return;
   }
 
   tbody.innerHTML = pageItems.map(row => {
-    let signalBadge = `<span class="badge-signal badge-hold">HOLD</span>`;
-    if (row.signal === 'BUY') signalBadge = `<span class="badge-signal badge-buy">BUY ENTRY</span>`;
-    else if (row.signal === 'SELL' || row.signal.includes('EXIT')) signalBadge = `<span class="badge-signal badge-sell">${row.signal}</span>`;
-    else if (row.isJournal) signalBadge = `<span class="badge-signal badge-journal">JOURNAL</span>`;
+    // Format Midday Cell
+    let midBadge = `<span class="badge-signal badge-watch">WATCH</span>`;
+    if (row.middayAction === 'BUY_PROBE') midBadge = `<span class="badge-signal badge-buy">PROBE 30%</span>`;
+    else if (row.middayAction === 'HOLD_CASH') midBadge = `<span class="badge-signal badge-hold">HOLD</span>`;
+    else if (row.middayAction === 'AVOID_DROP') midBadge = `<span class="badge-signal badge-sell">AVOID</span>`;
+
+    const midPriceDisplay = row.middayPrice ? `฿${row.middayPrice.toFixed(2)}` : '-';
+
+    // Format Evening Cell
+    let eveBadge = `<span class="badge-signal badge-hold">HOLD</span>`;
+    if (row.signal === 'BUY' || row.eveningAction === 'CONFIRM_BUY') eveBadge = `<span class="badge-signal badge-buy">BUY ENTRY</span>`;
+    else if (row.signal === 'SELL' || row.signal.includes('EXIT')) eveBadge = `<span class="badge-signal badge-sell">${row.signal}</span>`;
+    else if (row.eveningAction === 'TAKE_PROFIT') eveBadge = `<span class="badge-signal badge-buy">TAKE PROFIT</span>`;
+    else if (row.eveningAction === 'BREAKEVEN_SHIELD') eveBadge = `<span class="badge-signal badge-journal">SHIELD</span>`;
+
+    const evePriceDisplay = row.close ? `฿${row.close.toFixed(2)}` : '-';
 
     const v5Color = row.v5.startsWith('+') ? '#34d399' : '#f87171';
     const v20Color = row.v20.startsWith('+') ? '#a78bfa' : '#f87171';
-    const sessionTag = row.session === 'midday' ? '☀️ 13:00' : '🌙 17:30';
+
+    // Combined Note Tooltip
+    let noteText = '';
+    if (row.middayNote) noteText += `[☀️ เที่ยง]: ${row.middayNote} `;
+    if (row.eveningNote) noteText += `[🌙 เย็น]: ${row.eveningNote}`;
+    if (!noteText && row.isJournal) noteText = 'มีการบันทึกไดอารี่ประจำวัน';
 
     return `
       <tr>
-        <td><strong>${row.date}</strong> <span style="font-size: 0.72rem; color: var(--text-muted);">${sessionTag}</span></td>
+        <td><strong>${row.date}</strong></td>
         <td>฿${row.open ? row.open.toFixed(2) : '-'}</td>
-        <td style="color: #34d399;">฿${row.high ? row.high.toFixed(2) : '-'}</td>
-        <td style="color: #f87171;">฿${row.low ? row.low.toFixed(2) : '-'}</td>
-        <td><strong>฿${row.close ? row.close.toFixed(2) : '-'}</strong></td>
+        
+        <!-- ☀️ รอบเที่ยง 13:00 น. -->
+        <td>
+          <div class="session-price-pill" style="color: #fbbf24;">
+            <span>${midPriceDisplay}</span>
+            ${midBadge}
+          </div>
+        </td>
+
+        <!-- 🌙 รอบเย็น 17:30 น. (ปิดวัน) -->
+        <td>
+          <div class="session-price-pill" style="color: #38bdf8;">
+            <span>${evePriceDisplay}</span>
+            ${eveBadge}
+          </div>
+        </td>
+
+        <td>
+          <span style="color: #34d399;">${row.high ? row.high.toFixed(2) : '-'}</span> / 
+          <span style="color: #f87171;">${row.low ? row.low.toFixed(2) : '-'}</span>
+        </td>
         <td>${row.volume ? row.volume.toLocaleString() : '-'}</td>
         <td style="color: ${v5Color}; font-family: var(--font-code); font-weight: 700;">${row.v5}</td>
         <td style="color: ${v20Color}; font-family: var(--font-code); font-weight: 700;">${row.v20}</td>
         <td style="font-family: var(--font-code);">${row.rho}</td>
         <td style="font-family: var(--font-code);">${row.delta}</td>
-        <td>${signalBadge}</td>
-        <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${row.note || ''}">
-          ${row.note ? `📝 ${row.note}` : '<span style="color: rgba(255,255,255,0.2);">-</span>'}
+        
+        <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${noteText}">
+          ${noteText ? `📝 ${noteText}` : '<span style="color: rgba(255,255,255,0.2);">-</span>'}
         </td>
         <td>
-          <button type="button" class="btn btn-sm btn-outline btn-view-detail" data-date="${row.date}" style="padding: 2px 8px; font-size: 0.75rem;">
-            🔍 ดูลึก
-          </button>
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="btn btn-sm btn-outline btn-view-detail" data-date="${row.date}" style="padding: 2px 8px; font-size: 0.75rem;" title="ดูรายละเอียด 18 มิติ">
+              🔍 ดูลึก
+            </button>
+            <button type="button" class="btn btn-sm btn-outline btn-edit-entry" data-date="${row.date}" style="padding: 2px 8px; font-size: 0.75rem; border-color: #fbbf24; color: #fbbf24;" title="ดึงข้อมูลขึ้นมาแก้ไขในฟอร์ม">
+              ✏️ แก้ไข
+            </button>
+          </div>
         </td>
       </tr>
     `;
   }).join('');
 
-  // Attach modal detail click handlers
+  // Attach Detail Click Handler
   document.querySelectorAll('.btn-view-detail').forEach(btn => {
     btn.addEventListener('click', () => {
       const date = btn.dataset.date;
       showDetailModal(date);
     });
   });
+
+  // Attach Edit Click Handler (Loads existing values into form)
+  document.querySelectorAll('.btn-edit-entry').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const date = btn.dataset.date;
+      loadEntryIntoForm(date);
+    });
+  });
 }
 
 /**
- * Show Detailed Modal Inspector for a specific date
+ * Load existing daily record into form for easy editing
+ */
+function loadEntryIntoForm(date) {
+  const row = allDataRecords.find(r => r.date === date);
+  if (!row) return;
+
+  const inputDate = document.getElementById('entryDate');
+  const inputOpen = document.getElementById('entryOpen');
+  const inputHigh = document.getElementById('entryHigh');
+  const inputLow = document.getElementById('entryLow');
+  const inputVolume = document.getElementById('entryVolume');
+
+  const inputMidPrice = document.getElementById('entryPriceMidday');
+  const inputEvePrice = document.getElementById('entryPriceEvening');
+  const inputMidAction = document.getElementById('entryActionMidday');
+  const inputEveAction = document.getElementById('entryActionEvening');
+  const inputMidNote = document.getElementById('entryNoteMidday');
+  const inputEveNote = document.getElementById('entryNoteEvening');
+
+  if (inputDate) inputDate.value = row.date;
+  if (inputOpen) inputOpen.value = row.open || '';
+  if (inputHigh) inputHigh.value = row.high || '';
+  if (inputLow) inputLow.value = row.low || '';
+  if (inputVolume) inputVolume.value = row.volume || '';
+
+  if (inputMidPrice) inputMidPrice.value = row.middayPrice || row.close || '';
+  if (inputEvePrice) inputEvePrice.value = row.close || '';
+  if (inputMidAction && row.middayAction) inputMidAction.value = row.middayAction;
+  if (inputEveAction && row.eveningAction) inputEveAction.value = row.eveningAction;
+  if (inputMidNote) inputMidNote.value = row.middayNote || '';
+  if (inputEveNote) inputEveNote.value = row.eveningNote || '';
+
+  // Scroll smoothly to form
+  const formBox = document.querySelector('.form-box');
+  if (formBox) {
+    formBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * Show Detailed Modal Inspector for 2-in-1 Daily Record
  */
 function showDetailModal(date) {
   const record = allDataRecords.find(r => r.date === date);
@@ -404,32 +534,44 @@ function showDetailModal(date) {
   const title = document.getElementById('modalTitle');
   const content = document.getElementById('modalContent');
 
-  if (title) title.textContent = `🔬 ข้อมูลตรวจวัดละเอียด: ${record.date} (${record.session === 'midday' ? 'รอบเที่ยง 13:00 น.' : 'รอบเย็น 17:30 น.'})`;
+  if (title) title.textContent = `🔬 ข้อมูลตรวจวัด 2-in-1 ประจำวัน: ${record.date}`;
 
   if (content) {
     content.innerHTML = `
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
-        <div><strong>ราคาเปิด (Open):</strong> ฿${record.open || '-'}</div>
-        <div><strong>ราคาปิด (Close):</strong> ฿${record.close || '-'}</div>
-        <div><strong>ราคาสูงสุด (High):</strong> ฿${record.high || '-'}</div>
-        <div><strong>ราคาต่ำสุด (Low):</strong> ฿${record.low || '-'}</div>
-        <div><strong>ปริมาณซื้อขาย:</strong> ${record.volume ? record.volume.toLocaleString() + ' หุ้น' : '-'}</div>
-        <div><strong>กรอบไดนามิก:</strong> ${record.delta}</div>
+        <div><strong>ราคาเปิดเช้า (Open):</strong> ฿${record.open || '-'}</div>
+        <div><strong>ราคาปิดสิ้นวัน (Close):</strong> ฿${record.close || '-'}</div>
+        <div><strong>ราคาสูงสุดวัน (High):</strong> ฿${record.high || '-'}</div>
+        <div><strong>ราคาต่ำสุดวัน (Low):</strong> ฿${record.low || '-'}</div>
+        <div><strong>วอลุ่มซื้อขาย:</strong> ${record.volume ? record.volume.toLocaleString() + ' หุ้น' : '-'}</div>
+        <div><strong>กรอบความผันผวน:</strong> ${record.delta}</div>
       </div>
-      <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 8px;">
-        <h4 style="color: #38bdf8; margin-bottom: 6px;">🌊 สถิติคลื่นความเร็วรามานุจัน (Wave Vectors)</h4>
+
+      <!-- เปรียบเทียบ 2 รอบวันคู่ขนาน -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 8px;">
+          <h4 style="color: #fbbf24; margin-bottom: 6px;">☀️ รอบพักเที่ยง 13:00 น.</h4>
+          <div>ราคาปิดเที่ยง: <strong>฿${record.middayPrice ? record.middayPrice.toFixed(2) : '-'}</strong></div>
+          <div>แผนภาคบ่าย: <strong>${record.middayAction || 'TRIGGER_WATCH'}</strong></div>
+          ${record.middayNote ? `<p style="margin-top: 6px; font-size: 0.82rem; color: #f3f4f6;">📝 ${record.middayNote}</p>` : ''}
+        </div>
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 8px;">
+          <h4 style="color: #38bdf8; margin-bottom: 6px;">🌙 รอบปิดเย็น 17:30 น.</h4>
+          <div>ราคาปิดสิ้นวัน: <strong>฿${record.close ? record.close.toFixed(2) : '-'}</strong></div>
+          <div>สัญญาณระบบ: <strong>${record.signal} (${record.eveningAction || 'HOLD'})</strong></div>
+          ${record.eveningNote ? `<p style="margin-top: 6px; font-size: 0.82rem; color: #f3f4f6;">📝 ${record.eveningNote}</p>` : ''}
+        </div>
+      </div>
+
+      <!-- ค่าสถิติคลื่นรามานุจัน -->
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--card-border); padding: 12px; border-radius: 8px;">
+        <h4 style="color: #e2e8f0; margin-bottom: 6px;">📐 เวกเตอร์ฮาร์มอนิกรามานุจัน (Wave Vectors)</h4>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-family: var(--font-code);">
           <div>คลื่นสัปดาห์ V5: <strong>${record.v5}</strong></div>
           <div>คลื่นเดือน V20: <strong>${record.v20}</strong></div>
           <div>ความสอดคล้อง &rho;: <strong>${record.rho}</strong></div>
         </div>
       </div>
-      ${record.note ? `
-        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 8px;">
-          <h4 style="color: #fbbf24; margin-bottom: 4px;">📝 บันทึกความจำส่วนตัว (Trader Note)</h4>
-          <p style="color: #fff; line-height: 1.5;">${record.note}</p>
-        </div>
-      ` : ''}
     `;
   }
 
@@ -437,7 +579,7 @@ function showDetailModal(date) {
 }
 
 /**
- * Export entire database and journal to JSON file
+ * Export entire 2-in-1 database to JSON file
  */
 function exportDatabaseJson() {
   const quantData = window.RAMANUJAN_DATA || {};
@@ -445,41 +587,48 @@ function exportDatabaseJson() {
 
   const exportPayload = {
     exportedAt: new Date().toISOString(),
-    totalRecords: allDataRecords.length,
+    totalDays: allDataRecords.length,
     journalCount: journalEntries.length,
-    userJournal: journalEntries,
-    predictiveIntelligence: quantData.predictiveIntelligence || {},
-    history: allDataRecords
+    journalMasterRecords: journalEntries,
+    dailyMasterHistory: allDataRecords
   };
 
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
   const downloadAnchor = document.createElement('a');
   downloadAnchor.setAttribute("href", dataStr);
-  downloadAnchor.setAttribute("download", `SCB_Quant_Database_${new Date().toISOString().split('T')[0]}.json`);
+  downloadAnchor.setAttribute("download", `SCB_2in1_Quant_Database_${new Date().toISOString().split('T')[0]}.json`);
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   downloadAnchor.remove();
 }
 
 /**
- * Export entire historical table to CSV format
+ * Export entire 2-in-1 table to CSV format
  */
 function exportDatabaseCsv() {
-  const headers = ["Date", "Session", "Open", "High", "Low", "Close", "Volume", "V5_Micro", "V20_Macro", "Rho_Coherence", "Dynamic_Delta", "Signal", "Trader_Note"];
+  const headers = [
+    "Date", "Open", "Midday_Price_1300", "Midday_Action", "Midday_Note",
+    "Evening_Close_1730", "Evening_Action", "Evening_Note",
+    "High", "Low", "Volume", "V5_Micro", "V20_Macro", "Rho_Coherence", "Dynamic_Delta", "Signal"
+  ];
+
   const rows = allDataRecords.map(r => [
     r.date,
-    r.session,
     r.open || '',
+    r.middayPrice || '',
+    `"${r.middayAction || ''}"`,
+    `"${(r.middayNote || '').replace(/"/g, '""')}"`,
+    r.close || '',
+    `"${r.eveningAction || ''}"`,
+    `"${(r.eveningNote || '').replace(/"/g, '""')}"`,
     r.high || '',
     r.low || '',
-    r.close || '',
     r.volume || '',
     `"${r.v5}"`,
     `"${r.v20}"`,
     `"${r.rho}"`,
     `"${r.delta}"`,
-    `"${r.signal}"`,
-    `"${(r.note || '').replace(/"/g, '""')}"`
+    `"${r.signal}"`
   ]);
 
   const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
@@ -487,7 +636,7 @@ function exportDatabaseCsv() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('href', url);
-  a.setAttribute('download', `SCB_Daily_Archive_${new Date().toISOString().split('T')[0]}.csv`);
+  a.setAttribute('download', `SCB_2in1_Daily_Master_${new Date().toISOString().split('T')[0]}.csv`);
   document.body.appendChild(a);
   a.click();
   a.remove();
