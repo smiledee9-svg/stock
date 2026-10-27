@@ -174,7 +174,7 @@ function initLightweightCharts(candles) {
   priceChart = LightweightCharts.createChart(priceContainer, {
     ...chartTheme,
     width: priceContainer.clientWidth,
-    height: 420
+    height: 380
   });
 
   candleSeries = priceChart.addCandlestickSeries({
@@ -203,7 +203,7 @@ function initLightweightCharts(candles) {
   waveChart = LightweightCharts.createChart(waveContainer, {
     ...chartTheme,
     width: waveContainer.clientWidth,
-    height: 180
+    height: 140
   });
 
   vMicroSeries = waveChart.addLineSeries({

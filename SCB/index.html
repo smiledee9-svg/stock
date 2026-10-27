@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ramanujan SET Discrete Cycle Trader • สัจธรรมคลื่นหุ้น SCB.BK ผ่านดวงตาคณิตศาสตร์รามานุจัน</title>
-  <meta name="description" content="ชุดโมเดลวิเคราะห์และระบบเทรดเชิงปริมาณสำหรับหุ้น SCB.BK ตกผลึกขั้นสุดยอดภายในหน้าเดียวด้วยทฤษฎีจำนวนของรามานุจัน (RPT + Rogers-Ramanujan + Hardy-Ramanujan)">
+  <title>Ramanujan Quant Terminal • สัจธรรมข้อเท็จจริง SCB.BK</title>
+  <meta name="description" content="เทอร์มินัลวิเคราะห์เชิงปริมาณหุ้น SCB.BK ตกผลึกข้อเท็จจริงล้วนๆ ภายในหน้าเดียว ด้วยสมการรามานุจัน (RPT + Rogers-Ramanujan + Risk-Free Pyramiding)">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Prompt:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
   
   <!-- TradingView Lightweight Charts Local Library -->
   <script src="lightweight-charts.js"></script>
@@ -18,474 +18,210 @@
 <body>
   <div class="quant-container">
     
-    <!-- ================= HERO: RAMANUJAN'S DIVINE VISION OF SCB ================= -->
-    <header class="ramanujan-hero-header" id="topHeader">
-      <div class="hero-watermark">ॐ</div>
-      
-      <div class="hero-top-row">
-        <div class="vedic-badge">
-          <span class="vedic-symbol">ॐ</span>
-          <span>श्रीनिवास रामानुजन् • SRINIVASA RAMANUJAN QUANTUM HARMONICS</span>
+    <!-- ================= 1. COMPACT VEDIC FACT BAR (HEADER HUD) ================= -->
+    <header class="compact-header-hud">
+      <div class="hud-brand-row">
+        <div class="brand-title-wrap">
+          <span class="vedic-glyph">ॐ</span>
+          <div>
+            <h1 class="brand-title">RAMANUJAN QUANT TERMINAL • SCB.BK</h1>
+            <div class="brand-sub">สัจธรรมข้อเท็จจริงทางคณิตศาสตร์บริสุทธิ์รอบวัฏจักร (Pure Number Theory & Cycle Truth)</div>
+          </div>
         </div>
-        <div class="header-meta-actions">
-          <div class="live-status-pill">
+        
+        <div class="hud-status-strip">
+          <div class="status-pill status-live">
             <span class="pulse-dot"></span>
             <span id="liveStatusText">ตลาดปิดเย็น 27 ต.ค. 2026: ฿153.50</span>
           </div>
-          <a href="https://github.com/smiledee9-svg/stock" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="ดูซอร์สโค้ดและไปป์ไลน์บน GitHub">⭐ GitHub Repo</a>
+          <div class="status-pill status-div">
+            <span>💰 ปันผล 1 ปี: <strong>฿11.28 (7.35%)</strong></span>
+          </div>
+          <div class="status-pill status-cloud">
+            <span>☁️ ออโต้บอท 13:00 / 17:30 น.</span>
+          </div>
+          <a href="https://github.com/smiledee9-svg/stock" target="_blank" rel="noopener noreferrer" class="btn btn-outline-sm">⭐ GitHub Repo</a>
         </div>
       </div>
 
-      <h1 class="hero-main-title">
-        <span>ดวงตาคณิตศาสตร์รามานุจัน</span>
-        <span class="title-symbol-highlight">ส่องสัจธรรมหุ้น SCB.BK</span>
-      </h1>
-      
-      <p class="hero-subtitle">
-        ตกผลึกคลื่นควอนต์ไม่เชิงเส้น 18 มิติ ก้าวไดนามิก $\delta_t$ และการสะสมพลังไร้ความเสี่ยง (Risk-Free Pyramiding) ภายในหน้าจอเดียว — เผยวงรอบวัฏจักรแท้จริงของหุ้นธนาคารไทยที่เก่าแก่ที่สุด
-      </p>
+      <!-- Live 6-Fact Telemetry Strip -->
+      <div class="fact-telemetry-grid">
+        <div class="telemetry-card card-cyan">
+          <div class="tel-label">ราคาปิดตลาดล่าสุด</div>
+          <div class="tel-val" id="kpiPrice">฿153.50</div>
+          <div class="tel-meta" id="kpiDate">SET 27 ต.ค. 2026</div>
+        </div>
 
-      <div class="ramanujan-creed-box">
-        <div class="creed-avatar">🪷</div>
-        <div>
-          <div class="creed-quote">
-            "สมการใดไม่มีความหมายสำหรับข้าพเจ้า เว้นแต่มันจะสะท้อนถึงพระดำริแห่งพระผู้เป็นเจ้า — ความผันผวนของ SCB.BK หาใช่ความสุ่มไร้ทิศทาง หากแต่คือการสั่นพ้องของคลื่นฮาร์มอนิก 18 ชั้นที่กำลังหายใจในจังหวะของกาลเวลา"
-          </div>
-          <div class="creed-author">— ศรีนิวาส รามานุจัน (Srinivasa Ramanujan, FRS)</div>
+        <div class="telemetry-card card-gold">
+          <div class="tel-label">ก้าวไดนามิกรามานุจัน (±δt)</div>
+          <div class="tel-val text-gold" id="kpiDelta">±6.16%</div>
+          <div class="tel-meta">ช่วงปลอดภัย ±฿9.45 / รอบ</div>
+        </div>
+
+        <div class="telemetry-card card-green">
+          <div class="tel-label">ฐานรองรับสัจธรรม (Floor)</div>
+          <div class="tel-val text-green" id="kpiFloor">฿144.05</div>
+          <div class="tel-meta">แนวรับโมเดล ห้ามหลุด</div>
+        </div>
+
+        <div class="telemetry-card card-purple">
+          <div class="tel-label">เพดานคลื่นสูงสุด (Ceiling)</div>
+          <div class="tel-val text-purple" id="kpiCeiling">฿162.95</div>
+          <div class="tel-meta">เป้าหมายคลื่น V20 เต็มกำลัง</div>
+        </div>
+
+        <div class="telemetry-card">
+          <div class="tel-label">สภาวะคลื่นความเร็ว</div>
+          <div class="tel-val" style="font-size: 1.15rem; color: #38bdf8;">V5: +0.60 | V20: +1.43</div>
+          <div class="tel-meta" id="rhoBadge">Phase Coherence: +0.651 (Resonant)</div>
+        </div>
+
+        <div class="telemetry-card card-neutral">
+          <div class="tel-label">สัจธรรมสถานะปัจจุบัน</div>
+          <div class="tel-val text-green" style="font-size: 1.15rem;">CASH SANCTUARY</div>
+          <div class="tel-meta">ถือเงินสด 100% รอจุดชนวน ฿154.93</div>
         </div>
       </div>
     </header>
 
-    <!-- ================= STICKY SACRED NAVIGATION HUD ================= -->
-    <nav class="sacred-nav-hud" id="sacredNavHud" aria-label="สารบัญผลึกกาลเวลา นำทางในหน้าเดียว">
-      <div class="nav-hud-links">
-        <a href="#oracleSection" class="nav-hud-btn active"><span>🔮</span> <span>ดวงตาพยากรณ์สด</span></a>
-        <a href="#chartSection" class="nav-hud-btn"><span>📈</span> <span>กราฟคลื่นจักรวาล</span></a>
-        <a href="#scenarioSection" class="nav-hud-btn"><span>⚡</span> <span>4 สถานการณ์</span></a>
-        <a href="#wave18Section" class="nav-hud-btn"><span>🌊</span> <span>18 ฮาร์มอนิก</span></a>
-        <a href="#archiveSection" class="nav-hud-btn badge-special"><span>🗄️</span> <span>คลังรายวัน 2-in-1</span></a>
-        <a href="#ledgerSection" class="nav-hud-btn"><span>📜</span> <span>บันทึก 26 รอบ</span></a>
-        <a href="#pillarsSection" class="nav-hud-btn"><span>📐</span> <span>4 เสาหลัก</span></a>
-        <a href="#simulatorSection" class="nav-hud-btn"><span>🚀</span> <span>จำลองผลึกทุน</span></a>
-      </div>
+    <!-- Hidden placeholders to maintain 100% JS API compatibility -->
+    <div style="display: none;" id="oracleTitle"></div>
+    <div style="display: none;" id="oracleText"></div>
+
+    <!-- ================= 2. STICKY COMPACT NAV HUD ================= -->
+    <nav class="compact-nav-hud" id="sacredNavHud">
+      <a href="#chartDecisionSection" class="nav-hud-btn active"><span>📈</span> <span>กราฟ & 4 สภาวะจุดชนวน</span></a>
+      <a href="#waveSpectrumSection" class="nav-hud-btn"><span>🌊</span> <span>สเปกตรัม 18 คลื่น</span></a>
+      <a href="#ledgerSection" class="nav-hud-btn"><span>📜</span> <span>สถิติ 26 รอบจริง</span></a>
+      <a href="#archiveSection" class="nav-hud-btn"><span>🗄️</span> <span>คลังรายวัน 2-in-1 (เที่ยง/เย็น)</span></a>
+      <a href="#pillarsSection" class="nav-hud-btn"><span>📐</span> <span>4 เสาหลัก & จำลองทุน</span></a>
     </nav>
 
-    <!-- ================= SECTION 1: DIVINE TELEMETRY COCKPIT ================= -->
-    <section class="crystallized-section" id="oracleSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">🔮</span>
-          <span>ดวงตาญาณพยากรณ์สด & มาตรวัดสภาวะ SCB (Live Quantum Telemetry)</span>
-        </h2>
-        <span class="section-tag">Telemetric Feed</span>
-      </div>
-
-      <div class="cockpit-master-grid">
-        <div class="cockpit-tile tile-cyan">
-          <div class="tile-label"><span>💰</span> ราคาตลาดปิดล่าสุด (SCB.BK)</div>
-          <div class="tile-value" id="kpiPrice">฿153.50</div>
-          <div class="tile-sub" id="kpiDate">วันที่ 27 ตุลาคม 2026 (SET Closing)</div>
-        </div>
-
-        <div class="cockpit-tile">
-          <div class="tile-label"><span>📐</span> ก้าวไดนามิกรามานุจัน (Dynamic $\pm\delta_t$)</div>
-          <div class="tile-value text-gold" id="kpiDelta">±6.16%</div>
-          <div class="tile-sub">ช่วงผันผวนปลอดภัย $\pm฿9.45$ ต่อรอบ</div>
-        </div>
-
-        <div class="cockpit-tile tile-green">
-          <div class="tile-label"><span>🛡️</span> ฐานรองรับศักดิ์สิทธิ์ (Sacred Floor)</div>
-          <div class="tile-value text-green" id="kpiFloor">฿144.05</div>
-          <div class="tile-sub">แนวรับโมเดลรามานุจัน ห้ามหลุดเด็ดขาด</div>
-        </div>
-
-        <div class="cockpit-tile tile-purple">
-          <div class="tile-label"><span>⚡</span> เพดานคลื่นสูงสุด (Sacred Ceiling)</div>
-          <div class="tile-value text-purple" id="kpiCeiling">฿162.95</div>
-          <div class="tile-sub">เป้าหมายคลื่นสอดคล้อง $V_{20}$ เต็มกำลัง</div>
-        </div>
-      </div>
-
-      <div class="ramanujan-insight-banner">
-        <div class="insight-icon">👁️</div>
-        <div>
-          <div class="insight-title" id="oracleTitle">สัจธรรมแห่งสภาวะปัจจุบัน: พลังงานคลื่นสถิตในแดนบวกพร้อมกัน ($V_5 > 0, V_{20} > 0$)</div>
-          <div class="insight-text" id="oracleText">
-            "รามานุจันตรวจวัดคลื่นฮาร์มอนิกสัปดาห์ $V_5$ (+0.333) และคลื่นเดือน $V_{20}$ (+0.901) พบว่า SCB.BK มีการยกฐานราคาอย่างมั่นคงเหนือ Floor ฿144.05 โดยสมบูรณ์ ตลาดกำลังสะสมกำลังในโซนปลอดภัย รอคอยสัญญาณเบรกเอาท์ระเบิดตัวที่ ฿154.93 เพื่อเปิดรอบจักรวาลใหม่ — ในห้วงเวลานี้ พอร์ตปลอดภัย 100% ไร้ความเสี่ยงจากการติดดอย"
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION 2: SACRED CHART CANVAS ================= -->
-    <section class="crystallized-section" id="chartSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">📈</span>
-          <span>ผืนผ้าใบสะท้อนคลื่นเวลา (TradingView Sacred Candlestick Canvas)</span>
-        </h2>
-        <span class="section-tag">Interactive Lightweight Charts</span>
-      </div>
-
-      <div class="chart-card-wrapper">
-        <div class="chart-toolbar">
-          <div class="chart-controls-left">
-            <span style="font-size: 0.82rem; font-weight: 700; color: var(--gold); margin-right: 6px;">ช่วงเวลา:</span>
-            <button type="button" class="interval-pill active" id="btnRangeAll">4 ปีเต็ม (970 วัน)</button>
-            <button type="button" class="interval-pill" id="btnRange2y">2 ปี</button>
-            <button type="button" class="interval-pill" id="btnRange1y">1 ปี</button>
-            <button type="button" class="interval-pill" id="btnRange6m">6 เดือน</button>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button type="button" class="chart-toggle-btn active" id="toggleWaveBtn">
-              <span>🌊</span> <span>ซ้อนทับคลื่นรามานุจัน</span>
-            </button>
-            <button type="button" class="chart-toggle-btn active" id="toggleStopBtn">
-              <span>🛡️</span> <span>เส้นกันทุน Breakeven</span>
-            </button>
-            <button type="button" class="chart-toggle-btn" id="btnResetZoom">
-              <span>🔍</span> <span>รีเซ็ตมุมมอง</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="chart-container-box" id="priceChartContainer"></div>
-        <div class="wave-subchart-box" id="waveChartContainer"></div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION 3: 4 SACRED SCENARIOS ================= -->
-    <section class="crystallized-section" id="scenarioSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">⚡</span>
-          <span>สแกนเนอร์ 4 สถานการณ์ศักดิ์สิทธิ์แห่งรามานุจัน (4 Divine Scenarios)</span>
-        </h2>
-        <span class="section-tag">Scenario Matrix</span>
-      </div>
-
-      <div class="scenarios-grid">
-        <!-- Scenario 1: Inflection -->
-        <div class="scenario-card scenario-inflection">
-          <div class="sc-header">
-            <span class="sc-badge sc-badge-green">🟢 HARMONIC INFLECTION</span>
-            <span style="font-family: var(--font-code); font-size: 0.8rem; color: #34d399;">+1.59%</span>
-          </div>
-          <div class="sc-price-tag" id="scInflectPrice">฿154.93</div>
-          <div class="sc-desc">ราคาปิดยืนเหนือแนวต้านระยะสั้น คลื่นสัปดาห์ $V_5$ และเดือน $V_{20}$ วิ่งเข้าสู่เฟสสอดคล้อง (Phase Coherence $\ge 0.25$)</div>
-          <div class="sc-action-box" style="border-left-color: #34d399;">
-            🎯 แผนปฏิบัติการ: จับตาใกล้ชิด ตั้งรับไม้แรกหยั่งเชิง (Watchlist / Ready to Probe)
-          </div>
-        </div>
-
-        <!-- Scenario 2: Breakout -->
-        <div class="scenario-card scenario-breakout">
-          <div class="sc-header">
-            <span class="sc-badge sc-badge-gold">⚡ RESONANCE BREAKOUT</span>
-            <span style="font-family: var(--font-code); font-size: 0.8rem; color: #fbbf24;">+4.53%</span>
-          </div>
-          <div class="sc-price-tag" id="scBreakPrice">฿159.41</div>
-          <div class="sc-desc">ราคาปิดทะลุแนวต้านหลัก ทะลุกรอบไซด์เวย์ ค่าประสิทธิภาพ $\text{ER} \ge 0.26$ วอลุ่มยืนยันพร้อมคลื่นสอดคล้องสูงสุด</div>
-          <div class="sc-action-box" style="border-left-color: #fbbf24;">
-            🚀 แผนปฏิบัติการ: เปิดรอบซื้อไม้แรกตามระบบทันที (BUY Entry Stage 1)
-          </div>
-        </div>
-
-        <!-- Scenario 3: Neutral Sanctuary -->
-        <div class="scenario-card scenario-neutral">
-          <div class="sc-header">
-            <span class="sc-badge sc-badge-neutral">⚪ NEUTRAL SANCTUARY</span>
-            <span style="font-family: var(--font-code); font-size: 0.8rem; color: #cbd5e1;">CASH ZONE</span>
-          </div>
-          <div class="sc-price-tag" id="scNeutralRange">฿144.05 - ฿154.93</div>
-          <div class="sc-desc">คลื่นความเร็วยังไม่เข้าเกณฑ์คู่ ตลาดยังแกว่งตัวในกรอบสะสมพลัง รอการเลือกข้างที่ชัดเจน</div>
-          <div class="sc-action-box" style="border-left-color: #94a3b8;">
-            🛡️ แผนปฏิบัติการ: ถือเงินสด 100% สบายใจ ปล่อยคนอื่นติดดอย ไม่มีความเสี่ยง (HOLD CASH)
-          </div>
-        </div>
-
-        <!-- Scenario 4: Abyssal Drop -->
-        <div class="scenario-card scenario-danger">
-          <div class="sc-header">
-            <span class="sc-badge sc-badge-red">🔴 ABYSSAL FLOOR ALERT</span>
-            <span style="font-family: var(--font-code); font-size: 0.8rem; color: #f87171;">-6.16%</span>
-          </div>
-          <div class="sc-price-tag" id="scDangerPrice">฿144.05</div>
-          <div class="sc-desc">ราคาปิดหลุดต่ำกว่า Floor (หลุดกรอบล่าง Delta $\delta_t$ ของรามานุจัน) บ่งชี้คลื่นเกิดการสลายตัว</div>
-          <div class="sc-action-box" style="border-left-color: #f87171;">
-            ⚠️ แผนปฏิบัติการ: ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือนิ่งสนิทรอคลื่นสงบ (AVOID DROP)
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION 4: 18-WAVE LAB ================= -->
-    <section class="crystallized-section" id="wave18Section">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">🌊</span>
-          <span>สเปกตรัมมหาเวกเตอร์คลื่น 18 มิติแห่งจักรวาล ($V_1$ ถึง $V_{18}$)</span>
-        </h2>
-        <span class="section-tag">Harmonic Wave Continuum</span>
-      </div>
-
-      <div class="wave-lab-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
-          <p style="font-size: 0.9rem; color: var(--text-muted); max-width: 800px;">
-            รามานุจันแปลงอนุกรมราคา SCB.BK ให้กลายเป็นความถี่ฐานออร์โธโกนัล 18 มิติ โดยมี <strong style="color: var(--gold);">$V_5$ (คลื่นสัปดาห์)</strong> และ <strong style="color: #c084fc;">$V_{20}$ (คลื่นเดือน)</strong> เป็นตัวนำทางชะตากรรม
-          </p>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <span style="font-size: 0.82rem; color: var(--text-muted);">เฟสสอดคล้อง $\rho_{\text{ram}}$:</span>
-            <span class="vedic-badge" id="rhoBadge" style="padding: 4px 12px; font-size: 0.82rem;">+0.651 (Resonant)</span>
-          </div>
-        </div>
-
-        <div class="wave-grid-spectrum" id="waveGrid">
-          <!-- Dynamically populated 18 wave pills via JavaScript -->
-        </div>
-
-        <div style="background: rgba(0, 0, 0, 0.35); border-radius: var(--radius-sm); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <div style="font-size: 0.85rem; color: #cbd5e1;" id="activeWaveDesc">
-            คลื่นที่เลือก: <strong style="color: var(--gold);">V5 (Weekly Momentum Pulse)</strong> • คาบเวลา 5 วันทำการ • น้ำหนักสเปกตรัมสูงสุด
-          </div>
-          <div style="font-family: var(--font-code); font-size: 0.82rem; color: #38bdf8;" id="activeWaveEnergy">
-            พลังงานสะสม: 84.2%
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION 5: EMBEDDED 2-IN-1 DAILY ARCHIVE ================= -->
-    <section class="crystallized-section" id="archiveSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">🗄️</span>
-          <span>คลังบันทึกข้อมูลรายวัน 2-in-1 (SCB Daily Intelligence Archive)</span>
-        </h2>
-        <span class="section-tag">1 Master Row Per Trading Day</span>
-      </div>
-
-      <div class="archive-card">
-        <div class="archive-top-bar">
-          <div>
-            <div style="font-size: 1.15rem; font-weight: 700; color: #fff;">ระบบตรวจวัดบันทึก 2 ช่วงเวลาในแถวเดียว</div>
-            <div style="font-size: 0.84rem; color: var(--text-muted);">ผูกข้อมูลรอบพักเที่ยง (13:00 น.) และรอบตลาดปิดเย็น (17:30 น.) บันทึกเข้า LocalStorage อัตโนมัติ</div>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button type="button" id="btnToggleJournalForm" class="btn btn-gold">
-              <span>✏️</span> <span>บันทึกตรวจวัดวันนี้</span>
-            </button>
-            <button type="button" id="btnExportJson" class="btn btn-outline" style="border-color: #10b981; color: #34d399;" title="ดาวน์โหลดฐานข้อมูลเป็น JSON">
-              <span>💾</span> <span>Export JSON</span>
-            </button>
-            <button type="button" id="btnExportCsv" class="btn btn-outline" style="border-color: #f59e0b; color: #fbbf24;" title="ดาวน์โหลดฐานข้อมูลเป็น CSV">
-              <span>📊</span> <span>Export CSV</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- KPI Mini Stats Strip -->
-        <div class="archive-stats-strip">
-          <div class="archive-stat-mini">
-            <div class="stat-mini-label">📅 วันที่ตรวจวัดล่าสุด</div>
-            <div class="stat-mini-val text-brand" id="arcLastDate">2026-10-27</div>
-          </div>
-          <div class="archive-stat-mini">
-            <div class="stat-mini-label">💰 ราคาปิดตลาด</div>
-            <div class="stat-mini-val text-gold" id="arcLastPrice">฿153.50</div>
-          </div>
-          <div class="archive-stat-mini">
-            <div class="stat-mini-label">📊 แท่งเทียนสะสม</div>
-            <div class="stat-mini-val" id="arcTotalDays">970 วัน</div>
-          </div>
-          <div class="archive-stat-mini">
-            <div class="stat-mini-label">📈 ผลรวมรอบเทรดสุทธิ</div>
-            <div class="stat-mini-val text-green" id="arcCumulativePnl">+0.93%</div>
-          </div>
-        </div>
-
-        <!-- Inline Quick Entry Form (Collapsible) -->
-        <div class="archive-form-box" id="journalFormBox" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-            <h3 style="font-size: 1rem; color: var(--gold-glow); font-weight: 700;">บันทึกการตรวจวัดสัจธรรมรามานุจันประจำวัน (2-in-1 Journal Form)</h3>
-            <button type="button" id="btnCloseJournalForm" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
-          </div>
-
-          <form id="journalEntryForm">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
-              <div class="form-field-group">
-                <label for="formDate">วันที่ทำการ (Date)</label>
-                <input type="date" id="formDate" required>
-              </div>
-              <div class="form-field-group">
-                <label for="formOpen">ราคาเปิดเช้า (Open)</label>
-                <input type="number" step="0.25" id="formOpen" placeholder="153.00">
-              </div>
-              <div class="form-field-group">
-                <label for="formHigh">ราคาสูงสุด (High)</label>
-                <input type="number" step="0.25" id="formHigh" placeholder="154.50">
-              </div>
-              <div class="form-field-group">
-                <label for="formLow">ราคาต่ำสุด (Low)</label>
-                <input type="number" step="0.25" id="formLow" placeholder="152.50">
-              </div>
+    <!-- ================= 3. CORE ROW: CHART + 4 DECISION SCENARIOS ================= -->
+    <section class="crystallized-section" id="chartDecisionSection" style="padding-top: 6px;">
+      <div class="chart-decision-split">
+        
+        <!-- Left Column: Sacred TradingView Candlestick Canvas -->
+        <div class="chart-panel-wrap">
+          <div class="chart-header-compact">
+            <div class="chart-controls-left">
+              <span class="label-dim">ช่วงเวลา:</span>
+              <button type="button" class="interval-pill active" id="btnRangeAll">4 ปีเต็ม (970 วัน)</button>
+              <button type="button" class="interval-pill" id="btnRange2y">2 ปี</button>
+              <button type="button" class="interval-pill" id="btnRange1y">1 ปี</button>
+              <button type="button" class="interval-pill" id="btnRange6m">6 เดือน</button>
             </div>
-
-            <div class="archive-form-grid">
-              <!-- Midday Panel -->
-              <div class="session-box session-midday">
-                <div class="session-head-title">
-                  <span>☀️ รอบพักเที่ยง (13:00 น.)</span>
-                  <span style="font-size: 0.75rem; color: var(--gold);">Morning Intraday</span>
-                </div>
-                <div class="form-field-group">
-                  <label for="formMiddayPrice">ราคาปิดเที่ยง (Midday Price)</label>
-                  <input type="number" step="0.25" id="formMiddayPrice" placeholder="153.50">
-                </div>
-                <div class="form-field-group">
-                  <label for="formMiddayAction">การประเมินรอบเที่ยง (Midday Action)</label>
-                  <select id="formMiddayAction">
-                    <option value="TRIGGER_WATCH">TRIGGER_WATCH (จ่อจุดชนวน)</option>
-                    <option value="BUY_LAYER1">BUY_LAYER1 (เปิดไม้ 1)</option>
-                    <option value="HOLD_CASH">HOLD_CASH (ถือเงินสด)</option>
-                    <option value="TAKE_PROFIT">TAKE_PROFIT (ล็อกกำไร)</option>
-                  </select>
-                </div>
-                <div class="form-field-group">
-                  <label for="formMiddayNote">บันทึกตรวจวัดรอบเที่ยง</label>
-                  <textarea id="formMiddayNote" rows="2" placeholder="เช่น ราคาพักตัวทดสอบแนวรับ คลื่น V5 ยังเป็นบวก..."></textarea>
-                </div>
-              </div>
-
-              <!-- Evening Panel -->
-              <div class="session-box session-evening">
-                <div class="session-head-title">
-                  <span>🌙 รอบตลาดปิดเย็น (17:30 น.)</span>
-                  <span style="font-size: 0.75rem; color: #38bdf8;">Closing Settlement</span>
-                </div>
-                <div class="form-field-group">
-                  <label for="formEveningPrice">ราคาปิดตลาดเย็น (Closing Price)</label>
-                  <input type="number" step="0.25" id="formEveningPrice" placeholder="152.50">
-                </div>
-                <div class="form-field-group">
-                  <label for="formEveningAction">สรุปกลยุทธ์ปิดวัน (Evening Action)</label>
-                  <select id="formEveningAction">
-                    <option value="HOLD_CASH">HOLD_CASH (ถือเงินสด 100%)</option>
-                    <option value="HOLD_POSITION">HOLD_POSITION (ถือสถานะต่อ)</option>
-                    <option value="PYRAMID_BUY">PYRAMID_BUY (เติมไม้งอก)</option>
-                    <option value="CYCLE_EXIT">CYCLE_EXIT (ปิดรอบ)</option>
-                  </select>
-                </div>
-                <div class="form-field-group">
-                  <label for="formEveningNote">บันทึกตรวจวัดรอบเย็น</label>
-                  <textarea id="formEveningNote" rows="2" placeholder="เช่น ยืนเหนือ Floor ฿144.05 ได้อย่างสมบูรณ์แบบ..."></textarea>
-                </div>
-              </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="chart-toggle-btn active" id="toggleWaveBtn"><span>🌊</span> คลื่น V5/V20</button>
+              <button type="button" class="chart-toggle-btn active" id="toggleStopBtn"><span>🛡️</span> กันทุน Breakeven</button>
+              <button type="button" class="chart-toggle-btn" id="btnResetZoom"><span>🔍</span> รีเซ็ตมุมมอง</button>
             </div>
+          </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-              <button type="submit" class="btn btn-gold">💾 บันทึกสัจธรรมวันนี้</button>
+          <div class="chart-container-box" id="priceChartContainer" style="height: 380px;"></div>
+          <div class="wave-subchart-box" id="waveChartContainer" style="height: 140px;"></div>
+        </div>
+
+        <!-- Right Column: 4 Pure Decision Scenarios -->
+        <div class="decision-matrix-wrap">
+          <div class="matrix-head">
+            <span class="matrix-title">⚡ เมทริกซ์ 4 สภาวะราคาจุดชนวน</span>
+            <span class="badge-mini">Fact Matrix</span>
+          </div>
+
+          <!-- Scenario 1: Inflection -->
+          <div class="scenario-compact sc-inflection">
+            <div class="sc-top">
+              <span class="sc-tag sc-tag-green">🟢 HARMONIC INFLECTION</span>
+              <span class="sc-target" id="scInflectPrice">฿154.93</span>
             </div>
-          </form>
-        </div>
-
-        <!-- Master Table Controls (Search & Filter Pills) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
-          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-            <button type="button" class="interval-pill active" id="filterArcAll">ทั้งหมด (All)</button>
-            <button type="button" class="interval-pill" id="filterArcMidday">☀️ รอบเที่ยงมีสัญญาณ</button>
-            <button type="button" class="interval-pill" id="filterArcEvening">🌙 รอบเย็นมีสัญญาณ</button>
-            <button type="button" class="interval-pill" id="filterArcJournal">📝 มีบันทึกความจำ</button>
+            <div class="sc-info">ราคาปิดยืนเหนือแนวต้านระยะสั้น คลื่นสัปดาห์ V5 พลิกตัดบวก</div>
+            <div class="sc-exec">🎯 แผน: <strong>TRIGGER WATCH</strong> (เตรียมตั้งรับไม้แรก)</div>
           </div>
-          <div style="position: relative; min-width: 240px;">
-            <input type="text" id="arcSearchInput" placeholder="🔍 ค้นหาวันที่, บันทึก หรือการกระทำ..." style="width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-sm); padding: 6px 12px; color: #fff; font-size: 0.82rem; outline: none;">
+
+          <!-- Scenario 2: Breakout -->
+          <div class="scenario-compact sc-breakout">
+            <div class="sc-top">
+              <span class="sc-tag sc-tag-gold">⚡ RESONANCE BREAKOUT</span>
+              <span class="sc-target" id="scBreakPrice">฿155.00</span>
+            </div>
+            <div class="sc-info">ราคาปิดทะลุกรอบไซด์เวย์ ER ≥ 0.26 คลื่นสอดคล้องเต็มกำลัง</div>
+            <div class="sc-exec">🚀 แผน: <strong>BUY ENTRY #1</strong> (เปิดรอบซื้อไม้แรกทันที)</div>
           </div>
-        </div>
 
-        <!-- Scrollable 2-in-1 Master Table -->
-        <div class="master-table-scroll">
-          <table class="master-db-table">
-            <thead>
-              <tr>
-                <th>วันที่</th>
-                <th>ราคาเปิด</th>
-                <th>สูงสุด</th>
-                <th>ต่ำสุด</th>
-                <th>ราคาปิด</th>
-                <th>☀️ รอบเที่ยง (13:00)</th>
-                <th>🌙 รอบเย็น (17:30)</th>
-                <th>คลื่น V5</th>
-                <th>คลื่น V20</th>
-                <th>เฟส Coherence</th>
-                <th>ก้าว $\delta_t$</th>
-                <th>การกระทำ</th>
-              </tr>
-            </thead>
-            <tbody id="arcTableBody">
-              <!-- Populated dynamically via JavaScript -->
-            </tbody>
-          </table>
-        </div>
+          <!-- Scenario 3: Neutral Sanctuary -->
+          <div class="scenario-compact sc-neutral">
+            <div class="sc-top">
+              <span class="sc-tag sc-tag-neutral">⚪ CASH SANCTUARY</span>
+              <span class="sc-target" id="scNeutralRange">฿144.05 - ฿154.93</span>
+            </div>
+            <div class="sc-info">ราคาสะสมพลังในกรอบ คลื่นยังไม่ครบเกณฑ์คู่ ปลอดภัย 100%</div>
+            <div class="sc-exec">🛡️ แผน: <strong>HOLD 100% CASH</strong> (ถือเงินสด ไม่ติดดอย)</div>
+          </div>
 
-        <!-- Pagination Controls -->
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted);">
-          <div id="arcPageInfo">แสดง 1-50 จาก 970 แถว</div>
-          <div style="display: flex; gap: 6px;">
-            <button type="button" class="interval-pill" id="btnArcPrevPage">&laquo; ก่อนหน้า</button>
-            <button type="button" class="interval-pill" id="btnArcNextPage">ถัดไป &raquo;</button>
+          <!-- Scenario 4: Abyssal Drop -->
+          <div class="scenario-compact sc-danger">
+            <div class="sc-top">
+              <span class="sc-tag sc-tag-red">🔴 ABYSSAL FLOOR</span>
+              <span class="sc-target" id="scDangerPrice">฿144.05</span>
+            </div>
+            <div class="sc-info">ราคาหลุดต่ำกว่า Floor (หลุดกรอบล่าง Delta ของรามานุจัน)</div>
+            <div class="sc-exec">⚠️ แผน: <strong>AVOID DROP</strong> (ห้ามรับมีดเด็ดขาด นั่งทับมือ)</div>
           </div>
         </div>
+
       </div>
     </section>
 
-    <!-- ================= SECTION 6: MASTER CYCLE LEDGER ================= -->
+    <!-- ================= 4. COMPACT 18-HARMONIC SPECTRUM STRIP ================= -->
+    <section class="crystallized-section" id="waveSpectrumSection">
+      <div class="section-head-mini">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>🌊</span>
+          <strong style="font-size: 0.95rem; color: #fff;">สเปกตรัมมหาเวกเตอร์คลื่น 18 มิติ (V1 - V18)</strong>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);" id="activeWaveDesc">
+          คลิกเลือกคลื่นเพื่อดูสมการ • ตัวนำหลัก: <span style="color: var(--gold); font-weight: 700;">V5 (สัปดาห์)</span> & <span style="color: #c084fc; font-weight: 700;">V20 (เดือน)</span>
+        </div>
+        <div style="font-family: var(--font-code); font-size: 0.78rem; color: #38bdf8;" id="activeWaveEnergy">
+          พลังงานสะสม: 84.2%
+        </div>
+      </div>
+
+      <div class="wave-grid-compact" id="waveGrid">
+        <!-- 18 Wave pills populated dynamically via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ================= 5. MASTER CYCLE LEDGER (26 HISTORICAL CYCLES) ================= -->
     <section class="crystallized-section" id="ledgerSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">📜</span>
-          <span>ทะเบียนประวัติ 26 รอบวัฏจักรที่ตกผลึกแล้ว (Master Cycle Ledger)</span>
-        </h2>
-        <span class="section-tag">Historical Cycle Registry</span>
-      </div>
-
-      <!-- Ledger Performance Strip -->
-      <div class="ledger-kpi-grid">
-        <div class="ledger-kpi-card">
-          <div class="stat-mini-label">อัตราความแม่นยำ (Win Rate)</div>
-          <div class="stat-mini-val text-green" id="ledgerWinRate">61.54%</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">16 ชนะ / 10 แพ้ (รวม 26 รอบ)</div>
+      <div class="section-head-mini">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>📜</span>
+          <strong style="font-size: 0.95rem; color: #fff;">สัจธรรมประวัติ 26 รอบวัฏจักรย้อนหลัง (Master Cycle Ledger)</strong>
         </div>
-        <div class="ledger-kpi-card">
-          <div class="stat-mini-label">ผลตอบแทนสุทธิ (Net Return)</div>
-          <div class="stat-mini-val text-green" id="ledgerReturn">+0.93%</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">เน้นความปลอดภัยเงินสดเป็นเอก</div>
-        </div>
-        <div class="ledger-kpi-card">
-          <div class="stat-mini-label">กำไรต่อความเสี่ยง (Profit Factor)</div>
-          <div class="stat-mini-val text-gold" id="ledgerPF">1.10</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">กำไรคุ้มกว่าค่าคอมมิชชัน</div>
-        </div>
-        <div class="ledger-kpi-card">
-          <div class="stat-mini-label">ความเสี่ยงถดถอยสูงสุด (Max Drawdown)</div>
-          <div class="stat-mini-val text-amber" id="ledgerMDD">-5.71%</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">ปลอดภัยกว่า B&H (-18.99%) ถึง 3.3 เท่า</div>
+        <div class="ledger-stats-inline">
+          <span>ความแม่นยำ: <strong class="text-green" id="ledgerWinRate">61.54%</strong> (16 ชนะ / 10 แพ้)</span>
+          <span>ผลตอบแทนสุทธิ: <strong class="text-green" id="ledgerReturn">+0.93%</strong></span>
+          <span>Profit Factor: <strong class="text-gold" id="ledgerPF">1.10</strong></span>
+          <span>Max Drawdown: <strong class="text-amber" id="ledgerMDD">-5.71%</strong> (B&H -18.99%)</span>
         </div>
       </div>
 
-      <div class="master-table-scroll">
-        <table class="master-db-table">
+      <div class="master-table-scroll" style="max-height: 280px;">
+        <table class="master-db-table compact-table">
           <thead>
             <tr>
               <th>รอบ #</th>
               <th>วันที่เข้า</th>
               <th>วันที่ออก</th>
               <th>โหมดกลยุทธ์</th>
-              <th>ระดับความมั่นใจ</th>
-              <th>จำนวนไม้</th>
-              <th>หุ้นที่ถือ</th>
-              <th>ต้นทุนเฉลี่ย</th>
+              <th>ระดับมั่นใจ</th>
+              <th>ไม้</th>
+              <th>หุ้น</th>
+              <th>ทุนเฉลี่ย</th>
               <th>ราคาออก</th>
-              <th>ระยะถือครอง</th>
+              <th>ถือ (วัน)</th>
               <th>กำไร/ขาดทุน (฿)</th>
               <th>ผลตอบแทน (%)</th>
               <th>เหตุผลการออก</th>
@@ -493,158 +229,221 @@
             </tr>
           </thead>
           <tbody id="ledgerTableBody">
-            <!-- Populated dynamically via JavaScript -->
+            <!-- Populated dynamically via JS -->
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- ================= SECTION 7: 4 SACRED PILLARS ================= -->
+    <!-- ================= 6. 2-IN-1 DAILY INTELLIGENCE ARCHIVE ================= -->
+    <section class="crystallized-section" id="archiveSection">
+      <div class="section-head-mini">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>🗄️</span>
+          <strong style="font-size: 0.95rem; color: #fff;">คลังตรวจวัดรายวัน 2-in-1 (1 แถวต่อวัน รวมพักเที่ยง 13:00 + ปิดเย็น 17:30 น.)</strong>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button type="button" id="btnToggleJournalForm" class="btn btn-gold-sm"><span>✏️</span> บันทึกวันนี้</button>
+          <button type="button" id="btnExportJson" class="btn btn-outline-sm" style="color: #34d399; border-color: #10b981;"><span>💾</span> JSON</button>
+          <button type="button" id="btnExportCsv" class="btn btn-outline-sm" style="color: #fbbf24; border-color: #f59e0b;"><span>📊</span> CSV</button>
+        </div>
+      </div>
+
+      <!-- Mini KPI Strip -->
+      <div class="archive-strip-compact">
+        <span>📅 ล่าสุด: <strong id="arcLastDate">2026-10-27</strong></span>
+        <span>💰 ปิดตลาด: <strong class="text-gold" id="arcLastPrice">฿153.50</strong></span>
+        <span>📊 ประวัติสะสม: <strong id="arcTotalDays">970 วัน</strong></span>
+        <span>📈 ผลรวมสุทธิ: <strong class="text-green" id="arcCumulativePnl">+0.93%</strong></span>
+        <div style="margin-left: auto; display: flex; gap: 6px; align-items: center;">
+          <input type="text" id="arcSearchInput" placeholder="🔍 ค้นหาวันที่, สัญญาณ..." class="search-input-sm">
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="interval-pill active" id="filterArcAll">ทั้งหมด</button>
+            <button type="button" class="interval-pill" id="filterArcMidday">☀️ เที่ยง</button>
+            <button type="button" class="interval-pill" id="filterArcEvening">🌙 เย็น</button>
+            <button type="button" class="interval-pill" id="filterArcJournal">📝 มีโน้ต</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Quick Entry Form -->
+      <div class="archive-form-box" id="journalFormBox" style="display: none; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <strong style="color: var(--gold); font-size: 0.88rem;">บันทึกการตรวจวัดประจำวัน (2-in-1 Daily Form)</strong>
+          <button type="button" id="btnCloseJournalForm" style="background: none; border: none; color: #94a3b8; font-size: 1.1rem; cursor: pointer;">&times;</button>
+        </div>
+        <form id="journalEntryForm">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 8px;">
+            <div class="form-field-group">
+              <label for="formDate">วันที่</label>
+              <input type="date" id="formDate" required>
+            </div>
+            <div class="form-field-group">
+              <label for="formOpen">ราคาเปิด</label>
+              <input type="number" step="0.25" id="formOpen" placeholder="153.00">
+            </div>
+            <div class="form-field-group">
+              <label for="formHigh">สูงสุด</label>
+              <input type="number" step="0.25" id="formHigh" placeholder="154.50">
+            </div>
+            <div class="form-field-group">
+              <label for="formLow">ต่ำสุด</label>
+              <input type="number" step="0.25" id="formLow" placeholder="152.50">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <!-- Midday 13:00 -->
+            <div style="background: rgba(245, 158, 11, 0.05); padding: 8px; border-radius: var(--radius-sm); border: 1px solid rgba(245, 158, 11, 0.2);">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #fbbf24; margin-bottom: 4px;">☀️ พักเที่ยง (13:00 น.)</div>
+              <div style="display: flex; gap: 6px; margin-bottom: 4px;">
+                <input type="number" step="0.25" id="formMiddayPrice" placeholder="ราคา 153.50" style="width: 50%;">
+                <select id="formMiddayAction" style="width: 50%;">
+                  <option value="TRIGGER_WATCH">TRIGGER_WATCH</option>
+                  <option value="BUY_LAYER1">BUY_LAYER1</option>
+                  <option value="HOLD_CASH">HOLD_CASH</option>
+                  <option value="TAKE_PROFIT">TAKE_PROFIT</option>
+                </select>
+              </div>
+              <input type="text" id="formMiddayNote" placeholder="บันทึกรอบเที่ยง..." style="width: 100%;">
+            </div>
+
+            <!-- Evening 17:30 -->
+            <div style="background: rgba(56, 189, 248, 0.05); padding: 8px; border-radius: var(--radius-sm); border: 1px solid rgba(56, 189, 248, 0.2);">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px;">🌙 ปิดตลาดเย็น (17:30 น.)</div>
+              <div style="display: flex; gap: 6px; margin-bottom: 4px;">
+                <input type="number" step="0.25" id="formEveningPrice" placeholder="ราคา 153.50" style="width: 50%;">
+                <select id="formEveningAction" style="width: 50%;">
+                  <option value="HOLD_CASH">HOLD_CASH</option>
+                  <option value="HOLD_POSITION">HOLD_POSITION</option>
+                  <option value="PYRAMID_BUY">PYRAMID_BUY</option>
+                  <option value="CYCLE_EXIT">CYCLE_EXIT</option>
+                </select>
+              </div>
+              <input type="text" id="formEveningNote" placeholder="บันทึกรอบเย็น..." style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-gold-sm">💾 บันทึกสัจธรรมวันนี้</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Master Table -->
+      <div class="master-table-scroll" style="max-height: 280px;">
+        <table class="master-db-table compact-table">
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>เปิด</th>
+              <th>สูงสุด</th>
+              <th>ต่ำสุด</th>
+              <th>ราคาปิด</th>
+              <th>☀️ รอบเที่ยง (13:00)</th>
+              <th>🌙 รอบเย็น (17:30)</th>
+              <th>V5</th>
+              <th>V20</th>
+              <th>Coherence</th>
+              <th>Delta</th>
+              <th>ดู</th>
+            </tr>
+          </thead>
+          <tbody id="arcTableBody">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.78rem; color: var(--text-muted);">
+        <div id="arcPageInfo">แสดง 1-30 จาก 970 วัน</div>
+        <div style="display: flex; gap: 4px;">
+          <button type="button" class="interval-pill" id="btnArcPrevPage">&laquo; ก่อนหน้า</button>
+          <button type="button" class="interval-pill" id="btnArcNextPage">ถัดไป &raquo;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 7. COMPACT PILLARS & RISK SIMULATOR ================= -->
     <section class="crystallized-section" id="pillarsSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">📐</span>
-          <span>4 เสาหลักคณิตศาสตร์แห่งรามานุจัน (The 4 Sacred Mathematical Pillars)</span>
-        </h2>
-        <span class="section-tag">Pure Number Theory</span>
-      </div>
-
-      <div class="pillars-grid">
-        <!-- Pillar 1 -->
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR I</div>
-          <h3 class="pillar-title">Ramanujan Periodicity Transform (RPT)</h3>
-          <div class="pillar-formula-box">
-            c_q(n) = \sum_{a=1, \gcd(a,q)=1}^{q} e^{2\pi i a n / q}
-          </div>
-          <p class="pillar-text">
-            การแยกสัญญาณราคา SCB.BK ออกเป็นความถี่ฐานออร์โธโกนัล โดยไม่ใช้ Fourier ทั่วไปที่เกิดการบิดเบือน ช่วยดึงคลื่นแท้ $V_5$ (ชีพจรสัปดาห์) และ $V_{20}$ (วงสวิงเดือน) ออกมาจากสัญญาณรบกวนของตลาด
-          </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px;">
+        <div class="pillar-box-mini">
+          <div class="pillar-label">PILLAR I • RPT HARMONICS</div>
+          <div class="pillar-formula">c_q(n) = \sum_{(a,q)=1} e^{2\pi i a n / q}</div>
+          <div class="pillar-sub">แยกสัญญาณแท้ V5 (สัปดาห์) และ V20 (เดือน) จากคลื่นรบกวน</div>
         </div>
 
-        <!-- Pillar 2 -->
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR II</div>
-          <h3 class="pillar-title">Rogers-Ramanujan Continued Fraction $R(q)$</h3>
-          <div class="pillar-formula-box">
-            R(q) = \frac{q^{1/5}}{1 + \frac{q}{1 + \frac{q^2}{1 + \frac{q^3}{1 + \dots}}}}
-          </div>
-          <p class="pillar-text">
-            คำนวณก้าวไดนามิก $\delta_t$ ของการเคลื่อนที่ตามระดับความผันผวนจริง (Leland Volatility) เพื่อสร้างกรอบ Floor และ Ceiling ศักดิ์สิทธิ์ที่ยืดหยุ่นตามลมหายใจของตลาดหุ้นไทย
-          </p>
+        <div class="pillar-box-mini">
+          <div class="pillar-label">PILLAR II • ROGERS-RAMANUJAN</div>
+          <div class="pillar-formula">R(q) = \frac{q^{1/5}}{1 + \frac{q}{1 + \dots}} \to \pm\delta_t = 6.16\%</div>
+          <div class="pillar-sub">คำนวณก้าวผันผวนไดนามิกสร้าง Floor ฿144.05 / Ceiling ฿162.95</div>
         </div>
 
-        <!-- Pillar 3 -->
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR III</div>
-          <h3 class="pillar-title">Hardy-Ramanujan Asymptotic Partition $p(n)$</h3>
-          <div class="pillar-formula-box">
-            p(n) \sim \frac{1}{4n\sqrt{3}} \exp\left( \pi \sqrt{\frac{2n}{3}} \right)
-          </div>
-          <p class="pillar-text">
-            ตรวจวัดการบีบอัดตัวของพลังงาน (Volatility Squeeze) เมื่อราคาสะสมกำลังในกรอบแคบ สเกลลิ่งฟังก์ชันการแบ่งกั้นจำนวนจะตรวจจับจุดระเบิดคลื่นก่อนที่วอลุ่มของสถาบันจะปรากฏบนกระดาน
-          </p>
+        <div class="pillar-box-mini">
+          <div class="pillar-label">PILLAR III • HARDY-RAMANUJAN</div>
+          <div class="pillar-formula">p(n) \sim \frac{1}{4n\sqrt{3}} \exp(\pi\sqrt{2n/3})</div>
+          <div class="pillar-sub">สเกลการบีบอัดตัว (Squeeze) ตรวจจุดชนวนก่อนวอลุ่มสถาบันปรากฏ</div>
         </div>
 
-        <!-- Pillar 4 -->
-        <div class="pillar-card">
-          <div class="pillar-num">PILLAR IV</div>
-          <h3 class="pillar-title">Convex Risk-Free Pyramiding</h3>
-          <div class="pillar-formula-box">
-            \text{SL}_{\text{new}} \ge \text{AvgCost} \times (1 + \tau_{\text{fee}} + 0.002)
-          </div>
-          <p class="pillar-text">
-            การเข้าซื้อไม้แรกเมื่อคลื่นตกผลึกที่ก้นรอบ และอนุญาตให้เติมไม้งอก (Pyramiding) ได้เฉพาะเมื่อไม้แรกมีกำไรกันทุนครอบคลุมค่าคอมมิชชันแล้วเท่านั้น กำจัดความเสี่ยงการขาดทุนเงินต้นให้เป็นศูนย์
-          </p>
+        <div class="pillar-box-mini">
+          <div class="pillar-label">PILLAR IV • RISK-FREE PYRAMID</div>
+          <div class="pillar-formula">\text{SL}_{\text{new}} \ge \text{AvgCost}(1 + \tau_{\text{fee}} + 0.002)</div>
+          <div class="pillar-sub">เปิดไม้งอกได้เฉพาะเมื่อมีกำไรคุ้มทุนแล้ว กำจัดความเสี่ยงเงินต้นเป็นศูนย์</div>
         </div>
       </div>
-    </section>
 
-    <!-- ================= SECTION 8: SIMULATOR ================= -->
-    <section class="crystallized-section" id="simulatorSection">
-      <div class="section-head">
-        <h2 class="section-title">
-          <span class="section-title-glyph">🚀</span>
-          <span>เครื่องจำลองผลึกทุนและพีระมิด (Ramanujan Capital Compounder)</span>
-        </h2>
-        <span class="section-tag">Monte Carlo & Wealth Projection</span>
-      </div>
-
-      <div class="simulator-box">
-        <div class="sim-controls-grid">
-          <div class="sim-slider-wrap">
-            <label>
-              <span>เงินทุนตั้งต้น (Initial Capital)</span>
-              <strong style="color: var(--gold);" id="dispSimCap">฿500,000</strong>
-            </label>
-            <input type="range" id="simCapSlider" min="100000" max="5000000" step="50000" value="500000">
+      <!-- Compact Simulator Strip -->
+      <div class="sim-strip-compact">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span style="font-weight: 700; color: var(--gold); font-size: 0.85rem;">🚀 เครื่องจำลองผลึกทุน:</span>
+          <div style="display: flex; gap: 6px; align-items: center; font-size: 0.8rem;">
+            <span>เงินทุน:</span>
+            <input type="range" id="simCapSlider" min="100000" max="5000000" step="50000" value="500000" style="width: 110px;">
+            <strong id="dispSimCap" style="color: var(--gold);">฿500,000</strong>
           </div>
-
-          <div class="sim-slider-wrap">
-            <label>
-              <span>โหมดจัดสรรความเสี่ยง (Allocation Preset)</span>
-              <strong style="color: #38bdf8;" id="dispSimPreset">⚖️ สายสมดุล (Standard 60%)</strong>
-            </label>
-            <select id="simPresetSelect" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 8px 12px; color: #fff; font-family: inherit; outline: none;">
-              <option value="conservative">🛡️ สายเซฟตี้ (Conservative Probe 30%)</option>
-              <option value="balanced" selected>⚖️ สายสมดุล (Standard Resonance 60%)</option>
-              <option value="aggressive">🚀 สายมาสเตอร์ (Full Resonance 90%)</option>
+          <div style="display: flex; gap: 6px; align-items: center; font-size: 0.8rem;">
+            <span>โหมด:</span>
+            <select id="simPresetSelect" class="search-input-sm" style="padding: 2px 6px;">
+              <option value="conservative">🛡️ เซฟตี้ 30%</option>
+              <option value="balanced" selected>⚖️ สมดุล 60%</option>
+              <option value="aggressive">🚀 มาสเตอร์ 90%</option>
             </select>
+            <span id="dispSimPreset" style="display: none;">⚖️ สมดุล</span>
           </div>
-
-          <div class="sim-slider-wrap">
-            <label>
-              <span>จำนวนรอบจำลองล่วงหน้า</span>
-              <strong style="color: #c084fc;" id="dispSimCycles">26 รอบ (อ้างอิงประวัติศาสตร์จริง)</strong>
-            </label>
-            <input type="range" id="simCyclesSlider" min="10" max="50" step="1" value="26">
+          <div style="display: flex; gap: 6px; align-items: center; font-size: 0.8rem;">
+            <span>รอบ:</span>
+            <input type="range" id="simCyclesSlider" min="10" max="50" step="1" value="26" style="width: 80px;">
+            <strong id="dispSimCycles" style="color: #c084fc;">26 รอบ</strong>
           </div>
         </div>
 
-        <div style="background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-md); padding: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; border: 1px solid var(--card-border);">
-          <div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">มูลค่าพอร์ตจำลองสิ้นสุด (Final Equity)</div>
-            <div style="font-family: var(--font-num); font-size: 1.8rem; font-weight: 800; color: #34d399;" id="dispSimFinalEquity">฿504,650</div>
-          </div>
-          <div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">กำไรสุทธิจำลอง (Net Profit)</div>
-            <div style="font-family: var(--font-num); font-size: 1.8rem; font-weight: 800; color: var(--gold);" id="dispSimProfit">+฿4,650</div>
-          </div>
-          <div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">ผลตอบแทนสุทธิ (Projected Return)</div>
-            <div style="font-family: var(--font-num); font-size: 1.8rem; font-weight: 800; color: #38bdf8;" id="dispSimReturn">+0.93%</div>
-          </div>
-          <div>
-            <div style="font-size: 0.8rem; color: var(--text-muted);">ความเสี่ยงสูงสุดที่ยอมรับ (Risk Buffer)</div>
-            <div style="font-family: var(--font-num); font-size: 1.8rem; font-weight: 800; color: #f87171;" id="dispSimMaxRisk">-5.71%</div>
-          </div>
+        <div style="display: flex; gap: 14px; font-size: 0.82rem; font-family: var(--font-code);">
+          <span>พอร์ตสิ้นสุด: <strong class="text-green" id="dispSimFinalEquity">฿504,650</strong></span>
+          <span>กำไรสุทธิ: <strong class="text-gold" id="dispSimProfit">+฿4,650</strong></span>
+          <span>ผลตอบแทน: <strong style="color: #38bdf8;" id="dispSimReturn">+0.93%</strong></span>
+          <span>ความเสี่ยงสูงสุด: <strong style="color: #f87171;" id="dispSimMaxRisk">-5.71%</strong></span>
         </div>
       </div>
     </section>
 
-    <!-- ================= SACRED FOOTER ================= -->
-    <footer style="text-align: center; padding: 40px 20px; border-top: 1px solid var(--card-border); color: var(--text-dim); font-size: 0.85rem;">
-      <div style="font-family: var(--font-sacred); font-size: 1.1rem; color: var(--gold); margin-bottom: 6px;">
-        ॐ सत्यमेว जयते • THE RAMANUJAN QUANTUM ARCHITECTURE FOR SCB.BK
+    <!-- ================= FOOTER ================= -->
+    <footer style="text-align: center; padding: 18px 10px; color: var(--text-dim); font-size: 0.78rem;">
+      <div style="font-family: var(--font-sacred); font-size: 0.92rem; color: var(--gold); margin-bottom: 2px;">
+        ॐ सत्यमेव जयते • RAMANUJAN QUANTUM DISCRETE CYCLE ENGINE • SCB.BK
       </div>
-      <p style="max-width: 750px; margin: 0 auto 12px auto; line-height: 1.6;">
-        รันโดยอัลกอริทึมคณิตศาสตร์บริสุทธิ์เพื่อหุ้น SCB.BK ตรวจวัดรอบพักเที่ยง 13:00 น. และรอบตลาดปิดเย็น 17:30 น. ซิงค์กับระบบคลาวด์ GitHub Actions & Cloudflare Edge อัตโนมัติทุกวันทำการ
-      </p>
-      <div style="font-family: var(--font-code); font-size: 0.78rem; color: var(--text-dim);">
-        Autonomous Intelligence Pipeline &bull; Commit Verified &bull; All Rights Crystallized 2026
+      <div>
+        เชื่อมต่อ Yahoo Finance อัตโนมัติทุกวันทำการ 13:00 และ 17:30 น. • รันบน GitHub Cloud & Cloudflare Edge 24 ชม.
       </div>
     </footer>
 
-    <!-- ================= MODAL: DAILY DETAIL & NOTE EDITOR ================= -->
+    <!-- ================= MODAL: DETAIL INSPECTOR ================= -->
     <div class="modal-backdrop" id="detailModal">
       <div class="modal-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px;">
-          <h3 id="modalTitle" style="color: var(--gold-glow); font-size: 1.1rem;">รายละเอียดสัจธรรม 2-in-1 ประจำวัน</h3>
-          <button type="button" id="btnCloseModal" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+          <h3 id="modalTitle" style="color: var(--gold-glow); font-size: 0.95rem;">รายละเอียดสัจธรรม 2-in-1 ประจำวัน</h3>
+          <button type="button" id="btnCloseModal" style="background: none; border: none; color: #fff; font-size: 1.3rem; cursor: pointer;">&times;</button>
         </div>
-        <div id="modalContent" style="display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem;">
-          <!-- Dynamically filled -->
-        </div>
+        <div id="modalContent" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem;"></div>
       </div>
     </div>
 
@@ -652,7 +451,7 @@
 
   <!-- Data Bundle Script -->
   <script src="ramanujan_data.js"></script>
-  <!-- Unified Front-End Controller -->
+  <!-- Unified Controller -->
   <script src="app.js"></script>
 </body>
 </html>
