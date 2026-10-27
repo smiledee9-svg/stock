@@ -879,86 +879,127 @@ function renderPredictiveIntelligence(pred) {
 
 /**
  * Dual-Run Switcher & Co-Pilot Controller
- * Manages 2 distinct sessions: Midday (12:45) & Evening (17:30)
+ * Manages 2 distinct sessions: Midday (13:00) & Evening (17:30)
  * Drives the 18 Instruments, AI Captain Analysis, and Weather Atmosphere
+ * Dynamically generated from window.RAMANUJAN_DATA (No hardcoded mock dates)
  */
-const FORECAST_SESSIONS = {
-  midday: {
-    tagText: '☀️ บันทึกตรวจวัดรอบหลังเที่ยง 12:45 น. (วิเคราะห์ภาคเช้า วางแผนภาคบ่าย)',
-    copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังเที่ยง)',
-    copilotMsg: '"สวัสดีครับกัปตัน! จากการตรวจวัดแผง 18 ค่าประจำรอบเที่ยงนี้ พบว่าคลื่นสั้น V5 (ค่าที่ 3) เริ่มฟื้นตัวมาแตะ +0.196 ขณะที่คลื่นใหญ่ V20 (ค่าที่ 4) พุ่งแตะ +1.022 หนุนหลังเต็มที่ และความสอดคล้องคลื่น rho (ค่าที่ 5) ข้ามเกณฑ์มาอยู่ที่ +0.370 แล้วครับ! <strong>คำแนะนำเดินเรือภาคบ่าย:</strong> ปัจจุบันตลาดยังอยู่ในโซนสะสมพลัง แต่ถ้าบ่ายนี้ราคาขยับข้ามจุดชนวน (ค่าที่ 11) <strong>฿146.82 (+0.22%)</strong> แปลว่าสัญญาณกลับตัวยืนยันสมบูรณ์ เราแบ่งเปิดไม้แรกหยั่งเชิง 30% ได้ทันทีครับ!"',
-    weatherIcon: '⛅',
-    weatherHeading: 'มีเมฆสะสม คลื่นลมทิศเหนือเริ่มพัดหนุน (Inflection Watch)',
-    weatherSummary: 'คลื่นสั้น V5 เริ่มฟื้นตัวจ่อจุดชนวน ฿146.82 คลื่นใหญ่ V20 หนุนบวกแข็งแกร่ง ตลาดพร้อมระเบิดหากบ่ายนี้ข้ามต้านย่อย',
-    m18: {
-      date: '2026-10-15 (12:45 น.)',
-      price: '฿146.50',
-      v5: '+0.196',
-      v20: '+1.022',
-      rho: '+0.370',
-      er: '0.300',
-      delta: '±3.56%',
-      floor: '฿141.28',
-      ceiling: '฿151.72',
-      spread: '฿10.44',
-      inflection: '฿146.82 (+0.22%)',
-      breakout: '฿153.25 (+4.61%)',
-      neutral: '฿141.28 - ฿146.82',
-      breakdown: '฿141.28 (-3.56%)',
-      tp: '฿150.49 (+2.50%)',
-      trailing: '฿160.10+'
+function getForecastSessions() {
+  const d = window.RAMANUJAN_DATA || {};
+  const pred = d.predictiveIntelligence || {};
+  const candles = d.candlesWithSignals || [];
+  const lastC = candles.length > 0 ? candles[candles.length - 1] : {};
+
+  const lastDate = pred.lastDate || lastC.time || '2026-10-27';
+  const lastPrice = typeof pred.lastPrice === 'number' ? pred.lastPrice : (lastC.close || 153.50);
+  const delta = typeof pred.dynamicDeltaPct === 'number' ? pred.dynamicDeltaPct : 5.72;
+  const floorVal = pred.expectedRange?.floor || (lastPrice * (1 - delta / 100));
+  const ceilingVal = pred.expectedRange?.ceiling || (lastPrice * (1 + delta / 100));
+  const spreadVal = pred.expectedRange?.spreadThb || (ceilingVal - floorVal);
+
+  const scens = pred.scenarios || {};
+  const sInflection = scens.bullishInflection?.triggerPrice || (lastPrice * 1.003);
+  const sInflectionPct = scens.bullishInflection?.changePct || '+0.30%';
+  const sBreakout = scens.resonanceBreakout?.triggerPrice || (lastPrice * 1.005);
+  const sBreakoutPct = scens.resonanceBreakout?.changePct || '+0.33%';
+  const sNeutral = scens.neutralHolding?.rangeText || `฿${floorVal.toFixed(2)} - ฿${sInflection.toFixed(2)}`;
+  const sBreakdown = scens.bearishRisk?.triggerPrice || floorVal;
+  const sBreakdownPct = scens.bearishRisk?.changePct || `-${delta.toFixed(2)}%`;
+
+  const v5Num = typeof lastC.v_micro === 'number' ? lastC.v_micro : 0.333;
+  const v20Num = typeof lastC.v_macro === 'number' ? lastC.v_macro : 0.901;
+  const rhoNum = typeof lastC.rho_ram === 'number' ? lastC.rho_ram : 0.651;
+  const erNum = typeof lastC.er === 'number' ? lastC.er : 0.448;
+
+  const v5Str = (v5Num >= 0 ? '+' : '') + v5Num.toFixed(3);
+  const v20Str = (v20Num >= 0 ? '+' : '') + v20Num.toFixed(3);
+  const rhoStr = (rhoNum >= 0 ? '+' : '') + rhoNum.toFixed(3);
+  const erStr = erNum.toFixed(3);
+
+  const tpPrice = (sInflection * 1.025).toFixed(2);
+  const trailingPrice = `${(sInflection * 1.05).toFixed(2)}+`;
+  const cutPrice = (lastPrice * (1 - (delta / 100) * 0.5)).toFixed(2);
+  const shieldTrigger = (sInflection * 1.0075).toFixed(2);
+  const shieldSl = `${(sInflection * 1.0035).toFixed(2)} (+0.35%)`;
+
+  return {
+    midday: {
+      tagText: `☀️ บันทึกตรวจวัดรอบหลังเที่ยง 13:00 น. (วิเคราะห์ภาคเช้า วางแผนภาคบ่าย)`,
+      copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังเที่ยง)',
+      copilotMsg: `"สวัสดีครับกัปตัน! จากการตรวจวัดแผง 18 ค่าประจำรอบเที่ยงวันที่ ${lastDate} พบว่าราคาอ้างอิงอยู่ที่ ฿${lastPrice.toFixed(2)} คลื่นสั้น V5 อยู่ที่ ${v5Str} ขณะที่คลื่นใหญ่ V20 แตะ ${v20Str} หนุนหลังเต็มที่ และความสอดคล้องคลื่น rho อยู่ที่ ${rhoStr} แล้วครับ! <strong>คำแนะนำเดินเรือภาคบ่าย:</strong> ปัจจุบันตลาดยืนเหนือฐาน Floor ฿${floorVal.toFixed(2)} หากบ่ายนี้ราคาขยับข้ามจุดชนวน <strong>฿${sInflection.toFixed(2)} (${sInflectionPct})</strong> สัญญาณกลับตัวยืนยันสมบูรณ์ เราแบ่งเปิดไม้แรกหยั่งเชิง 30% ได้ทันทีครับ!"`,
+      weatherIcon: v5Num >= 0 && v20Num >= 0 ? '🌤️' : '⛅',
+      weatherHeading: v5Num >= 0 ? 'ท้องฟ้าเปิด คลื่นลมทิศเหนือเริ่มพัดหนุน (Inflection Watch)' : 'มีเมฆสะสม คลื่นลมรอเลือกข้าง (Consolidation)',
+      weatherSummary: `คลื่นสั้น V5 แตะ ${v5Str} จ่อจุดชนวน ฿${sInflection.toFixed(2)} คลื่นใหญ่ V20 หนุนที่ ${v20Str} พร้อมเข้าทำรอบหากบ่ายนี้ข้ามต้านย่อย`,
+      m18: {
+        date: `${lastDate} (13:00 น.)`,
+        price: `฿${lastPrice.toFixed(2)}`,
+        v5: v5Str,
+        v20: v20Str,
+        rho: rhoStr,
+        er: erStr,
+        delta: `±${delta.toFixed(2)}%`,
+        floor: `฿${floorVal.toFixed(2)}`,
+        ceiling: `฿${ceilingVal.toFixed(2)}`,
+        spread: `฿${spreadVal.toFixed(2)}`,
+        inflection: `฿${sInflection.toFixed(2)} (${sInflectionPct})`,
+        breakout: `฿${sBreakout.toFixed(2)} (${sBreakoutPct})`,
+        neutral: sNeutral,
+        breakdown: `฿${sBreakdown.toFixed(2)} (${sBreakdownPct})`,
+        tp: `฿${tpPrice} (+2.50%)`,
+        trailing: `฿${trailingPrice}`
+      },
+      cheatBadge: `☀️ โพยประจำรอบเที่ยง 13:00 น. (ภาคบ่าย ${lastDate})`,
+      cheat: {
+        entry: `฿${sInflection.toFixed(2)}`,
+        entrySub: 'รอราคาข้ามจุดชนวน + คลื่น V5, V20 พุ่งคู่',
+        shieldTrigger: `฿${shieldTrigger}`,
+        shieldSl: `฿${shieldSl}`,
+        tp: `฿${tpPrice}`,
+        trailing: `฿${trailingPrice}`,
+        cut: `฿${cutPrice}`
+      }
     },
-    cheatBadge: '☀️ โพยประจำรอบเที่ยง 12:45 น. (ภาคบ่ายวันนี้)',
-    cheat: {
-      entry: '฿146.82',
-      entrySub: 'รอราคาข้ามจุดชนวน + คลื่น V5, V20 พุ่งคู่',
-      shieldTrigger: '฿147.92',
-      shieldSl: '฿147.33 (+0.35%)',
-      tp: '฿150.49',
-      trailing: '฿160.10+',
-      cut: '฿144.20'
+    evening: {
+      tagText: `🌙 บันทึกตรวจวัดรอบหลังตลาดปิด 17:30 น. (สรุปวันเต็ม วางแผนวันพรุ่งนี้)`,
+      copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังตลาดปิด)',
+      copilotMsg: `"สรุปตลาดวันเต็มวันที่ ${lastDate} ครับกัปตัน! แผงตรวจวัด 18 ค่าประจำวันปิดยืนยันว่า SCB ยืนที่ ฿${lastPrice.toFixed(2)} อย่างเหนียวแน่น กรอบอุณหภูมิวันพรุ่งนี้คำนวณได้พื้นรับ Floor ที่ ฿${floorVal.toFixed(2)} และเพดาน Ceiling ที่ ฿${ceilingVal.toFixed(2)} <strong>คำแนะนำเดินเรือวันพรุ่งนี้:</strong> โครงสร้างราคารักษาฐานได้อย่างยอดเยี่ยม พรุ่งนี้เช้าหากเปิดกระโดดข้าม <strong>฿${sInflection.toFixed(2)}</strong> เราจะเข้าจังหวะไม้แรกตามระบบทันที ล็อกเป้ากำไรแรกที่ ฿${tpPrice} สบายใจไร้กังวลครับ!"`,
+      weatherIcon: '🌤️',
+      weatherHeading: 'ท้องฟ้าเปิด คลื่นใหญ่ประคองตัวแข็งแกร่ง (Ready for Tomorrow)',
+      weatherSummary: `โครงสร้างแท่งเทียนวันเต็มรักษาฐานราคาเหนือ Floor ฿${floorVal.toFixed(2)} ได้อย่างสมบูรณ์แบบ วางแผนรับมือล่วงหน้าก่อนตลาดเปิดเช้าพรุ่งนี้`,
+      m18: {
+        date: `${lastDate} (17:30 น.)`,
+        price: `฿${lastPrice.toFixed(2)}`,
+        v5: v5Str,
+        v20: v20Str,
+        rho: rhoStr,
+        er: erStr,
+        delta: `±${delta.toFixed(2)}%`,
+        floor: `฿${floorVal.toFixed(2)}`,
+        ceiling: `฿${ceilingVal.toFixed(2)}`,
+        spread: `฿${spreadVal.toFixed(2)}`,
+        inflection: `฿${sInflection.toFixed(2)} (${sInflectionPct})`,
+        breakout: `฿${sBreakout.toFixed(2)} (${sBreakoutPct})`,
+        neutral: sNeutral,
+        breakdown: `฿${sBreakdown.toFixed(2)} (${sBreakdownPct})`,
+        tp: `฿${tpPrice} (+2.50%)`,
+        trailing: `฿${trailingPrice}`
+      },
+      cheatBadge: `🌙 โพยประจำรอบเย็น 17:30 น. (วางแผนวันถัดไป)`,
+      cheat: {
+        entry: `฿${sInflection.toFixed(2)}`,
+        entrySub: 'รอราคาเปิดข้ามจุดชนวน + สัญญาณคลื่นเช้าพรุ่งนี้',
+        shieldTrigger: `฿${shieldTrigger}`,
+        shieldSl: `฿${shieldSl}`,
+        tp: `฿${tpPrice}`,
+        trailing: `฿${trailingPrice}`,
+        cut: `฿${cutPrice}`
+      }
     }
-  },
-  evening: {
-    tagText: '🌙 บันทึกตรวจวัดรอบหลังตลาดปิด 17:30 น. (สรุปวันเต็ม วางแผนวันพรุ่งนี้)',
-    copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังตลาดปิด)',
-    copilotMsg: '"สรุปตลาดวันเต็มครับกัปตัน! แผงตรวจวัด 18 ค่าประจำวันปิดยืนยันว่า SCB ปิดประคองตัวที่ ฿146.50 อย่างเหนียวแน่น กรอบอุณหภูมิวันพรุ่งนี้คำนวณได้พื้นรับ Floor (ค่าที่ 8) ที่ ฿141.28 และเพดาน Ceiling (ค่าที่ 9) ที่ ฿151.72 <strong>คำแนะนำเดินเรือวันพรุ่งนี้:</strong> คืนนี้นอนหลับสบายใจได้เต็มที่ครับ ไม่มีอะไรต้องกังวล พรุ่งนี้เช้าหากเปิดกระโดดข้าม <strong>฿146.82</strong> เราจะเข้าจังหวะไม้แรกตามระบบทันที และหากวิ่งไปแตะ ฿150.49 เราล็อกกำไร +2.50% พร้อมขยับ Trailing Stop คุ้มกันต้นทุนให้ฟรี ไม่มีความเสี่ยงครับ!"',
-    weatherIcon: '🌤️',
-    weatherHeading: 'ท้องฟ้าเริ่มเปิด คลื่นใหญ่ประคองตัวแข็งแกร่ง (Ready for Tomorrow)',
-    weatherSummary: 'โครงสร้างแท่งเทียนวันเต็มรักษาฐานราคาเหนือ Floor ฿141.28 ได้อย่างสมบูรณ์แบบ วางแผนรับมือล่วงหน้าก่อนตลาดเปิดเช้าพรุ่งนี้',
-    m18: {
-      date: '2026-10-15 (17:30 น.)',
-      price: '฿146.50',
-      v5: '+0.215',
-      v20: '+1.045',
-      rho: '+0.410',
-      er: '0.315',
-      delta: '±3.56%',
-      floor: '฿141.28',
-      ceiling: '฿151.72',
-      spread: '฿10.44',
-      inflection: '฿146.82 (+0.22%)',
-      breakout: '฿153.25 (+4.61%)',
-      neutral: '฿141.28 - ฿146.82',
-      breakdown: '฿141.28 (-3.56%)',
-      tp: '฿150.49 (+2.50%)',
-      trailing: '฿160.10+'
-    },
-    cheatBadge: '🌙 โพยประจำรอบเย็น 17:30 น. (วางแผนวันพรุ่งนี้)',
-    cheat: {
-      entry: '฿146.82',
-      entrySub: 'รอราคาเปิดข้ามจุดชนวน + สัญญาณคลื่นเช้าพรุ่งนี้',
-      shieldTrigger: '฿147.92',
-      shieldSl: '฿147.33 (+0.35%)',
-      tp: '฿150.49',
-      trailing: '฿160.10+',
-      cut: '฿144.20'
-    }
-  }
-};
+  };
+}
 
 function applyForecastSession(sessionKey) {
-  const session = FORECAST_SESSIONS[sessionKey];
+  const sessions = getForecastSessions();
+  const session = sessions[sessionKey] || sessions.midday;
   if (!session) return;
 
   // 1. Update Session Tag
@@ -1076,7 +1117,7 @@ function initForecastRunSwitcher() {
   if (btnCopy) {
     btnCopy.addEventListener('click', () => {
       const activeTab = document.getElementById('btnRunEvening')?.classList.contains('active') ? 'evening' : 'midday';
-      const s = FORECAST_SESSIONS[activeTab];
+      const s = getForecastSessions()[activeTab] || getForecastSessions().midday;
       const textToCopy = [
         `🎯 โพยตั้งราคาเทรดมือ SCB.BK (รามานุจัน Discrete Cycle)`,
         `📅 รอบ: ${s.cheatBadge}`,
@@ -1112,61 +1153,75 @@ function initForecastRunSwitcher() {
 /**
  * MODULE 05: 18-Vector Mathematical Synthesis Engine Controller
  * Pure custom quantitative mathematics applied directly to SCB telemetry data
+ * Dynamically generated from window.RAMANUJAN_DATA
  */
-const MATH_SESSIONS_DATA = {
-  midday: {
-    name: 'รอบเที่ยง 12:45 น.',
-    lastDate: '2026-10-15 (12:45 น.)',
-    price: 146.50,
-    v5: 0.196,
-    v20: 1.022,
-    rho: 0.370,
-    er: 0.300,
-    floor: 141.28,
-    ceiling: 151.72,
-    spread: 10.44,
-    delta: 3.56,
-    inflection: 146.82,
-    breakout: 153.25,
-    tp: 150.49,
-    trailing: '฿160.10+',
-    cut: 144.20,
-    mag: 1.426,
-    angle: 79.1,
-    energy: 0.305,
-    magPct: 71.3,
-    comp: 0.690,
-    confScore: 80.5,
-    matrixStatus: '🟢 พร้อมเปิดไม้หยั่งเชิงบ่ายนี้ (PROBE 30% AT ฿146.82)',
-    copilot: '"สวัสดีครับกัปตัน! จากการตรวจวัด 18 ค่ารอบเที่ยง โมเดลคำนวณขนาดแรงส่งสุทธิ |M| ได้ 1.426 และองศาคลื่น θ อยู่ที่ 79.1° (ชี้ขึ้นคู่) ระดับราคา H_alt = 50.0% ยังไม่อยู่ในโซน Overbought หากบ่ายนี้ราคาข้ามจุดชนวน ฿146.82 เปิดไม้หยั่งเชิง 30% ตามระบบได้ทันทีครับ!"'
-  },
-  evening: {
-    name: 'รอบเย็น 17:30 น.',
-    lastDate: '2026-10-15 (17:30 น.)',
-    price: 146.50,
-    v5: 0.215,
-    v20: 1.045,
-    rho: 0.410,
-    er: 0.315,
-    floor: 141.28,
-    ceiling: 151.72,
-    spread: 10.44,
-    delta: 3.56,
-    inflection: 146.82,
-    breakout: 153.25,
-    tp: 150.49,
-    trailing: '฿160.10+',
-    cut: 144.20,
-    mag: 1.504,
-    angle: 78.4,
-    energy: 0.356,
-    magPct: 75.2,
-    comp: 0.712,
-    confScore: 82.5,
-    matrixStatus: '🟢 ยืนยันสัญญาณสะสมพลัง (READY TO PROBE 30% ON OPEN)',
-    copilot: '"สรุปตลาดวันเต็มครับกัปตัน! แรงส่งสุทธิเร่งตัวขึ้นมาเป็น |M| = 1.504 (+5.47%) ค่าความสอดคล้องคลื่นกระโดดแตะ +0.410 และพลังงานจลน์แตะ 0.356 J โครงสร้างราคารักษาฐานเหนือ Floor ฿141.28 ได้อย่างสวยงาม พรุ่งนี้เช้าหากเปิดข้าม ฿146.82 ลุยไม้แรกตามแผนได้เลยครับ!"'
-  }
-};
+function getDynamicMathSessionsData() {
+  const d = window.RAMANUJAN_DATA || {};
+  const pred = d.predictiveIntelligence || {};
+  const candles = d.candlesWithSignals || [];
+  const lastC = candles.length > 0 ? candles[candles.length - 1] : {};
+
+  const lastDate = pred.lastDate || lastC.time || '2026-10-27';
+  const lastPrice = typeof pred.lastPrice === 'number' ? pred.lastPrice : (lastC.close || 153.50);
+  const delta = typeof pred.dynamicDeltaPct === 'number' ? pred.dynamicDeltaPct : 5.72;
+  const floorVal = pred.expectedRange?.floor || (lastPrice * (1 - delta / 100));
+  const ceilingVal = pred.expectedRange?.ceiling || (lastPrice * (1 + delta / 100));
+  const spreadVal = pred.expectedRange?.spreadThb || (ceilingVal - floorVal);
+
+  const scens = pred.scenarios || {};
+  const sInflection = scens.bullishInflection?.triggerPrice || (lastPrice * 1.003);
+  const sBreakout = scens.resonanceBreakout?.triggerPrice || (lastPrice * 1.005);
+
+  const v5Num = typeof lastC.v_micro === 'number' ? lastC.v_micro : 0.333;
+  const v20Num = typeof lastC.v_macro === 'number' ? lastC.v_macro : 0.901;
+  const rhoNum = typeof lastC.rho_ram === 'number' ? lastC.rho_ram : 0.651;
+  const erNum = typeof lastC.er === 'number' ? lastC.er : 0.448;
+
+  const mag = Math.sqrt(v5Num * v5Num + v20Num * v20Num);
+  const angle = (Math.atan2(v20Num, v5Num) * 180 / Math.PI + 360) % 360;
+  const energy = 0.5 * mag * mag;
+  const tpVal = sInflection * 1.025;
+  const cutVal = lastPrice * (1 - (delta / 100) * 0.5);
+
+  const baseObj = {
+    price: lastPrice,
+    v5: v5Num,
+    v20: v20Num,
+    rho: rhoNum,
+    er: erNum,
+    floor: floorVal,
+    ceiling: ceilingVal,
+    spread: spreadVal,
+    delta: delta,
+    inflection: sInflection,
+    breakout: sBreakout,
+    tp: tpVal,
+    trailing: `฿${(sInflection * 1.05).toFixed(2)}+`,
+    cut: cutVal,
+    mag: mag,
+    angle: angle,
+    energy: energy,
+    magPct: Math.min(100, Math.round(mag * 50)),
+    comp: Math.min(1.0, Math.max(0.0, 0.5 + rhoNum * 0.3)),
+    confScore: Math.min(100, Math.max(0, 50 + rhoNum * 30 + (v5Num > 0 ? 10 : 0))),
+    matrixStatus: `🟢 พร้อมเข้าทำรอบ (PROBE 30% AT ฿${sInflection.toFixed(2)})`,
+  };
+
+  return {
+    midday: {
+      ...baseObj,
+      name: 'รอบเที่ยง 13:00 น.',
+      lastDate: `${lastDate} (13:00 น.)`,
+      copilot: `"สวัสดีครับกัปตัน! ตรวจวัดรอบเที่ยงวันที่ ${lastDate} ขนาดแรงส่งสุทธิ |M| = ${mag.toFixed(3)} องศาคลื่น θ = ${angle.toFixed(1)}° หากบ่ายนี้ราคาข้ามจุดชนวน ฿${sInflection.toFixed(2)} เปิดไม้หยั่งเชิง 30% ตามระบบได้ทันทีครับ!"`
+    },
+    evening: {
+      ...baseObj,
+      name: 'รอบเย็น 17:30 น.',
+      lastDate: `${lastDate} (17:30 น.)`,
+      copilot: `"สรุปตลาดวันเต็มวันที่ ${lastDate} ครับกัปตัน! แรงส่งสุทธิ |M| = ${mag.toFixed(3)} ความสอดคล้องคลื่น rho = ${(rhoNum >= 0 ? '+' : '') + rhoNum.toFixed(3)} โครงสร้างราคารักษาฐานเหนือ Floor ฿${floorVal.toFixed(2)} ได้อย่างแข็งแกร่ง พรุ่งนี้หากเปิดข้าม ฿${sInflection.toFixed(2)} ลุยไม้แรกตามแผนได้เลยครับ!"`
+    }
+  };
+}
 
 function initMath18Lab() {
   const btnMidday = document.getElementById('btnMathMidday');
@@ -1194,7 +1249,8 @@ function initMath18Lab() {
   if (btnCopyAi) {
     btnCopyAi.addEventListener('click', () => {
       const activeSessionKey = document.getElementById('btnMathEvening')?.classList.contains('active') ? 'evening' : 'midday';
-      const s = MATH_SESSIONS_DATA[activeSessionKey];
+      const mathSessions = getDynamicMathSessionsData();
+      const s = mathSessions[activeSessionKey] || mathSessions.evening;
 
       const promptTemplate = [
         `🎯 [คำสั่ง AI VISION QUANT]: คุณคือเจ้าหน้าที่วิเคราะห์ความเสี่ยงและตัดสินใจส่งคำสั่งซื้อขาย (Senior Quantitative Trading AI) ประจำระบบ Ramanujan SCB.BK`,
@@ -1205,11 +1261,11 @@ function initMath18Lab() {
         `3. สรุปตั๋วคำสั่งซื้อขายสำเร็จรูปสำหรับป้อนระบบ Streaming:`,
         `   - คำสั่ง: BUY LIMIT (แบ่งสัดส่วนไม้แรก 30% ของพอร์ต)`,
         `   - ราคาตั้งซื้อ (Entry Limit): ฿${s.inflection.toFixed(2)}`,
-        `   - เงื่อนไขล็อกทุน Breakeven (+0.75%): เมื่อราคาแตะ ฿147.92 ให้เลื่อน SL ไปที่ ฿147.33 (+0.35%) เพื่อล็อกต้นทุนฟรี`,
+        `   - เงื่อนไขล็อกทุน Breakeven (+0.75%): เมื่อราคาแตะ ฿${(s.inflection * 1.0075).toFixed(2)} ให้เลื่อน SL ไปที่ ฿${(s.inflection * 1.0035).toFixed(2)} (+0.35%) เพื่อล็อกต้นทุนฟรี`,
         `   - เป้าทำกำไรแรก (Take Profit 50%): ฿${s.tp.toFixed(2)} (+2.50%)`,
         `   - เป้ารันเทรนด์ใหญ่ (Super Trend 50%): ${s.trailing} (รันตาม Trailing ต่อ)`,
         `   - จุดยอมแพ้ฉุกเฉิน (Emergency Cut Loss): ฿${s.cut.toFixed(2)} (-1.78%)`,
-        `4. ประเมินความคุ้มค่าเชิงคณิตศาสตร์ (Risk:Reward = 7.14:1) และสิ่งที่ "ห้ามทำเด็ดขาด" ในรอบเวลานี้`
+        `4. ประเมินความคุ้มค่าเชิงคณิตศาสตร์ และสิ่งที่ "ห้ามทำเด็ดขาด" ในรอบเวลานี้`
       ].join('\n');
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1232,7 +1288,8 @@ function initMath18Lab() {
 }
 
 function updateMathLabUI(sessionKey) {
-  const s = MATH_SESSIONS_DATA[sessionKey] || MATH_SESSIONS_DATA.evening;
+  const mathSessions = getDynamicMathSessionsData();
+  const s = mathSessions[sessionKey] || mathSessions.evening;
 
   // 1. Hero Big Stats
   const elDispMomentum = document.getElementById('mathDispMomentum');

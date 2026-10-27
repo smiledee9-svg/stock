@@ -17,25 +17,46 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-def fetch_scb_data(symbol="SCB.BK", period="4y", interval="1d"):
+def fetch_scb_data(symbol="SCB.BK", period="4y", interval="1d", max_retries=3, retry_delay=15):
     output_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(output_dir, "scb_candles.json")
     csv_path = os.path.join(output_dir, "scb_candles.csv")
 
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range={period}&interval={interval}"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
     }
 
-    print(f"[*] กำลังดึงข้อมูลหุ้น {symbol} ย้อนหลัง {period} จาก Yahoo Finance...")
-    res = requests.get(url, headers=headers, timeout=15)
-    if res.status_code != 200:
-        raise Exception(f"Failed to fetch data: HTTP {res.status_code}")
+    data = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"[*] [{attempt}/{max_retries}] กำลังดึงข้อมูลหุ้น {symbol} ย้อนหลัง {period} จาก Yahoo Finance...")
+            res = requests.get(url, headers=headers, timeout=20)
+            if res.status_code == 200:
+                raw_json = res.json()
+                if "chart" in raw_json and "result" in raw_json["chart"] and raw_json["chart"]["result"]:
+                    data = raw_json
+                    print(f"[✓] เชื่อมต่อ Yahoo Finance สำเร็จ (HTTP 200)")
+                    break
+            print(f"[!] คำขอครั้งที่ {attempt} ไม่สำเร็จ (HTTP {res.status_code}) กำลังรอ {retry_delay} วินาทีเพื่อลองใหม่...")
+        except Exception as err:
+            print(f"[!] เกิดข้อผิดพลาดในรอบที่ {attempt}: {err}. กำลังรอ {retry_delay} วินาที...")
+        
+        if attempt < max_retries:
+            time.sleep(retry_delay)
 
-    data = res.json()
+    # หากดึงข้อมูลออนไลน์ไม่สำเร็จ ให้เปิดใช้ข้อมูลแคชเดิมในเครื่องทันที (Zero Crash)
+    if data is None:
+        if os.path.exists(json_path):
+            print(f"[!] ไม่สามารถเชื่อมต่อ Yahoo ได้ ใช้ข้อมูลแคชเดิมจาก {json_path}")
+            with open(json_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        raise Exception(f"Failed to fetch data from Yahoo Finance after {max_retries} attempts and no local cache available.")
+
     result = data["chart"]["result"][0]
-    timestamps = result["timestamp"]
-    quote = result["indicators"]["quote"][0]
+    timestamps = result.get("timestamp", [])
+    indicators = result.get("indicators", {})
+    quote = indicators.get("quote", [{}])[0]
 
     opens = quote.get("open", [])
     highs = quote.get("high", [])
