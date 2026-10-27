@@ -333,10 +333,11 @@ class RamanujanConfidenceCycleTrader:
                 exit_price = c_t
                 exit_reason = ""
 
-                # 0. EARLY BREAKEVEN SHIELD (+0.75% trigger -> move SL to +0.35% fee-covered)
+                # 0. DYNAMIC BREAKEVEN SHIELD (Volatility-Adaptive: max(1.5%, be_mult * delta_t))
                 if not cycle_super_trend:
-                    fee_breakeven_price = round(avg_entry * (1.0 + self.roundtrip_tau + 0.0005), 2)
-                    if h_t >= avg_entry * 1.0075 and cycle_sl < fee_breakeven_price:
+                    fee_breakeven_price = round(avg_entry * (1.0 + self.roundtrip_tau + 0.0015), 2)
+                    dyn_be_trigger = avg_entry * (1.0 + max(0.015, cycle_be_trigger_mult * delta_t))
+                    if h_t >= dyn_be_trigger and cycle_sl < fee_breakeven_price:
                         cycle_sl = fee_breakeven_price
 
                 # 1. EVALUATE TP +2.5% & DYNAMIC SUPER TREND SWITCHER
@@ -447,15 +448,10 @@ class RamanujanConfidenceCycleTrader:
                     trailing_stops[t] = exit_price
                     continue
 
-                # B. Early Breakeven Shield (+0.75% trigger) + SuperTrend Switcher (+2.50%)
+                # B. Dynamic Breakeven Shield & Pyramiding Protection
+                be_price = avg_entry * (1.0 + self.roundtrip_tau + 0.002)
                 if not cycle_super_trend:
-                    # Early Breakeven Shield at +0.75%
-                    fee_breakeven_price = avg_entry * (1.0 + self.roundtrip_tau + 0.0005) # covers 0.336% fee
-                    if h_t >= avg_entry * 1.0075 and cycle_sl < fee_breakeven_price:
-                        cycle_sl = fee_breakeven_price
-                    
-                    be_price = avg_entry * (1.0 + self.roundtrip_tau + 0.002)
-                    if h_t >= avg_entry * (1.0 + cycle_be_trigger_mult * delta_t) and cycle_sl < be_price:
+                    if h_t >= avg_entry * (1.0 + max(0.015, cycle_be_trigger_mult * delta_t)) and cycle_sl < be_price:
                         cycle_sl = be_price
 
                 trailing_stops[t] = round(cycle_sl, 2)
