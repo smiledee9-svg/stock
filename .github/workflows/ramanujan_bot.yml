@@ -32,12 +32,17 @@ jobs:
       - name: 🚀 Run Ramanujan Automated Pipeline (Fetch & Predict)
         run: |
           python quant-ramanujan/auto_update.py
+          # ซิงค์ข้อมูลที่อัพเดทเข้าสู่โฟลเดอร์ SCB อัตโนมัติ เพื่อให้พร้อมแยกโปรเจกต์ตลอดเวลา
+          cp quant-ramanujan/scb_candles.json SCB/scb_candles.json || true
+          cp quant-ramanujan/scb_candles.csv SCB/scb_candles.csv || true
+          cp quant-ramanujan/ramanujan_results.json SCB/ramanujan_results.json || true
+          cp quant-ramanujan/ramanujan_data.js SCB/ramanujan_data.js || true
 
       - name: 💾 Commit & Push Updated Quant Intelligence
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add quant-ramanujan/scb_candles.json quant-ramanujan/scb_candles.csv quant-ramanujan/ramanujan_results.json quant-ramanujan/ramanujan_data.js
+          git add quant-ramanujan/scb_candles.json quant-ramanujan/scb_candles.csv quant-ramanujan/ramanujan_results.json quant-ramanujan/ramanujan_data.js SCB/scb_candles.json SCB/scb_candles.csv SCB/ramanujan_results.json SCB/ramanujan_data.js
           if git diff --staged --quiet; then
             echo "No data changes to commit."
           else

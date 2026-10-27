@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SCB Trader Pro - ระบบวิเคราะห์สัญญาณซื้อขายหุ้น SCB และแบคเทสย้อนหลัง 2 ปี</title>
+  <meta name="description" content="ระบบวิเคราะห์สัญญาณซื้อ-ขายหุ้น SCB ดึงข้อมูลย้อนหลัง 2 ปีจาก Yahoo Finance วิเคราะห์ด้วย AI Gemini แจ้งเตือนผ่าน LINE อัตโนมัติ พร้อมระบบ Backtesting จำลองผลตอบแทน">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="terminal-container">
+    
+    <!-- TOP NAVIGATION & BRAND BAR -->
+    <header class="terminal-header glass">
+      <div class="brand-section">
+        <div class="brand-logo-badge" style="background: linear-gradient(135deg, #ea580c, #f97316);">⛩️ SCB</div>
+        <div class="brand-details">
+          <h1>SCB Pure Ichimoku Master <span class="badge-tag" style="background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4);">⛩️ อิชิโมกุแท้ Goichi Hosoda</span></h1>
+          <p class="brand-subtitle">
+            <span class="tri-tag"><span class="tri-dot" style="background: #a855f7;"></span> GitHub Synced</span> •
+            <span class="tri-tag"><span class="tri-dot" style="background: #f97316;"></span> Cloudflare MCP CLI</span> •
+            <span class="tri-tag"><span class="tri-dot" style="background: #10b981;"></span> Gemini Multimodal AI</span> •
+            <span>สามประสานดึงข้อมูล SCB 2 ปี</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="refreshLiveQuoteBtn" class="btn btn-secondary" title="ดึงข้อมูลราคาสดจาก Yahoo Finance">
+          <span>🔄</span> <span>อัปเดตราคาล่าสุด</span>
+        </button>
+        <button id="openMcpModalBtn" class="btn btn-secondary" style="border-color: rgba(249, 115, 22, 0.4); color: #fb923c;" title="เปิดคอนโซลทดสอบ Cloudflare MCP CLI Tool">
+          <span>⚡</span> <span>Cloudflare MCP CLI</span>
+        </button>
+        <button id="triggerVisionAiBtn" class="btn btn-ai" title="แคปรูปกราฟอิชิโมกุส่งให้ Gemini AI ส่องและวิเคราะห์ตามหลัก Hosoda">
+          <span>👁️</span> <span>Gemini ส่องอิชิโมกุ</span>
+        </button>
+        <button id="openLineConfigBtn" class="btn btn-line" title="ตั้งค่าการแจ้งเตือนเข้า LINE">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+          </svg>
+          <span>ตั้งค่า LINE แจ้งเตือน</span>
+        </button>
+        <a href="../quant-ramanujan/index.html" class="btn btn-secondary" style="border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc;" title="เปิดห้องทดลองควอนต์รามานุจัน (โปรเจกต์ 3)">
+          <span>📐</span> <span>Ramanujan Lab</span>
+        </a>
+        <a href="../quant-rebalance/index.html" class="btn btn-secondary" style="border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;" title="เปิดระบบรีบาลานซ์พอร์ต SCB (โปรเจกต์ 4)">
+          <span>⚖️</span> <span>SCB Rebalance</span>
+        </a>
+        <a href="../index.html" class="btn btn-hub-back" title="กลับไปหน้าสต็อกสินค้าเดิม">
+          <span>📦</span> <span>หน้าหลักคลังสินค้า</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- REAL-TIME TICKER STATS BANNER -->
+    <section class="ticker-banner glass">
+      <div class="ticker-left">
+        <div>
+          <span class="ticker-symbol">SCB.BK</span>
+          <span style="font-size: 13px; color: var(--text-muted); margin-left: 6px;">SCB X Public Company Limited (SET)</span>
+        </div>
+        <div class="ticker-price" id="livePriceText">146.50 ฿</div>
+        <div class="ticker-change up" id="liveChangeBadge">+0.69% (+1.00)</div>
+      </div>
+
+      <div class="ticker-stats">
+        <div class="stat-item">
+          <span class="stat-label">ราคาสูงสุดวันนี้</span>
+          <span class="stat-value" id="statDayHigh">146.50</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ราคาต่ำสุดวันนี้</span>
+          <span class="stat-value" id="statDayLow">145.50</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ปริมาณซื้อขาย (Volume)</span>
+          <span class="stat-value" id="statVolume">5.68M</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ช่วงราคา 52 สัปดาห์</span>
+          <span class="stat-value" id="stat52Week">127.00 - 160.00</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ข้อมูลแท่งเทียน</span>
+          <span class="stat-value" id="statCandleCount" style="color: #60a5fa;">488 วัน (2 ปี)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN DASHBOARD GRID -->
+    <div class="dashboard-grid">
+      
+      <!-- LEFT: CANDLESTICK & INDICATOR CHART -->
+      <section class="chart-panel glass">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>⛩️</span> กราฟอิชิโมกุแท้ 5 เส้นสมดุล (Ichimoku Kinko Hyo Master Chart)
+          </div>
+          <div class="chart-controls">
+            <span class="interval-pill active" id="rangeAllBtn">2 ปีเต็ม</span>
+            <span class="interval-pill" id="range1yBtn">1 ปี</span>
+            <span class="interval-pill" id="range6mBtn">6 เดือน</span>
+            <span class="interval-pill" id="range3mBtn">3 เดือน</span>
+            <button id="toggleKumoBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(6, 182, 212, 0.4); color: #22d3ee; padding: 4px 10px; font-size: 12px; margin-left: 6px;">
+              <span>☁️ เมฆ Kumo</span>
+            </button>
+            <button id="toggleChikouBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 4px;">
+              <span>👁️ Chikou 26</span>
+            </button>
+            <button id="chartScanVisionBtn" class="btn btn-secondary btn-sm" style="border-color: rgba(139, 92, 246, 0.4); color: #c084fc; padding: 4px 10px; font-size: 12px; margin-left: 6px;">
+              <span>👁️ ส่องรูปกราฟนี้</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="chart-container-wrap">
+          <canvas id="tradingChartCanvas"></canvas>
+        </div>
+
+        <!-- 100% PURE ICHIMOKU LEGEND -->
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span> แท่งเทียนขึ้น</div>
+          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span> แท่งเทียนลง</div>
+          <div class="legend-item"><span class="legend-color" style="background: #22d3ee;"></span> Tenkan 9 (โมเมนตัมเร็ว)</div>
+          <div class="legend-item"><span class="legend-color" style="background: #f97316; height: 4px;"></span> Kijun 26 (ศูนย์ถ่วงสมดุล 2.5px)</div>
+          <div class="legend-item" id="legendChikou" style="display: flex;"><span class="legend-color" style="background: #c084fc;"></span> Chikou 26 (พ้นเงาอดีต)</div>
+          <div class="legend-item" id="legendKumo" style="display: flex;"><span class="legend-color" style="background: rgba(6, 182, 212, 0.5);"></span> เมฆ Kumo (Span A/B)</div>
+        </div>
+      </section>
+
+      <!-- RIGHT: LIVE SIGNAL & POSITION MANAGEMENT -->
+      <aside class="sidebar-panel">
+        
+        <!-- SIGNAL CARD -->
+        <div class="signal-card glass" id="mainSignalCard">
+          <div class="signal-badge-wrap">
+            <div class="signal-badge buy" id="currentSignalBadge">
+              <span id="signalDot">🟢</span> <span id="signalText">สัญญาณ: รอจังหวะ (HOLD)</span>
+            </div>
+            <span class="signal-time" id="signalDateText">อัปเดต: วันนี้</span>
+          </div>
+
+          <div class="signal-targets-grid">
+            <div class="target-box">
+              <span class="target-label">จุดเข้า (Entry)</span>
+              <span class="target-val entry" id="targetEntryVal">146.50 ฿</span>
+            </div>
+            <div class="target-box">
+              <span class="target-label">ตัดขาดทุน (SL)</span>
+              <span class="target-val sl" id="targetSlVal">142.00 ฿</span>
+            </div>
+            <div class="target-box">
+              <span class="target-label">เป้าทำกำไร (TP)</span>
+              <span class="target-val tp" id="targetTpVal">154.00 ฿</span>
+            </div>
+          </div>
+
+          <!-- ACTIVE POSITION TRACKER -->
+          <div class="position-card glass" style="margin-top: 14px; border-radius: 8px;">
+            <div class="position-header">
+              <span style="font-size: 13px; font-weight: 700;">สถานะพอร์ตการลงทุน</span>
+              <span class="pos-tag idle" id="positionStatusTag">ยังไม่มีการถือครอง</span>
+            </div>
+            <div class="position-details">
+              <div class="pos-row">
+                <span class="pos-row-label">ราคาเข้าซื้อ:</span>
+                <span class="pos-row-val" id="posBuyPrice">-</span>
+              </div>
+              <div class="pos-row">
+                <span class="pos-row-label">กำไร/ขาดทุนปัจจุบัน:</span>
+                <span class="pos-row-val" id="posPnlText" style="color: var(--text-dim);">-</span>
+              </div>
+              <div class="pos-row">
+                <span class="pos-row-label">เป้าหมายขาย (TP):</span>
+                <span class="pos-row-val" id="posTpTarget" style="color: var(--buy-green);">-</span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+              <button id="simBuyBtn" class="btn btn-secondary btn-sm" style="flex: 1; padding: 6px; font-size: 12px; border-color: var(--buy-green-border); color: var(--buy-green);">
+                + จำลองเข้าซื้อราคาปัจจุบัน
+              </button>
+              <button id="simSellBtn" class="btn btn-secondary btn-sm" style="flex: 1; padding: 6px; font-size: 12px; border-color: var(--sell-red-border); color: var(--sell-red);" disabled>
+                ✕ จำลองขายออก
+              </button>
+            </div>
+          </div>
+
+          <!-- HOSODA 4-LAYER QUANT PIPELINE -->
+          <div class="hosoda-panel-box">
+            <div class="hosoda-header">
+              <span class="hosoda-title">👑 ทฤษฎีแท้ Goichi Hosoda (3 เสาหลัก)</span>
+              <span class="badge-tag" style="background: rgba(139, 92, 246, 0.2); color: #c084fc;">4-Layer Pipeline</span>
+            </div>
+            <div class="hosoda-steps-grid">
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L1: สภาวะสมดุล (Regime Filter)</span>
+                <span class="hosoda-step-val" id="hosodaL1Status" style="color: #34d399;">Sanyaku Kouten (ไฟเขียว)</span>
+              </div>
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L2: โครงสร้างคลื่น (Hado-ron)</span>
+                <span class="hosoda-step-val" id="hosodaL2Status" style="color: #60a5fa;">คลื่น N: A ➔ B ➔ C (ยืน Kijun)</span>
+              </div>
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L3: มิติเวลา (Jikan-ron)</span>
+                <span class="hosoda-step-val" id="hosodaL3Status" style="color: #facc15;">Henka-bi Window (เปิดรับคำสั่ง)</span>
+              </div>
+              <div class="hosoda-step-item">
+                <span class="hosoda-step-name">L4: ความคุ้มค่า (Nehaba R:R)</span>
+                <span class="hosoda-step-val" id="hosodaL4Status" style="color: #34d399;">Expected R:R ≥ 1.5x (คุ้มค่า)</span>
+              </div>
+            </div>
+
+            <!-- NEHABA TARGETS -->
+            <div class="nehaba-targets-row">
+              <div class="nehaba-target-item">
+                <div class="lbl">เป้าหมาย V</div>
+                <div class="val" id="targetVVal">150.50 ฿</div>
+              </div>
+              <div class="nehaba-target-item" style="border-color: rgba(16, 185, 129, 0.3);">
+                <div class="lbl">เป้าหมาย N (หลัก)</div>
+                <div class="val" id="targetNVal" style="color: #34d399;">152.00 ฿</div>
+              </div>
+              <div class="nehaba-target-item">
+                <div class="lbl">เป้าหมาย E</div>
+                <div class="val" id="targetEVal">154.50 ฿</div>
+              </div>
+              <div class="nehaba-target-item">
+                <div class="lbl">เป้าหมาย NT</div>
+                <div class="val" id="targetNtVal">148.50 ฿</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI MULTIMODAL VISION INSIGHT BOX -->
+          <div class="ai-insight-box">
+            <div class="ai-insight-header">
+              <span class="ai-insight-title">
+                <span>👁️</span> การวิเคราะห์ด้วย Gemini Vision AI
+              </span>
+              <span class="ai-confidence-pill" id="aiConfidenceBadge">ความมั่นใจ 85%</span>
+            </div>
+
+            <div id="aiStrategyChosenBadge" class="strategy-selected-badge" style="display: flex;">
+              <span>🎯 กลยุทธ์ที่ AI เลือก:</span>
+              <span id="aiStrategyChosenText" style="color: #67e8f9; font-weight: 800;">Hosoda 4-Layer N-Wave & Kumo Equilibrium</span>
+            </div>
+
+            <!-- SNAPSHOT OF CHART VIEWED BY AI -->
+            <div class="vision-snapshot-wrap" id="visionSnapshotWrap">
+              <div class="vision-snapshot-header">
+                <span>📸 ภาพกราฟที่ Gemini AI เพิ่งส่องวิเคราะห์</span>
+                <span id="visionScanTimeText">สดจาก Canvas</span>
+              </div>
+              <img id="visionThumbnailImg" class="vision-thumbnail-img" alt="Chart Snapshot">
+            </div>
+
+            <p class="ai-insight-text" id="aiInsightSummary" style="margin-top: 10px;">
+              Gemini Vision AI ได้ส่องดูรูปกราฟแท่งเทียน: มองเห็นการเรียงตัวของแท่งเทียนทรงตัวเกาะเหนือเส้น EMA 50 สะท้อนแรงรับเหนียวแน่น แนะนำวางจุดตัดขาดทุนใต้แนวรับ 142.00 บาท และเล็งเป้าหมายทำกำไร 154.00 บาท ตามกรอบกติกา RRR 1:2.0
+            </p>
+          </div>
+
+          <!-- RISK GUARDRAILS PANEL -->
+          <div class="guardrails-box">
+            <div class="guardrails-header">
+              <span class="guardrails-title">🛡️ กรอบกติกาความเสี่ยง (Risk Guardrails)</span>
+              <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">🔒 ล็อกกติกา</span>
+            </div>
+            <div class="guardrails-list">
+              <span class="guardrail-pill active" title="จำกัดขาดทุนไม่เกิน 3.5% ต่อไม้">Max SL: ≤ 3.5%</span>
+              <span class="guardrail-pill active" title="ผลตอบแทนคาดหวังต้องคุ้มค่าอย่างน้อย 1.5 เท่า">Min RRR: ≥ 1.5x</span>
+              <span class="guardrail-pill active" title="ห้ามซื้อเมื่อ RSI สูงเกินไป">RSI Ceiling: < 75</span>
+              <span class="guardrail-pill active" title="ซื้อทีละ 1 ไม้ ห้ามถัว">Single Position: 1 ไม้</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; display: flex; gap: 10px;">
+            <button id="shareToLineBtn" class="btn btn-line" style="flex: 1; justify-content: center;">
+              <span>💬</span> ส่งสัญญาณเข้า LINE
+            </button>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+    <!-- BACKTESTING SIMULATION ENGINE -->
+    <section class="backtest-section glass">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>⚙️</span> ระบบจำลองการเทรดย้อนหลัง (Backtesting Simulator) บนข้อมูล SCB 2 ปี
+        </div>
+        <button id="runBacktestBtn" class="btn btn-primary">
+          <span>🚀</span> <span>เริ่มคำนวณแบคเทสย้อนหลัง</span>
+        </button>
+      </div>
+
+      <!-- CONTROLS ROW -->
+      <div class="backtest-controls-row">
+        <div class="form-group">
+          <label>กลยุทธ์การเทรด (Strategy)</label>
+          <select id="btStrategySelect" class="form-control">
+            <option value="hosoda_4layer" selected>👑 ทฤษฎีแท้ Goichi Hosoda 4 ชั้น (Hado N-Wave + Jikan + Nehaba + Sanyaku)</option>
+            <option value="sanyaku_kouten">🟢 Sanyaku Kouten (三役好転 - ไฟเขียว 3 ด่านสมดุลเหนือเมฆ)</option>
+            <option value="kijun_bounce">⚖️ Kijun-sen Equilibrium Bounce (ย่อรับเส้นฐาน 26 วันในเทรนด์ขาขึ้น)</option>
+            <option value="kumo_breakout">☁️ Kumo Breakout & Cloud Surfer (ทะลุแนวต้านขอบเมฆ Kumo หนา)</option>
+            <option value="gemini_vision_strategy">🤖 Gemini Vision AI Autonomous Pure Ichimoku (AI เลือกกลยุทธ์อิชิโมกุ)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>เงินทุนจำลองเริ่มต้น (บาท)</label>
+          <input type="number" id="btCapitalInput" class="form-control" value="100000" step="10000">
+        </div>
+
+        <div class="form-group">
+          <label>เป้าหมายทำกำไร (Take Profit %)</label>
+          <input type="number" id="btTpInput" class="form-control" value="6.0" step="0.5">
+        </div>
+
+        <div class="form-group">
+          <label>จุดตัดขาดทุน (Stop Loss %)</label>
+          <input type="number" id="btSlInput" class="form-control" value="3.5" step="0.5">
+        </div>
+
+        <div class="form-group">
+          <label>ช่วงระยะเวลาทดสอบ</label>
+          <select id="btPeriodSelect" class="form-control">
+            <option value="2y" selected>2 ปีเต็ม (ข้อมูลทั้งหมด)</option>
+            <option value="1y">1 ปีย้อนหลัง</option>
+            <option value="6m">6 เดือนย้อนหลัง</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- METRICS RESULT GRID -->
+      <div class="backtest-metrics-grid">
+        <div class="metric-card">
+          <span class="metric-title">กำไร/ขาดทุนสุทธิ (Net Return)</span>
+          <span class="metric-number positive" id="metricTotalReturn">+24.50%</span>
+          <span class="metric-sub" id="metricProfitBaht">+24,500 บาท จาก 100,000 บาท</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-title">อัตราความแม่นยำ (Win Rate)</span>
+          <span class="metric-number" id="metricWinRate" style="color: #60a5fa;">66.7%</span>
+          <span class="metric-sub" id="metricWinLossCount">ชนะ 10 ไม้ / แพ้ 5 ไม้</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-title">ความเสี่ยงสูงสุด (Max Drawdown)</span>
+          <span class="metric-number negative" id="metricMaxDd">-5.20%</span>
+          <span class="metric-sub">การย่อตัวสูงสุดของพอร์ต</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-title">จำนวนการเทรด (Total Trades)</span>
+          <span class="metric-number neutral" id="metricTotalTrades">15 ไม้</span>
+          <span class="metric-sub" id="metricProfitFactor">Profit Factor: 2.35</span>
+        </div>
+      </div>
+
+      <!-- DETAILED TRADE LOG TABLE -->
+      <div class="panel-header" style="margin-top: 10px; margin-bottom: 12px;">
+        <span style="font-size: 14.5px; font-weight: 700; color: var(--text-muted);">📋 รายการบันทึกการซื้อ-ขายย้อนหลังทุกไม้ (Trade Execution Log)</span>
+        <span id="tradeLogCountBadge" style="font-size: 12px; color: var(--text-dim);">15 รายการ</span>
+      </div>
+
+      <div class="table-container">
+        <table class="trade-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>วันที่ซื้อ (Buy Date)</th>
+              <th>ราคาซื้อ</th>
+              <th>วันที่ขาย (Sell Date)</th>
+              <th>ราคาขาย</th>
+              <th>ถือครอง (วัน)</th>
+              <th>กำไร/ขาดทุน (%)</th>
+              <th>กำไร/ขาดทุน (บาท)</th>
+              <th>เหตุผลที่ปิดออเดอร์</th>
+              <th>ผลลัพธ์</th>
+            </tr>
+          </thead>
+          <tbody id="tradeLogTableBody">
+            <!-- Dynamically populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MODAL: LINE NOTIFICATION SETTINGS -->
+  <div class="modal-overlay" id="lineConfigModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span style="color: var(--line-green);">💬</span> ตั้งค่าการแจ้งเตือนผ่าน LINE
+        </h3>
+        <button class="close-btn" id="closeLineModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6;">
+          ระบบจะส่งสัญญาณเมื่อเกิดจังหวะ **เข้าซื้อ (BUY)** และติดตามจนกระทั่งถึงจุด **ขายทำกำไร/ตัดขาดทุน (SELL)** แล้วส่งแจ้งเตือนเข้าห้องแชท LINE ทันที
+        </p>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label>LINE Webhook URL (หรือ LINE Messaging API Webhook)</label>
+          <input type="url" id="lineWebhookInput" class="form-control" placeholder="https://hook.make.com/... หรือ Zapier/n8n/LINE Bot Webhook">
+          <span style="font-size: 11.5px; color: var(--text-dim); margin-top: 4px;">
+            ใส่ Webhook สำหรับรับข้อความแจ้งเตือนอัตโนมัติ (หรือใช้ปุ่มแชร์ด่วนด้านล่าง)
+          </span>
+        </div>
+
+        <div style="background: rgba(6, 199, 85, 0.08); border: 1px solid rgba(6, 199, 85, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <h4 style="font-size: 13px; font-weight: 700; color: var(--line-green); margin-bottom: 6px;">⚡ หรือใช้ปุ่ม "แชร์ส่งตรงเข้า LINE ทันที" (ไม่ต้องตั้งค่า API)</h4>
+          <p style="font-size: 12.5px; color: #d1d5db; margin-bottom: 10px;">
+            สามารถคลิกปุ่มแชร์เพื่อส่งการ์ดสัญญาณซื้อ/ขายเข้าห้องแชทหรือกลุ่ม LINE ของคุณได้ทันทีผ่านแอป LINE บนมือถือหรือคอมพิวเตอร์
+          </p>
+          <button type="button" id="testDirectLineShareBtn" class="btn btn-line btn-sm" style="width: 100%; justify-content: center;">
+            📲 ทดสอบเปิดแชร์สัญญาณเข้าแอป LINE
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="autoAlertBuyCheck" checked>
+            <span>แจ้งเตือนอัตโนมัติเมื่อเกิดสัญญาณซื้อ (BUY Signal)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 8px;">
+            <input type="checkbox" id="autoAlertSellCheck" checked>
+            <span>แจ้งเตือนอัตโนมัติเมื่อถึงจุดขาย (TP / SL / SELL Signal)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelLineModalBtn">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" id="saveLineConfigBtn">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CLOUDFLARE MCP CLI & SKILL PLAYGROUND -->
+  <div class="modal-overlay" id="mcpPlaygroundModal" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span style="color: #fb923c;">⚡</span> Cloudflare MCP CLI & AI Skill Console
+        </h3>
+        <button class="close-btn" id="closeMcpModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 13px; font-weight: 700; color: #fb923c; margin-bottom: 4px;">
+            สามประสาน: GitHub ➔ Cloudflare MCP CLI ➔ Google Gemini AI
+          </div>
+          <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5; margin: 0;">
+            ระบบนี้รองรับ Model Context Protocol (MCP) ผ่าน Cloudflare Workers & CLI Tool ช่วยให้ Agent/Gemini AI เรียกดูข้อมูลอิชิโมกุ 5 เส้น คำนวณเป้าหมาย Nehaba (V, N, E, NT) และสั่ง Backtest ผ่าน JSON-RPC 2.0 ได้ทันที
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label>เลือก MCP Tool ที่ต้องการเรียกใช้งาน (Model Context Protocol)</label>
+          <select id="mcpToolSelect" class="form-control">
+            <option value="ichimoku_get_regime" selected>🛠️ ichimoku_get_regime (ดึงสภาวะสมดุล 5 เส้น + Sanyaku Kouten)</option>
+            <option value="ichimoku_calculate_nehaba">🛠️ ichimoku_calculate_nehaba (คำนวณเป้าหมายราคา V, N, E, NT และ R:R)</option>
+            <option value="ichimoku_scan_hado_wave">🛠️ ichimoku_scan_hado_wave (สแกนโครงสร้างคลื่น N: A➔B➔C และกรอบเวลา Henka-bi)</option>
+            <option value="ichimoku_backtest_simulator">🛠️ ichimoku_backtest_simulator (จำลองการเทรด Hosoda 4-Layer 2 ปี)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button type="button" id="executeMcpToolBtn" class="btn btn-primary" style="flex: 1; justify-content: center; background: linear-gradient(135deg, #ea580c, #f97316);">
+            <span>⚡</span> <span>รัน MCP Tool Call (JSON-RPC 2.0)</span>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; justify-content: space-between; align-items: center;">
+            <span>ผลลัพธ์ JSON-RPC 2.0 ตอบกลับจาก Cloudflare MCP Server</span>
+            <span id="mcpLatencyBadge" style="font-size: 11px; color: #34d399; font-family: var(--font-mono);">200 OK • 12ms</span>
+          </label>
+          <pre id="mcpJsonOutput" style="background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; padding: 12px; color: #38bdf8; font-size: 11.5px; font-family: var(--font-mono); max-height: 220px; overflow-y: auto; white-space: pre-wrap; margin: 0;">กดปุ่มด้านบนเพื่อทดสอบยิง MCP Tool Call</pre>
+        </div>
+
+        <div style="margin-top: 12px; font-size: 11px; color: var(--text-dim); line-height: 1.4;">
+          💡 <strong>คำสั่งเชื่อมต่อ CLI กับ Cloudflare MCP Server:</strong><br>
+          <code style="background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; color: #fb923c;">npx @cloudflare/mcp-server --config scb-trader/mcp/wrangler.jsonc</code>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="dismissMcpModalBtn">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION LOGIC -->
+  <script src="data/scb_data.js"></script>
+  <script src="trader.js"></script>
+</body>
+</html>

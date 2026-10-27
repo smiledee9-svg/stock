@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "scb-pure-ichimoku-mcp",
+  "main": "ichimoku-mcp-server.js",
+  "compatibility_date": "2024-11-05",
+  "observability": {
+    "enabled": true
+  }
+}
