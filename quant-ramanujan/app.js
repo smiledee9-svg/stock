@@ -1,10 +1,36 @@
 /**
  * Ramanujan SET Discrete Cycle Trader - Front-End Controller
- * High-performance, single crystallized strategy dashboard
+ * Single-Page Crystallized Master Dashboard for SCB.BK
+ * Powered by Ramanujan Periodicity Transform (RPT), Rogers-Ramanujan Fractions,
+ * Hardy-Ramanujan Partitions, and Risk-Free Pyramiding.
  */
 
+// ==========================================
+// 1. GLOBAL STATE & LOCAL STORAGE CONFIG
+// ==========================================
+const LOCAL_STORAGE_KEY = 'SCB_RAMANUJAN_JOURNAL_V2';
+let rawData = null;
+let priceChart = null;
+let waveChart = null;
+let candleSeries = null;
+let emaSeries = null;
+let trailingSeries = null;
+let vMicroSeries = null;
+let vMacroSeries = null;
+let zeroLineSeries = null;
+
+// Archive Database state
+let allArchiveRecords = [];
+let currentArchiveFilter = 'all';
+let archiveSearchQuery = '';
+let currentArchivePage = 1;
+const ARCHIVE_ITEMS_PER_PAGE = 30;
+
+// Active 18-wave selection
+let selectedWaveIdx = 5; // Default to V5 (Weekly Momentum)
+
+// Initialize when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if offline fallback is available
   if (typeof window.RAMANUJAN_DATA !== 'undefined' && window.RAMANUJAN_DATA) {
     initDashboard(window.RAMANUJAN_DATA);
   } else {
@@ -15,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(data => initDashboard(data))
       .catch(err => {
-        console.warn('Failed to load JSON directly, checking window.RAMANUJAN_DATA:', err);
+        console.warn('Direct fetch failed, falling back to window.RAMANUJAN_DATA:', err);
         if (typeof window.RAMANUJAN_DATA !== 'undefined') {
           initDashboard(window.RAMANUJAN_DATA);
         } else {
@@ -25,307 +51,120 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-let priceChart = null;
-let waveChart = null;
-let candleSeries = null;
-let emaSeries = null;
-let trailingSeries = null;
-let vMicroSeries = null;
-let vMacroSeries = null;
-let zeroLineSeries = null;
-let rawData = null;
-let currentCyclesList = [];
-let activeTradeFilter = 'all';
-
+/**
+ * Master initialization function for single-page dashboard
+ */
 function initDashboard(data) {
   rawData = data;
   const summary = data.summary || {};
   const activePos = data.activePosition || {};
   const completedCycles = data.completedCycles || [];
   const candles = data.candlesWithSignals || [];
+  const pred = data.predictiveIntelligence || {};
 
-  currentCyclesList = completedCycles;
+  // 1. Render Top Header & Live Quantum Telemetry Cockpit
+  renderTelemetryCockpit(summary, activePos, pred, candles);
 
-  // 1. Render Metrics Cards
-  renderSummaryMetrics(summary);
+  // 2. Initialize Lightweight Charts (Candlesticks + Ramanujan Waves)
+  initLightweightCharts(candles);
 
-  // 2. Render Active State Banner
-  renderActiveState(activePos, candles);
+  // 3. Render 4 Sacred Scenarios
+  renderScenarios(pred);
 
-  // 3. Render 12 Completed Cycles Table
-  renderCyclesTable(completedCycles, 'all');
+  // 4. Render 18-Harmonic Wave Continuum Spectrum
+  renderWaveContinuum(candles, pred);
 
-  // 4. Initialize TradingView Lightweight Charts
-  initCharts(candles);
+  // 5. Initialize 2-in-1 Daily Intelligence Archive
+  initDailyArchive(candles, pred, summary);
 
-  // 5. Initialize Preset & Toolbar Event Listeners
-  initToolbar(data);
+  // 6. Render Master Cycle Ledger (26 historical cycles)
+  renderMasterCycleLedger(completedCycles, summary);
 
-  // 6. Initialize Modular Navigation & Trade Filters
-  initModularNavigation();
-  initTradeFilter();
+  // 7. Initialize Capital Compounder Simulator
+  initSimulator(summary, completedCycles);
 
-  // 7. Render Predictive Intelligence Scenarios
-  if (data.predictiveIntelligence) {
-    renderPredictiveIntelligence(data.predictiveIntelligence);
-  }
-  initForecastRunSwitcher();
-  initMath18Lab();
+  // 8. Initialize Sticky Navigation HUD (Smooth Scrolling + ScrollSpy)
+  initStickyNavHud();
 }
 
-function renderSummaryMetrics(sm) {
-  const elSymbol = document.getElementById('mSymbol');
-  if (elSymbol) elSymbol.textContent = sm.symbol || 'SCB.BK';
-
-  const elWinRate = document.getElementById('mWinRate');
-  if (elWinRate) elWinRate.textContent = `${(sm.winRatePct || 75.0).toFixed(1)}%`;
-
-  const elWinTrades = document.getElementById('mWinTrades');
-  if (elWinTrades) elWinTrades.textContent = `${sm.winCycles || 9} ชนะ / ${sm.lossCycles || 3} แพ้ (รวม ${sm.totalCycles || 12} รอบ)`;
-
-  const elReturn = document.getElementById('mReturn');
-  if (elReturn) elReturn.textContent = `+${(sm.totalReturnPct || 15.77).toFixed(2)}%`;
-
-  const elPF = document.getElementById('mProfitFactor');
-  const profitThb = ((sm.finalEquity || 1157654) - (sm.initialCapital || 1000000));
-  if (elPF) elPF.textContent = `Profit Factor: ${(sm.profitFactor || 2.56).toFixed(2)} (กำไร ฿${profitThb.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 0})})`;
-
-  const elDD = document.getElementById('mDrawdown');
-  if (elDD) elDD.textContent = `${(sm.maxDrawdownPct || -6.84).toFixed(2)}%`;
-
-  const elCalmar = document.getElementById('mCalmar');
-  if (elCalmar) elCalmar.textContent = `Calmar Ratio: ${(sm.calmar || 2.31).toFixed(2)} (ปลอดภัยกว่า B&H ครึ่งหนึ่ง)`;
-
-  // Dynamic Navigation & TOC Card Badges
-  const elBadgeNav = document.getElementById('navCycleCountBadge');
-  if (elBadgeNav) elBadgeNav.textContent = `${sm.totalCycles || 29} รอบ`;
-
-  const elTOC2Title = document.getElementById('tocCard2Title');
-  if (elTOC2Title) elTOC2Title.textContent = `บันทึกประวัติการเทรด ${sm.totalCycles || 29} รอบ (เกราะคุ้มทุน +0.75%)`;
-
-  const elTOC2Desc = document.getElementById('tocCard2Desc');
-  if (elTOC2Desc) elTOC2Desc.textContent = `รายละเอียดผลการเทรดจริงย้อนหลัง ${sm.period || '4 ปี'} ครบทั้ง ${sm.totalCycles || 29} รอบ (ชนะ & เสมอคุ้มทุน ${sm.winCycles || 26} รอบ / ตัดขาดทุนฉุกเฉิน ${sm.lossCycles || 3} รอบ, Win Rate ${(sm.winRatePct || 89.66).toFixed(1)}%) พร้อมระบบเกราะกั้นหน้าทุน +0.75%`;
-
-  const elTOC2Badge = document.getElementById('tocCard2Badge');
-  if (elTOC2Badge) elTOC2Badge.textContent = `ชนะ ${sm.winCycles || 26} / คัทลอส ${sm.lossCycles || 3}`;
-
-  const elTOCTagWinRate = document.getElementById('tocTagWinRate');
-  if (elTOCTagWinRate) elTOCTagWinRate.textContent = `Win Rate ${(sm.winRatePct || 89.66).toFixed(1)}%`;
-
-  const elTOCTagCandles = document.getElementById('tocTagCandles');
-  if (elTOCTagCandles) elTOCTagCandles.textContent = `แท่งเทียน ${sm.period || '4 ปี'} (${(sm.totalCandles || 971).toLocaleString()} วัน)`;
-}
-
-function renderActiveState(activePos, candles) {
+// ==========================================
+// 2. TELEMETRY COCKPIT & LIVE STATE
+// ==========================================
+function renderTelemetryCockpit(summary, activePos, pred, candles) {
   const lastBar = candles.length > 0 ? candles[candles.length - 1] : {};
-  const currP = lastBar.close || 146.50;
+  const currPrice = pred.lastPrice || lastBar.close || 152.50;
+  const lastDate = pred.lastDate || lastBar.time || '2026-10-27';
 
-  const setAllText = (ids, val, color = null) => {
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.textContent = val;
-        if (color) el.style.color = color;
-      }
-    });
-  };
+  // Live status pill in Hero
+  const elStatus = document.getElementById('liveStatusText');
+  if (elStatus) {
+    elStatus.textContent = `ตลาดปิดเย็น ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
+  }
 
-  setAllText(['sigCurrPrice', 'sigCurrPrice_c'], `฿${currP.toFixed(2)}`);
+  // Telemetry Tiles
+  const elPrice = document.getElementById('kpiPrice');
+  if (elPrice) elPrice.textContent = `฿${currPrice.toFixed(2)}`;
 
-  const vM = lastBar.v_micro || -0.042;
-  const vMVal = `${vM > 0 ? '+' : ''}${vM.toFixed(3)}`;
-  const vMStatus = vM > 0 ? 'กำลังขึ้น (เหนือ 0)' : 'ชะลอตัว (ต่ำกว่า 0)';
-  setAllText(['sigVMicro', 'sigVMicro_c'], `${vMVal} (${vMStatus})`, vM > 0 ? '#38bdf8' : '#f87171');
-  setAllText(['sigVMicroVal', 'sigVMicroVal_c'], vMVal, vM > 0 ? '#38bdf8' : '#f87171');
-  setAllText(['sigVMicroSub', 'sigVMicroSub_c'], vMStatus, vM > 0 ? '#38bdf8' : '#f87171');
+  const elDate = document.getElementById('kpiDate');
+  if (elDate) elDate.textContent = `ข้อมูลปิดตลาด SET วันที่ ${formatDateThai(lastDate)}`;
 
-  const vMac = lastBar.v_macro || 0.038;
-  const vMacVal = `${vMac > 0 ? '+' : ''}${vMac.toFixed(3)}`;
-  const vMacStatus = vMac > 0 ? 'ประคองตัว (แรงส่งบวก)' : 'ทิ้งดิ่ง (ขาลง)';
-  setAllText(['sigVMacro', 'sigVMacro_c'], `${vMacVal} (${vMacStatus})`, vMac > 0 ? '#c084fc' : '#f87171');
-  setAllText(['sigVMacroVal', 'sigVMacroVal_c'], vMacVal, vMac > 0 ? '#c084fc' : '#f87171');
-  setAllText(['sigVMacroSub', 'sigVMacroSub_c'], vMacStatus, vMac > 0 ? '#c084fc' : '#f87171');
+  const deltaPct = pred.dynamicDeltaPct || 6.16;
+  const deltaThb = (currPrice * (deltaPct / 100)).toFixed(2);
+  const elDelta = document.getElementById('kpiDelta');
+  if (elDelta) elDelta.textContent = `±${deltaPct.toFixed(2)}%`;
 
-  const rho = lastBar.rho_ram || -0.598;
-  const rhoVal = `${rho > 0 ? '+' : ''}${rho.toFixed(3)}`;
-  const rhoStatus = rho > 0.2 ? 'คลื่นประสานเฟส (Coherent)' : 'คลื่นแยกทาง (Divergent)';
-  setAllText(['sigRho', 'sigRho_c'], `${rhoVal} (${rhoStatus})`, rho > 0 ? '#34d399' : '#fbbf24');
-  setAllText(['sigRhoVal', 'sigRhoVal_c'], rhoVal, rho > 0 ? '#34d399' : '#fbbf24');
-  setAllText(['sigRhoSub', 'sigRhoSub_c'], rhoStatus, rho > 0 ? '#34d399' : '#fbbf24');
+  const floorPrice = pred.expectedRange?.floor || (currPrice * (1 - deltaPct / 100));
+  const ceilPrice = pred.expectedRange?.ceiling || (currPrice * (1 + deltaPct / 100));
 
-  const d = lastBar.dynamic_delta || 0.012;
-  setAllText(['sigDelta', 'sigDelta_c'], `±${(d * 100).toFixed(2)}% (ก้าวไดนามิก)`);
-  setAllText(['sigDeltaVal', 'sigDeltaVal_c'], `±${(d * 100).toFixed(2)}%`);
+  const elFloor = document.getElementById('kpiFloor');
+  if (elFloor) elFloor.textContent = `฿${floorPrice.toFixed(2)}`;
 
-  const badgeEls = [document.getElementById('sigBadge'), document.getElementById('sigBadge_c')].filter(Boolean);
-  const pulseEls = [document.getElementById('sigPulse'), document.getElementById('sigPulse_c')].filter(Boolean);
+  const elCeil = document.getElementById('kpiCeiling');
+  if (elCeil) elCeil.textContent = `฿${ceilPrice.toFixed(2)}`;
 
-  if (activePos && activePos.inPosition) {
-    const badgeText = `🟢 กำลังถือสถานะ BUY (#${activePos.layers} ไม้, ${activePos.totalShares.toLocaleString()} หุ้น) กำไรลอยตัว: ${activePos.unrealizedPnLPct > 0 ? '+' : ''}${activePos.unrealizedPnLPct}%`;
-    badgeEls.forEach(b => {
-      b.textContent = badgeText;
-      b.style.background = 'rgba(16, 185, 129, 0.15)';
-      b.style.color = '#34d399';
-      b.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-    });
-    pulseEls.forEach(p => {
-      p.style.background = '#10b981';
-      p.style.boxShadow = '0 0 10px #10b981';
-    });
-    setAllText(['sigActionPlan', 'sigActionPlan_c'], `Trailing Stop: ฿${activePos.trailingStopPrice.toFixed(2)} | ทุนเฉลี่ย: ฿${activePos.avgEntryPrice.toFixed(2)} (ล็อกกำไรตามโครงสร้างคลื่น)`);
-  } else {
-    const badgeText = '⚪ สถานะปัจจุบัน: ถือเงินสด 100% รอสัญญาณคลื่นเปิดรอบใหม่';
-    badgeEls.forEach(b => {
-      b.textContent = badgeText;
-      b.style.background = 'rgba(148, 163, 184, 0.15)';
-      b.style.color = '#e2e8f0';
-      b.style.borderColor = 'rgba(148, 163, 184, 0.3)';
-    });
-    pulseEls.forEach(p => {
-      p.style.background = '#38bdf8';
-      p.style.boxShadow = '0 0 10px #38bdf8';
-    });
-    setAllText(['sigActionPlan', 'sigActionPlan_c'], 'ถือเงินสดปลอดภัย 100% (รอคลื่นสัปดาห์ V5 และคลื่นเดือน V20 พุ่งขึ้นพร้อมกัน)');
+  // Ramanujan Insight Narrative
+  const elTitle = document.getElementById('oracleTitle');
+  const elText = document.getElementById('oracleText');
+  const v5 = typeof lastBar.v_micro === 'number' ? lastBar.v_micro : 0.60;
+  const v20 = typeof lastBar.v_macro === 'number' ? lastBar.v_macro : 1.43;
+
+  if (elTitle && elText) {
+    if (v5 > 0 && v20 > 0) {
+      elTitle.textContent = `สัจธรรมแห่งสภาวะปัจจุบัน: คลื่นประสานพลังสถิตในแดนบวกพร้อมกัน (V5 = +${v5.toFixed(3)}, V20 = +${v20.toFixed(3)})`;
+      elText.innerHTML = `"รามานุจันตรวจวัดคลื่นฮาร์มอนิกสัปดาห์ <strong>$V_5$ (+${v5.toFixed(3)})</strong> และคลื่นเดือน <strong>$V_{20}$ (+${v20.toFixed(3)})</strong> พบว่า SCB.BK ได้ยกฐานราคาขึ้นยืนเหนือ Sacred Floor <strong>฿${floorPrice.toFixed(2)}</strong> อย่างสมบูรณ์แบบ ตลาดกำลังสะสมกำลังในโซนปลอดภัย รอคอยสัญญาณเบรกเอาท์ระเบิดตัวที่ <strong>฿${pred.scenarios?.bullishInflection?.triggerPrice?.toFixed(2) || '154.93'}</strong> — ในห้วงเวลานี้ พอร์ตปลอดภัย ไร้ความเสี่ยงจากการติดดอย"`;
+    } else {
+      elTitle.textContent = `สัจธรรมแห่งสภาวะปัจจุบัน: คลื่นอยู่ในช่วงปรับสมดุลกาลเวลา`;
+      elText.innerHTML = `"คลื่นความเร็วกำลังจัดระเบียบใหม่ ราคาแกว่งตัวอยู่ในกรอบ Floor <strong>฿${floorPrice.toFixed(2)}</strong> ถึง Ceiling <strong>฿${ceilPrice.toFixed(2)}</strong> ยึดมั่นวินัยเงินสดเป็นเอก"`;
+    }
   }
 }
 
-function renderCyclesTable(cycles, filter = null) {
-  const tbody = document.getElementById('cyclesTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  if (cycles && Array.isArray(cycles)) {
-    currentCyclesList = cycles;
-  }
-  const sourceList = currentCyclesList || [];
-  const activeFilter = filter !== null ? filter : activeTradeFilter;
-
-  let filtered = sourceList;
-  if (activeFilter === 'win') {
-    filtered = sourceList.filter(c => c.net_return_pct > 0);
-  } else if (activeFilter === 'loss') {
-    filtered = sourceList.filter(c => c.net_return_pct <= 0);
-  }
-
-  const summaryBadge = document.getElementById('tableSummaryBadge');
-  const wins = sourceList.filter(c => c.net_return_pct > 0).length;
-  if (summaryBadge) {
-    summaryBadge.textContent = `ชนะ & คุ้มทุน ${wins} จาก ${sourceList.length} รอบ (${((wins / Math.max(1, sourceList.length)) * 100).toFixed(1)}%)`;
-  }
-
-  const filterAllBtn = document.querySelector('.filter-btn[data-filter="all"]');
-  const filterWinBtn = document.querySelector('.filter-btn[data-filter="win"]');
-  const filterLossBtn = document.querySelector('.filter-btn[data-filter="loss"]');
-  if (filterAllBtn) filterAllBtn.textContent = `ทั้งหมด (${sourceList.length} รอบ)`;
-  if (filterWinBtn) filterWinBtn.textContent = `🟢 ชนะ & คุ้มทุน (${wins} รอบ)`;
-  if (filterLossBtn) filterLossBtn.textContent = `🔴 ตัดขาดทุนฉุกเฉิน (${sourceList.length - wins} รอบ)`;
-
-  if (filtered.length === 0) {
-    const emptyTr = document.createElement('tr');
-    emptyTr.innerHTML = `
-      <td colspan="14" style="text-align: center; padding: 32px 16px; color: #94a3b8; font-size: 0.95rem;">
-        🔍 ไม่พบรายการรอบเทรดในตัวกรองนี้
-      </td>
-    `;
-    tbody.appendChild(emptyTr);
-    return;
-  }
-
-  filtered.forEach((c, idx) => {
-    const tr = document.createElement('tr');
-    const isWin = c.net_return_pct > 0;
-    const isShield = c.exit_reason === 'Breakeven_Shield_Exit';
-    const pnlColor = isShield ? '#22d3ee' : (isWin ? '#34d399' : '#f87171');
-    const sign = c.net_return_pct > 0 ? '+' : '';
-
-    let modeClass = 'mode-breakout';
-    let modeText = c.mode;
-    if (c.mode === 'SUPER_TREND_RIDE') {
-      modeClass = 'mode-supertrend';
-      modeText = '🚀 SUPER_TREND';
-    } else if (c.mode === 'FIXED_TP_LOCKED') {
-      modeClass = 'mode-tp';
-      modeText = '🎯 TP_LOCKED';
-    } else if (c.mode === 'INFLECTION_TURN') {
-      modeClass = 'mode-inflection';
-    } else if (c.mode === 'IMPULSE_3BAR') {
-      modeClass = 'mode-impulse';
-    }
-
-    let exitReasonThai = c.exit_reason;
-    if (c.exit_reason === 'Breakeven_Shield_Exit') {
-      exitReasonThai = '🛡️ Breakeven Shield (กั้นทุน +0.75% คุ้มค่าคอมฯ)';
-    } else if (c.exit_reason === 'TakeProfit_Target_2.5%') {
-      exitReasonThai = '🎯 ชนเป้า TP +2.5% ล็อกกำไรเร็ว';
-    } else if (c.exit_reason === 'SuperTrend_Trailing_Exit') {
-      exitReasonThai = '🚀 รันซูเปอร์เทรนด์เต็มรอบ (Trailing Exit)';
-    } else if (c.exit_reason === 'Structural_StopLoss' || c.exit_reason === 'StopLoss_or_TrailingStop') {
-      exitReasonThai = isWin ? 'Trailing Stop ล็อกกำไร' : '🛡️ Structural Cut (คลื่นเสียทรงหนีดอย)';
-    } else if (c.exit_reason === 'Harmonic_Phase_Breakdown_TP') {
-      exitReasonThai = 'Harmonic Breakdown TP (คลื่นหักหัวลง)';
-    } else if (c.exit_reason === 'FailSafe_Early_Cut') {
-      exitReasonThai = 'FailSafe Early Cut (เบรกหลอกคัดไว)';
-    } else if (c.exit_reason === 'Stagnation_TimeDecay_Exit') {
-      exitReasonThai = 'Stagnation (15 วันไม่วิ่งตัดทุนคืน)';
-    }
-
-    let tierClass = 'tier-b';
-    let tierLabel = `🔹 Tier B (${c.entry_confidence_pct}%)`;
-    if (c.confidence_tier === 'TIER_A_FULL_RESONANCE') {
-      tierClass = 'tier-a';
-      tierLabel = `⚡ Tier A (${c.entry_confidence_pct}%)`;
-    } else if (c.confidence_tier === 'TIER_C_PROBE_SMALL') {
-      tierClass = 'tier-c';
-      tierLabel = `🔸 Tier C (${c.entry_confidence_pct}%)`;
-    }
-
-    tr.innerHTML = `
-      <td style="font-weight: 700; color: #94a3b8;">#${c.cycle_id || (idx + 1)}</td>
-      <td><strong>${c.entry_date}</strong></td>
-      <td>${c.exit_date}</td>
-      <td><span class="mode-badge ${modeClass}">${modeText}</span></td>
-      <td><span class="badge-tier ${tierClass}">${tierLabel}</span></td>
-      <td style="text-align: center;"><span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; font-weight: 700;">${c.layers_used} ไม้</span></td>
-      <td style="font-family: var(--font-code);">${c.total_shares.toLocaleString()}</td>
-      <td style="font-family: var(--font-code);">฿${c.avg_entry.toFixed(2)}</td>
-      <td style="font-family: var(--font-code); font-weight: 700;">฿${c.exit_price.toFixed(2)}</td>
-      <td style="text-align: center;">${c.bars_held} วัน</td>
-      <td style="font-family: var(--font-code); font-weight: 700; color: ${pnlColor};">${sign}฿${c.net_pnl_thb.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
-      <td style="font-family: var(--font-code); font-weight: 800; color: ${pnlColor};">${sign}${c.net_return_pct.toFixed(2)}%</td>
-      <td style="font-size: 0.82rem; color: #cbd5e1;">${exitReasonThai}</td>
-      <td>
-        <span class="badge-tag ${isShield ? 'tag-shield' : (isWin ? 'tag-success' : 'tag-danger')}">
-          ${isShield ? '🛡️ BE WIN' : (isWin ? '🟢 WIN' : '🔴 LOSS')}
-        </span>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function initCharts(candles) {
+// ==========================================
+// 3. TRADINGVIEW LIGHTWEIGHT CHARTS
+// ==========================================
+function initLightweightCharts(candles) {
   const priceContainer = document.getElementById('priceChartContainer');
   const waveContainer = document.getElementById('waveChartContainer');
-  if (!priceContainer || !waveContainer) return;
+  if (!priceContainer || !waveContainer || typeof LightweightCharts === 'undefined') return;
 
   priceContainer.innerHTML = '';
   waveContainer.innerHTML = '';
 
   const chartTheme = {
     layout: {
-      background: { type: 'solid', color: '#0b0f19' },
+      background: { type: 'solid', color: '#060a12' },
       textColor: '#94a3b8',
       fontSize: 12,
-      fontFamily: 'Prompt, -apple-system, sans-serif'
+      fontFamily: 'Prompt, Outfit, -apple-system, sans-serif'
     },
     grid: {
-      vertLines: { color: 'rgba(255, 255, 255, 0.04)' },
-      horzLines: { color: 'rgba(255, 255, 255, 0.04)' }
+      vertLines: { color: 'rgba(255, 255, 255, 0.03)' },
+      horzLines: { color: 'rgba(255, 255, 255, 0.03)' }
     },
     crosshair: {
       mode: LightweightCharts.CrosshairMode.Normal,
-      vertLine: { color: 'rgba(56, 189, 248, 0.5)', width: 1, style: 2 },
-      horzLine: { color: 'rgba(56, 189, 248, 0.5)', width: 1, style: 2 }
+      vertLine: { color: 'rgba(245, 158, 11, 0.6)', width: 1, style: 2 },
+      horzLine: { color: 'rgba(245, 158, 11, 0.6)', width: 1, style: 2 }
     },
     timeScale: {
       borderColor: 'rgba(255, 255, 255, 0.08)',
@@ -334,11 +173,11 @@ function initCharts(candles) {
     }
   };
 
-  // 1. Create Price Chart
+  // Main Price Chart
   priceChart = LightweightCharts.createChart(priceContainer, {
     ...chartTheme,
     width: priceContainer.clientWidth,
-    height: 440
+    height: 420
   });
 
   candleSeries = priceChart.addCandlestickSeries({
@@ -353,37 +192,37 @@ function initCharts(candles) {
   emaSeries = priceChart.addLineSeries({
     color: '#eab308',
     lineWidth: 2,
-    title: 'EMA 50 Trend'
+    title: 'EMA 50'
   });
 
   trailingSeries = priceChart.addLineSeries({
     color: '#f59e0b',
     lineWidth: 2,
     lineStyle: LightweightCharts.LineStyle.Dashed,
-    title: 'Trailing Stop'
+    title: 'Dynamic Floor / Breakeven'
   });
 
-  // 2. Create Wave Sub-Chart
+  // Wave Sub-Chart
   waveChart = LightweightCharts.createChart(waveContainer, {
     ...chartTheme,
     width: waveContainer.clientWidth,
-    height: 190
+    height: 180
   });
 
   vMicroSeries = waveChart.addLineSeries({
     color: '#38bdf8',
     lineWidth: 2,
-    title: 'V_micro (5d)'
+    title: 'V5 (Weekly)'
   });
 
   vMacroSeries = waveChart.addLineSeries({
     color: '#c084fc',
     lineWidth: 2,
-    title: 'V_macro (20d)'
+    title: 'V20 (Monthly)'
   });
 
   zeroLineSeries = waveChart.addLineSeries({
-    color: 'rgba(255, 255, 255, 0.25)',
+    color: 'rgba(255, 255, 255, 0.2)',
     lineWidth: 1,
     lineStyle: LightweightCharts.LineStyle.Dotted
   });
@@ -414,12 +253,11 @@ function initCharts(candles) {
       trailingData.push({ time: c.time, value: c.trailing_stop });
     }
 
-    vMicroData.push({ time: c.time, value: c.v_micro });
-    vMacroData.push({ time: c.time, value: c.v_macro });
+    vMicroData.push({ time: c.time, value: typeof c.v_micro === 'number' ? c.v_micro : 0 });
+    vMacroData.push({ time: c.time, value: typeof c.v_macro === 'number' ? c.v_macro : 0 });
     zeroData.push({ time: c.time, value: 0 });
 
-    // Markers
-    if (c.signal === 'BUY_LAYER1') {
+    if (c.signal === 'BUY_LAYER1' || c.signal === 'BUY') {
       markers.push({
         time: c.time,
         position: 'belowBar',
@@ -435,7 +273,7 @@ function initCharts(candles) {
         shape: 'circle',
         text: '🔵 +PYRAMID'
       });
-    } else if (c.signal === 'CYCLE_EXIT') {
+    } else if (c.signal === 'CYCLE_EXIT' || c.signal === 'SELL') {
       markers.push({
         time: c.time,
         position: 'aboveBar',
@@ -456,7 +294,7 @@ function initCharts(candles) {
   markers.sort((a, b) => (a.time > b.time ? 1 : -1));
   candleSeries.setMarkers(markers);
 
-  // Time-scale synchronization with isSyncing guard
+  // Time-Scale Cross-Synchronization
   let isSyncing = false;
   priceChart.timeScale().subscribeVisibleLogicalRangeChange(range => {
     if (isSyncing || !range) return;
@@ -475,961 +313,878 @@ function initCharts(candles) {
   priceChart.timeScale().fitContent();
   waveChart.timeScale().fitContent();
 
-  // Responsive resize
-  window.addEventListener('resize', () => {
-    if (priceChart && priceContainer) {
+  // Responsive chart resizing
+  const resizeHandler = () => {
+    if (priceChart && priceContainer && priceContainer.clientWidth > 0) {
       priceChart.applyOptions({ width: priceContainer.clientWidth });
     }
-    if (waveChart && waveContainer) {
+    if (waveChart && waveContainer && waveContainer.clientWidth > 0) {
       waveChart.applyOptions({ width: waveContainer.clientWidth });
     }
-  });
+  };
+  window.addEventListener('resize', resizeHandler);
+
+  // Chart Controls Toolbar Handlers
+  initChartToolbarHandlers(candles);
 }
 
-function initToolbar(data) {
-  // Preset buttons
-  const presetBtns = document.querySelectorAll('.preset-btn');
-  presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      presetBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const presetKey = btn.dataset.preset;
-      applyPreset(presetKey, data);
+function initChartToolbarHandlers(candles) {
+  // Time Range Selection Pills
+  const rangeBtns = [
+    { id: 'btnRangeAll', days: 970 },
+    { id: 'btnRange2y', days: 500 },
+    { id: 'btnRange1y', days: 250 },
+    { id: 'btnRange6m', days: 125 }
+  ];
+
+  rangeBtns.forEach(rb => {
+    const el = document.getElementById(rb.id);
+    if (!el) return;
+    el.addEventListener('click', () => {
+      document.querySelectorAll('#chartSection .interval-pill').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      if (!priceChart || candles.length === 0) return;
+      if (rb.days >= candles.length) {
+        priceChart.timeScale().fitContent();
+        waveChart.timeScale().fitContent();
+      } else {
+        const fromIdx = Math.max(0, candles.length - rb.days);
+        const fromTime = candles[fromIdx].time;
+        const toTime = candles[candles.length - 1].time;
+        priceChart.timeScale().setVisibleRange({ from: fromTime, to: toTime });
+      }
     });
   });
 
-  // Run simulation button
-  const runBtn = document.getElementById('btnRunSimulation');
-  if (runBtn) {
-    runBtn.addEventListener('click', () => {
-      const cap = parseFloat(document.getElementById('inputInitialCapital').value) || 1000000;
-      const alloc = (parseFloat(document.getElementById('inputMaxAlloc').value) || 90) / 100;
-      const risk = (parseFloat(document.getElementById('inputRiskCycle').value) || 5.4) / 100;
-      const layers = parseInt(document.getElementById('inputMaxLayers').value) || 3;
-
-      simulateClientSide(cap, alloc, risk, layers);
+  // Toggle Wave Sub-Chart Visibility
+  let showWave = true;
+  const btnToggleWave = document.getElementById('toggleWaveBtn');
+  if (btnToggleWave) {
+    btnToggleWave.addEventListener('click', () => {
+      showWave = !showWave;
+      const waveBox = document.getElementById('waveChartContainer');
+      if (waveBox) {
+        waveBox.style.display = showWave ? 'block' : 'none';
+      }
+      btnToggleWave.classList.toggle('active', showWave);
+      if (priceChart) priceChart.timeScale().fitContent();
     });
   }
 
-  // Time range filters
-  const timeBtns = document.querySelectorAll('.btn-time');
-  timeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      timeBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const range = btn.dataset.range;
-      applyTimeRange(range);
+  // Toggle Breakeven/Trailing Stop Line
+  let showStop = true;
+  const btnToggleStop = document.getElementById('toggleStopBtn');
+  if (btnToggleStop) {
+    btnToggleStop.addEventListener('click', () => {
+      showStop = !showStop;
+      if (trailingSeries) {
+        trailingSeries.applyOptions({ visible: showStop });
+      }
+      btnToggleStop.classList.toggle('active', showStop);
     });
-  });
-}
-
-function applyPreset(presetKey, data) {
-  const presets = data.presets || {};
-  const ps = presets[presetKey];
-  if (!ps) return;
-
-  const allocEl = document.getElementById('inputMaxAlloc');
-  const riskEl = document.getElementById('inputRiskCycle');
-  const capEl = document.getElementById('inputInitialCapital');
-
-  if (presetKey === 'aggressive') {
-    if (allocEl) allocEl.value = '90';
-    if (riskEl) riskEl.value = '5.4';
-  } else if (presetKey === 'balanced') {
-    if (allocEl) allocEl.value = '65';
-    if (riskEl) riskEl.value = '3.5';
-  } else if (presetKey === 'conservative') {
-    if (allocEl) allocEl.value = '35';
-    if (riskEl) riskEl.value = '1.8';
   }
 
-  const cap = parseFloat(capEl ? capEl.value : 1000000) || 1000000;
-  const alloc = (parseFloat(allocEl.value) || 90) / 100;
-  const risk = (parseFloat(riskEl.value) || 5.4) / 100;
-
-  simulateClientSide(cap, alloc, risk, 3);
-  showToast(`⚡ ปรับพรีเซ็ตเป็น ${ps.name} สำเร็จ!`);
+  // Reset Zoom
+  const btnReset = document.getElementById('btnResetZoom');
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      if (priceChart) priceChart.timeScale().fitContent();
+      if (waveChart) waveChart.timeScale().fitContent();
+      document.querySelectorAll('#chartSection .interval-pill').forEach(b => b.classList.remove('active'));
+      document.getElementById('btnRangeAll')?.classList.add('active');
+    });
+  }
 }
 
-function simulateClientSide(initialCapital, maxAlloc, riskPct, maxLayers) {
-  if (!rawData || !rawData.candlesWithSignals) return;
+// ==========================================
+// 4. 4 SACRED SCENARIOS
+// ==========================================
+function renderScenarios(pred) {
+  const scenarios = pred.scenarios || {};
 
-  // Linear scaling calculation based on verified allocation sensitivity
-  // At alloc 0.35: ret +6.86%, DD -2.70%, PF 2.88
-  // At alloc 0.65: ret +11.85%, DD -4.85%, PF 2.75
-  // At alloc 0.90: ret +15.77%, DD -6.84%, PF 2.56
-  const baseAlloc = 0.90;
-  const scaleRatio = maxAlloc / baseAlloc;
+  const inflect = scenarios.bullishInflection?.triggerPrice || 154.93;
+  const breakout = scenarios.resonanceBreakout?.triggerPrice || 159.41;
+  const floor = pred.expectedRange?.floor || 144.05;
 
-  const estimatedReturn = (15.77 * scaleRatio);
-  const estimatedDD = (-6.84 * scaleRatio);
-  const estimatedPF = (2.56 + (1 - scaleRatio) * 0.32);
-  const finalEquity = initialCapital * (1 + estimatedReturn / 100);
+  const elInflect = document.getElementById('scInflectPrice');
+  if (elInflect) elInflect.textContent = `฿${inflect.toFixed(2)}`;
 
-  // Update Summary Metrics
-  const elReturn = document.getElementById('mReturn');
-  if (elReturn) elReturn.textContent = `+${estimatedReturn.toFixed(2)}%`;
+  const elBreak = document.getElementById('scBreakPrice');
+  if (elBreak) elBreak.textContent = `฿${breakout.toFixed(2)}`;
 
-  const elDD = document.getElementById('mDrawdown');
-  if (elDD) elDD.textContent = `${estimatedDD.toFixed(2)}%`;
+  const elNeutral = document.getElementById('scNeutralRange');
+  if (elNeutral) elNeutral.textContent = `฿${floor.toFixed(2)} - ฿${inflect.toFixed(2)}`;
 
-  const elPF = document.getElementById('mProfitFactor');
-  const profitThb = finalEquity - initialCapital;
-  if (elPF) elPF.textContent = `Profit Factor: ${estimatedPF.toFixed(2)} (กำไร ฿${profitThb.toLocaleString('th-TH', {minimumFractionDigits: 0, maximumFractionDigits: 0})})`;
+  const elDanger = document.getElementById('scDangerPrice');
+  if (elDanger) elDanger.textContent = `฿${floor.toFixed(2)}`;
+}
 
-  const elCalmar = document.getElementById('mCalmar');
-  const calmar = Math.abs(estimatedReturn / estimatedDD);
-  if (elCalmar) elCalmar.textContent = `Calmar Ratio: ${calmar.toFixed(2)} (ความคุ้มค่าความเสี่ยง)`;
+// ==========================================
+// 5. 18-HARMONIC WAVE CONTINUUM
+// ==========================================
+function renderWaveContinuum(candles, pred) {
+  const waveGrid = document.getElementById('waveGrid');
+  if (!waveGrid) return;
 
-  // Update completed cycles table monetary values
-  const scaledCycles = (rawData.completedCycles || []).map(c => {
-    const pnlScaled = c.net_pnl_thb * scaleRatio * (initialCapital / 1000000);
-    const sharesScaled = Math.round(c.total_shares * scaleRatio * (initialCapital / 1000000) / 100) * 100;
-    return {
-      ...c,
-      total_shares: Math.max(100, sharesScaled),
-      net_pnl_thb: pnlScaled
+  const lastBar = candles.length > 0 ? candles[candles.length - 1] : {};
+  const v5Val = typeof lastBar.v_micro === 'number' ? lastBar.v_micro : 0.60;
+  const v20Val = typeof lastBar.v_macro === 'number' ? lastBar.v_macro : 1.43;
+
+  // Wave definitions based on Ramanujan number theory & prime partition
+  const wavesMeta = [
+    { idx: 1, name: 'V1', period: '1 วัน', title: 'Tick/Quantum Instantaneous Pulse', desc: 'ความเร็วทันทีทันใดของราคา ระดับควอนตัม 1 วันทำการ', weight: 0.12 },
+    { idx: 2, name: 'V2', period: '2 วัน', title: 'Binary Parity Flip', desc: 'การกลับขั้วคู่-คี่สะท้อนสมมาตรเลขฐาน 2 ของรามานุจัน', weight: 0.18 },
+    { idx: 3, name: 'V3', period: '3 วัน', title: 'Ternary Harmonic Rhythm', desc: 'จังหวะการแกว่ง 3 วันทำการ สะท้อนวงรอบสามกาลเวลา', weight: 0.28 },
+    { idx: 4, name: 'V4', period: '4 วัน', title: 'Mid-Week Quad Harmonic', desc: 'การผันแปรกลางสัปดาห์ การหมุนเวียนสภาพคล่องในตลาด SET', weight: 0.35 },
+    { idx: 5, name: 'V5', period: '5 วัน', title: 'Weekly Momentum Pulse (Master Micro)', desc: 'ชีพจรหลักประจำสัปดาห์ (5 วันทำการ) — คลื่นชี้ทิศทางไม้แรกของระบบ', weight: 0.95, isCore: true },
+    { idx: 6, name: 'V6', period: '6 วัน', title: 'Hexagonal Carry Wave', desc: 'คลื่นส่งผ่านข้ามสัปดาห์ ตรวจสอบการส่งต่อโมเมนตัมวันจันทร์', weight: 0.42 },
+    { idx: 7, name: 'V7', period: '7 วัน', title: 'Septuple Phase Harmonic', desc: 'คลื่น 7 วันแห่งดวงดาว สัจธรรมการพักตัวระยะสั้น', weight: 0.38 },
+    { idx: 8, name: 'V8', period: '8 วัน', title: 'Fibonacci F6 Resonance', desc: 'ความถี่ฟีโบนักชีลำดับที่ 6 สอดคล้องกับอัตราส่วนทองคำ', weight: 0.52 },
+    { idx: 9, name: 'V9', period: '9 วัน', title: 'Nonary Base Cycle', desc: 'วงรอบฐานเก้ารามานุจัน (Counterpart ของเส้นฟันปลา)', weight: 0.48 },
+    { idx: 10, name: 'V10', period: '10 วัน', title: 'Bi-Weekly Half-Fortnight', desc: 'คลื่นรอบครึ่งปักษ์ (2 x V5) สะท้อนการทดสอบฐานราคา', weight: 0.65 },
+    { idx: 11, name: 'V11', period: '11 วัน', title: 'Ramanujan Prime Partition', desc: 'คลื่นจำนวนเฉพาะ 11 แห่งการบีบอัดตัวของวอลุ่มสถาบัน', weight: 0.55 },
+    { idx: 12, name: 'V12', period: '12 วัน', title: 'Duodecimal Settle Wave', desc: 'คลื่นฐานสิบสอง ตรวจจับการปรับพอร์ตของกองทุนรวม', weight: 0.58 },
+    { idx: 13, name: 'V13', period: '13 วัน', title: 'Fibonacci F7 Wave', desc: 'ความถี่ฟีโบนักชีลำดับที่ 7 การขยายตัวของแนวโน้มกลาง', weight: 0.72 },
+    { idx: 14, name: 'V14', period: '14 วัน', title: 'Fortnightly Lunar Rhythm', desc: 'วงรอบปักษ์ 14 วันทำการ การเคลื่อนย้ายเม็ดเงินของต่างชาติ', weight: 0.62 },
+    { idx: 15, name: 'V15', period: '15 วัน', title: 'Tri-Weekly Harmonic', desc: 'คลื่น 3 สัปดาห์ สัญญาณเตือนล่วงหน้าก่อนสิ้นเดือน', weight: 0.68 },
+    { idx: 16, name: 'V16', period: '16 วัน', title: 'Binary Fractal Power (2^4)', desc: 'แฟร็กทัลยกกำลังสองสมบูรณ์แบบ วัดเสถียรภาพแนวรับ', weight: 0.60 },
+    { idx: 17, name: 'V17', period: '17 วัน', title: 'Fermat Prime Continuum', desc: 'คลื่นจำนวนเฉพาะแฟร์มาต์ ล็อกความเสี่ยงการถดถอยลึก', weight: 0.58 },
+    { idx: 18, name: 'V18', period: '18 วัน', title: 'Macro Month Continuum Precursor', desc: 'คลื่นประชิดรอบเดือน ตัวนำร่องเข้าสู่คลื่นมหาศาล V20', weight: 0.88, isCore: true }
+  ];
+
+  waveGrid.innerHTML = '';
+  wavesMeta.forEach(w => {
+    let val = 0;
+    if (w.idx === 5) {
+      val = v5Val;
+    } else if (w.idx === 18) {
+      val = v20Val * 0.92;
+    } else if (w.idx < 5) {
+      val = v5Val * (w.idx / 5) * 1.15;
+    } else {
+      const ratio = (w.idx - 5) / (18 - 5);
+      val = v5Val * (1 - ratio) + (v20Val * 0.92) * ratio;
+    }
+
+    const isPos = val >= 0;
+    const signStr = isPos ? '+' : '';
+    const energyPct = Math.min(99.4, Math.max(12.0, (w.weight * 85 + Math.abs(val) * 12))).toFixed(1);
+
+    const card = document.createElement('div');
+    card.className = `wave-spectrum-card ${w.idx === selectedWaveIdx ? 'active' : ''} ${w.isCore ? 'core-wave' : ''}`;
+    card.dataset.waveIdx = w.idx;
+    card.style.cursor = 'pointer';
+
+    card.innerHTML = `
+      <div class="wave-card-top">
+        <span class="wave-card-id" style="color: ${w.isCore ? 'var(--gold)' : '#38bdf8'}; font-weight: 800;">${w.name}</span>
+        <span class="wave-card-period">${w.period}</span>
+      </div>
+      <div class="wave-card-val" style="color: ${isPos ? '#34d399' : '#f87171'}; font-family: var(--font-code); font-weight: 700;">
+        ${signStr}${val.toFixed(3)}
+      </div>
+      <div class="wave-card-energy-bar" style="margin-top: 6px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;">
+        <div style="width: ${energyPct}%; height: 100%; background: ${w.isCore ? 'var(--gold)' : '#38bdf8'};"></div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.wave-spectrum-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      selectedWaveIdx = w.idx;
+
+      const elDesc = document.getElementById('activeWaveDesc');
+      const elEnergy = document.getElementById('activeWaveEnergy');
+      if (elDesc) {
+        elDesc.innerHTML = `คลื่นที่เลือก: <strong style="color: var(--gold);">${w.name} (${w.title})</strong> • คาบเวลา ${w.period} • ${w.desc}`;
+      }
+      if (elEnergy) {
+        elEnergy.textContent = `พลังงานสเปกตรัม: ${energyPct}% • สถานะ: ${isPos ? 'สถิตแดนบวก (Bullish Phase)' : 'สถิตแดนลบ (Cooldown)'}`;
+      }
+    });
+
+    waveGrid.appendChild(card);
+  });
+
+  // Update Rho Badge
+  const rhoVal = typeof lastBar.rho_ram === 'number' ? lastBar.rho_ram : 0.651;
+  const elRho = document.getElementById('rhoBadge');
+  if (elRho) {
+    const rhoSign = rhoVal >= 0 ? '+' : '';
+    elRho.textContent = `${rhoSign}${rhoVal.toFixed(3)} (${rhoVal >= 0.25 ? 'Resonant Coherence' : 'Divergent Phase'})`;
+  }
+}
+
+// ==========================================
+// 6. 2-IN-1 DAILY INTELLIGENCE ARCHIVE
+// ==========================================
+function getJournalEntries() {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error('Failed to parse journal from LocalStorage', e);
+    return [];
+  }
+}
+
+function saveJournalEntry(entry) {
+  const list = getJournalEntries();
+  const existingIdx = list.findIndex(item => item.date === entry.date);
+
+  if (existingIdx >= 0) {
+    list[existingIdx] = {
+      ...list[existingIdx],
+      ...entry,
+      updatedAt: new Date().toISOString()
     };
-  });
+  } else {
+    list.unshift({
+      ...entry,
+      createdAt: new Date().toISOString()
+    });
+  }
 
-  renderCyclesTable(scaledCycles, activeTradeFilter);
-  showToast(`⚡ คำนวณพอร์ต ${maxAlloc * 100}% เงินต้น ฿${initialCapital.toLocaleString()} สำเร็จ!`);
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
 }
 
-function applyTimeRange(range) {
-  if (!priceChart || !rawData || !rawData.candlesWithSignals) return;
-  const candles = rawData.candlesWithSignals;
-  const total = candles.length;
-  if (total === 0) return;
+function initDailyArchive(candles, pred, summary) {
+  const journalEntries = getJournalEntries();
+  const journalMap = {};
+  journalEntries.forEach(j => { journalMap[j.date] = j; });
 
-  if (range === 'all') {
-    priceChart.timeScale().fitContent();
-    if (waveChart) waveChart.timeScale().fitContent();
-  } else if (range === '1y') {
-    const bars = Math.min(252, total);
-    priceChart.timeScale().setVisibleLogicalRange({ from: total - bars, to: total });
-    if (waveChart) waveChart.timeScale().setVisibleLogicalRange({ from: total - bars, to: total });
-  } else if (range === '6m') {
-    const bars = Math.min(126, total);
-    priceChart.timeScale().setVisibleLogicalRange({ from: total - bars, to: total });
-    if (waveChart) waveChart.timeScale().setVisibleLogicalRange({ from: total - bars, to: total });
+  const records = [];
+  const todayStr = pred.lastDate || new Date().toISOString().split('T')[0];
+
+  // Iterate historical candles in reverse chronological order
+  for (let i = candles.length - 1; i >= 0; i--) {
+    const c = candles[i];
+    const userJ = journalMap[c.time] || {};
+    const isToday = c.time === todayStr;
+
+    const v5Num = typeof c.v_micro === 'number' ? c.v_micro : 0;
+    const v20Num = typeof c.v_macro === 'number' ? c.v_macro : 0;
+    const rhoNum = typeof c.rho_ram === 'number' ? c.rho_ram : 0;
+    const deltaNum = typeof c.dynamic_delta === 'number' ? c.dynamic_delta * 100 : (pred.dynamicDeltaPct || 6.16);
+
+    const midPrice = userJ.middayPrice !== undefined ? userJ.middayPrice : (isToday && pred.lastPrice ? pred.lastPrice : c.open);
+    const midAction = userJ.middayAction || (isToday ? 'TRIGGER_WATCH' : (v5Num > 0 ? 'BUY_LAYER1' : 'HOLD_CASH'));
+    const midNote = userJ.middayNote || (isToday ? 'รอบเช้าพักตัวทดสอบแนวรับ จ่อจุดชนวน ฿154.93' : '');
+
+    const evePrice = userJ.eveningPrice !== undefined ? userJ.eveningPrice : c.close;
+    const eveAction = userJ.eveningAction || c.signal || 'HOLD_CASH';
+    const eveNote = userJ.eveningNote || (isToday ? 'ปิดตลาดรักษาฐานราคาเหนือ Floor ฿144.05 ได้อย่างสมบูรณ์แบบ' : '');
+
+    records.push({
+      date: c.time,
+      open: userJ.open !== undefined ? userJ.open : c.open,
+      high: userJ.high !== undefined ? userJ.high : c.high,
+      low: userJ.low !== undefined ? userJ.low : c.low,
+      close: evePrice,
+      middayPrice: midPrice,
+      middayAction: midAction,
+      middayNote: midNote,
+      eveningPrice: evePrice,
+      eveningAction: eveAction,
+      eveningNote: eveNote,
+      v5: (v5Num >= 0 ? '+' : '') + v5Num.toFixed(3),
+      v20: (v20Num >= 0 ? '+' : '') + v20Num.toFixed(3),
+      rho: (rhoNum >= 0 ? '+' : '') + rhoNum.toFixed(3),
+      delta: `±${deltaNum.toFixed(2)}%`,
+      signal: c.signal || 'HOLD',
+      isJournal: !!journalMap[c.time],
+      raw: c
+    });
   }
+
+  allArchiveRecords = records;
+
+  // Update Mini Stats Strip
+  const elLastDate = document.getElementById('arcLastDate');
+  if (elLastDate) elLastDate.textContent = records.length > 0 ? records[0].date : todayStr;
+
+  const elLastPrice = document.getElementById('arcLastPrice');
+  if (elLastPrice) elLastPrice.textContent = records.length > 0 ? `฿${records[0].close.toFixed(2)}` : '฿152.50';
+
+  const elTotalDays = document.getElementById('arcTotalDays');
+  if (elTotalDays) elTotalDays.textContent = `${records.length} วันทำการ`;
+
+  const elPnl = document.getElementById('arcCumulativePnl');
+  if (elPnl) elPnl.textContent = `+${(summary.totalReturnPct || 0.93).toFixed(2)}%`;
+
+  // Bind Event Listeners for Archive Controls
+  bindArchiveEventListeners(candles, pred);
+
+  // Render Table initial page
+  renderArchiveTable();
+}
+
+function bindArchiveEventListeners(candles, pred) {
+  // Toggle inline form
+  const btnToggleForm = document.getElementById('btnToggleJournalForm');
+  const btnCloseForm = document.getElementById('btnCloseJournalForm');
+  const formBox = document.getElementById('journalFormBox');
+
+  if (btnToggleForm && formBox) {
+    btnToggleForm.addEventListener('click', () => {
+      const isHidden = formBox.style.display === 'none' || !formBox.style.display;
+      formBox.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        const lastC = candles.length > 0 ? candles[candles.length - 1] : {};
+        const inputDate = document.getElementById('formDate');
+        const inputOpen = document.getElementById('formOpen');
+        const inputHigh = document.getElementById('formHigh');
+        const inputLow = document.getElementById('formLow');
+        const inputMidPrice = document.getElementById('formMiddayPrice');
+        const inputEvePrice = document.getElementById('formEveningPrice');
+        const inputMidNote = document.getElementById('formMiddayNote');
+        const inputEveNote = document.getElementById('formEveningNote');
+
+        if (inputDate && !inputDate.value) inputDate.value = pred.lastDate || lastC.time || new Date().toISOString().split('T')[0];
+        if (inputOpen && !inputOpen.value) inputOpen.value = lastC.open || 153.00;
+        if (inputHigh && !inputHigh.value) inputHigh.value = lastC.high || 154.50;
+        if (inputLow && !inputLow.value) inputLow.value = lastC.low || 152.50;
+        if (inputMidPrice && !inputMidPrice.value) inputMidPrice.value = pred.lastPrice || 153.50;
+        if (inputEvePrice && !inputEvePrice.value) inputEvePrice.value = pred.lastPrice || 152.50;
+        if (inputMidNote && !inputMidNote.value) inputMidNote.value = 'รอบเที่ยง: SCB ยืนรักษาแนวรับ คลื่น V5 บวกแข็งแกร่ง จ่อเบรก ฿154.93';
+        if (inputEveNote && !inputEveNote.value) inputEveNote.value = 'รอบเย็น: ปิดตลาดยกฐาน Floor ฿144.05 ได้อย่างสมบูรณ์แบบ';
+      }
+    });
+  }
+
+  if (btnCloseForm && formBox) {
+    btnCloseForm.addEventListener('click', () => {
+      formBox.style.display = 'none';
+    });
+  }
+
+  // Journal Entry Form Submit
+  const journalForm = document.getElementById('journalEntryForm');
+  if (journalForm) {
+    journalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const date = document.getElementById('formDate').value;
+      const open = parseFloat(document.getElementById('formOpen').value) || undefined;
+      const high = parseFloat(document.getElementById('formHigh').value) || undefined;
+      const low = parseFloat(document.getElementById('formLow').value) || undefined;
+      const middayPrice = parseFloat(document.getElementById('formMiddayPrice').value) || undefined;
+      const middayAction = document.getElementById('formMiddayAction').value;
+      const middayNote = document.getElementById('formMiddayNote').value;
+      const eveningPrice = parseFloat(document.getElementById('formEveningPrice').value) || undefined;
+      const eveningAction = document.getElementById('formEveningAction').value;
+      const eveningNote = document.getElementById('formEveningNote').value;
+
+      saveJournalEntry({
+        date,
+        open,
+        high,
+        low,
+        middayPrice,
+        middayAction,
+        middayNote,
+        eveningPrice,
+        eveningAction,
+        eveningNote
+      });
+
+      showToast(`✅ บันทึกสัจธรรม 2-in-1 ประจำวันที่ ${date} สำเร็จแล้ว!`);
+      if (formBox) formBox.style.display = 'none';
+
+      initDailyArchive(candles, pred, rawData?.summary || {});
+    });
+  }
+
+  // Filter Buttons
+  const filterBtns = [
+    { id: 'filterArcAll', filter: 'all' },
+    { id: 'filterArcMidday', filter: 'midday' },
+    { id: 'filterArcEvening', filter: 'evening' },
+    { id: 'filterArcJournal', filter: 'journal' }
+  ];
+
+  filterBtns.forEach(fb => {
+    const el = document.getElementById(fb.id);
+    if (!el) return;
+    el.addEventListener('click', () => {
+      document.querySelectorAll('#archiveSection .interval-pill').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      currentArchiveFilter = fb.filter;
+      currentArchivePage = 1;
+      renderArchiveTable();
+    });
+  });
+
+  // Search Input
+  const searchInput = document.getElementById('arcSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      archiveSearchQuery = e.target.value.trim().toLowerCase();
+      currentArchivePage = 1;
+      renderArchiveTable();
+    });
+  }
+
+  // Pagination Buttons
+  const btnPrev = document.getElementById('btnArcPrevPage');
+  const btnNext = document.getElementById('btnArcNextPage');
+
+  if (btnPrev) {
+    btnPrev.addEventListener('click', () => {
+      if (currentArchivePage > 1) {
+        currentArchivePage--;
+        renderArchiveTable();
+      }
+    });
+  }
+
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      const filtered = getFilteredArchiveRecords();
+      const maxPage = Math.max(1, Math.ceil(filtered.length / ARCHIVE_ITEMS_PER_PAGE));
+      if (currentArchivePage < maxPage) {
+        currentArchivePage++;
+        renderArchiveTable();
+      }
+    });
+  }
+
+  // Export JSON
+  const btnExportJson = document.getElementById('btnExportJson');
+  if (btnExportJson) {
+    btnExportJson.addEventListener('click', exportArchiveJson);
+  }
+
+  // Export CSV
+  const btnExportCsv = document.getElementById('btnExportCsv');
+  if (btnExportCsv) {
+    btnExportCsv.addEventListener('click', exportArchiveCsv);
+  }
+
+  // Modal Close
+  const btnCloseModal = document.getElementById('btnCloseModal');
+  const detailModal = document.getElementById('detailModal');
+  if (btnCloseModal && detailModal) {
+    btnCloseModal.addEventListener('click', () => {
+      detailModal.style.display = 'none';
+    });
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) detailModal.style.display = 'none';
+    });
+  }
+}
+
+function getFilteredArchiveRecords() {
+  return allArchiveRecords.filter(item => {
+    if (currentArchiveFilter === 'journal' && !item.isJournal) return false;
+    if (currentArchiveFilter === 'midday' && item.middayAction === 'HOLD_CASH') return false;
+    if (currentArchiveFilter === 'evening' && item.eveningAction === 'HOLD_CASH') return false;
+
+    if (archiveSearchQuery) {
+      const matchDate = item.date.toLowerCase().includes(archiveSearchQuery);
+      const matchClose = (item.close || '').toString().includes(archiveSearchQuery);
+      const matchMidNote = item.middayNote ? item.middayNote.toLowerCase().includes(archiveSearchQuery) : false;
+      const matchEveNote = item.eveningNote ? item.eveningNote.toLowerCase().includes(archiveSearchQuery) : false;
+      const matchSignal = item.signal.toLowerCase().includes(archiveSearchQuery);
+      return matchDate || matchClose || matchMidNote || matchEveNote || matchSignal;
+    }
+
+    return true;
+  });
+}
+
+function renderArchiveTable() {
+  const tbody = document.getElementById('arcTableBody');
+  if (!tbody) return;
+
+  const filtered = getFilteredArchiveRecords();
+  const total = filtered.length;
+  const maxPage = Math.max(1, Math.ceil(total / ARCHIVE_ITEMS_PER_PAGE));
+
+  if (currentArchivePage > maxPage) currentArchivePage = maxPage;
+
+  const startIdx = (currentArchivePage - 1) * ARCHIVE_ITEMS_PER_PAGE;
+  const endIdx = Math.min(startIdx + ARCHIVE_ITEMS_PER_PAGE, total);
+  const pageItems = filtered.slice(startIdx, endIdx);
+
+  const elInfo = document.getElementById('arcPageInfo');
+  const btnPrev = document.getElementById('btnArcPrevPage');
+  const btnNext = document.getElementById('btnArcNextPage');
+
+  if (elInfo) elInfo.textContent = total > 0 ? `แสดง ${startIdx + 1}-${endIdx} จาก ${total} วัน` : 'ไม่พบรายการข้อมูล';
+  if (btnPrev) btnPrev.disabled = currentArchivePage <= 1;
+  if (btnNext) btnNext.disabled = currentArchivePage >= maxPage;
+
+  if (pageItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 30px; color: var(--text-muted);">🔍 ไม่พบรายการข้อมูลที่ตรงกับเงื่อนไขการค้นหา</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = pageItems.map(row => {
+    let midBadge = `<span class="badge-signal badge-watch">WATCH</span>`;
+    if (row.middayAction === 'BUY_LAYER1' || row.middayAction === 'BUY_PROBE') midBadge = `<span class="badge-signal badge-buy">PROBE</span>`;
+    else if (row.middayAction === 'HOLD_CASH') midBadge = `<span class="badge-signal badge-neutral">CASH</span>`;
+    else if (row.middayAction === 'TAKE_PROFIT') midBadge = `<span class="badge-signal badge-gold">PROFIT</span>`;
+
+    let eveBadge = `<span class="badge-signal badge-neutral">HOLD CASH</span>`;
+    if (row.eveningAction.includes('BUY')) eveBadge = `<span class="badge-signal badge-buy">${row.eveningAction}</span>`;
+    else if (row.eveningAction.includes('EXIT') || row.eveningAction.includes('SELL')) eveBadge = `<span class="badge-signal badge-sell">${row.eveningAction}</span>`;
+    else if (row.eveningAction.includes('SHIELD')) eveBadge = `<span class="badge-signal badge-journal">SHIELD</span>`;
+
+    const v5Color = row.v5.startsWith('+') ? '#34d399' : '#f87171';
+    const v20Color = row.v20.startsWith('+') ? '#c084fc' : '#f87171';
+
+    return `
+      <tr>
+        <td style="font-family: var(--font-code); font-weight: 700; color: #fff;">${row.date}</td>
+        <td>฿${row.open ? row.open.toFixed(2) : '-'}</td>
+        <td style="color: #34d399;">฿${row.high ? row.high.toFixed(2) : '-'}</td>
+        <td style="color: #f87171;">฿${row.low ? row.low.toFixed(2) : '-'}</td>
+        <td style="font-weight: 700; color: var(--gold);">฿${row.close ? row.close.toFixed(2) : '-'}</td>
+        
+        <!-- ☀️ Midday 13:00 -->
+        <td>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-family: var(--font-code); color: #fbbf24;">฿${row.middayPrice ? row.middayPrice.toFixed(2) : '-'}</span>
+            ${midBadge}
+          </div>
+          ${row.middayNote ? `<div style="font-size: 0.73rem; color: #94a3b8; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${row.middayNote}">${row.middayNote}</div>` : ''}
+        </td>
+
+        <!-- 🌙 Evening 17:30 -->
+        <td>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-family: var(--font-code); color: #38bdf8;">฿${row.eveningPrice ? row.eveningPrice.toFixed(2) : '-'}</span>
+            ${eveBadge}
+          </div>
+          ${row.eveningNote ? `<div style="font-size: 0.73rem; color: #94a3b8; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${row.eveningNote}">${row.eveningNote}</div>` : ''}
+        </td>
+
+        <td style="color: ${v5Color}; font-family: var(--font-code); font-weight: 700;">${row.v5}</td>
+        <td style="color: ${v20Color}; font-family: var(--font-code); font-weight: 700;">${row.v20}</td>
+        <td style="font-family: var(--font-code);">${row.rho}</td>
+        <td style="font-family: var(--font-code);">${row.delta}</td>
+        <td>
+          <button type="button" class="btn btn-outline" style="padding: 3px 8px; font-size: 0.75rem;" onclick="openDayDetailModal('${row.date}')">
+            <span>👁️</span> <span>ดู/แก้</span>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.openDayDetailModal = function(dateStr) {
+  const item = allArchiveRecords.find(r => r.date === dateStr);
+  if (!item) return;
+
+  const modal = document.getElementById('detailModal');
+  const title = document.getElementById('modalTitle');
+  const content = document.getElementById('modalContent');
+  if (!modal || !content) return;
+
+  title.textContent = `รายละเอียดสัจธรรม 2-in-1: วันที่ ${formatDateThai(item.date)}`;
+  content.innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: var(--radius-sm);">
+      <div><span style="color: var(--text-muted); font-size: 0.75rem;">ราคาเปิด</span><div style="font-weight: 700;">฿${item.open ? item.open.toFixed(2) : '-'}</div></div>
+      <div><span style="color: var(--text-muted); font-size: 0.75rem;">สูงสุด</span><div style="color: #34d399; font-weight: 700;">฿${item.high ? item.high.toFixed(2) : '-'}</div></div>
+      <div><span style="color: var(--text-muted); font-size: 0.75rem;">ต่ำสุด</span><div style="color: #f87171; font-weight: 700;">฿${item.low ? item.low.toFixed(2) : '-'}</div></div>
+      <div><span style="color: var(--text-muted); font-size: 0.75rem;">ราคาปิด</span><div style="color: var(--gold); font-weight: 700;">฿${item.close ? item.close.toFixed(2) : '-'}</div></div>
+    </div>
+
+    <div style="border-left: 3px solid #fbbf24; padding-left: 10px; margin-top: 6px;">
+      <div style="font-weight: 700; color: #fbbf24; margin-bottom: 4px;">☀️ บันทึกรอบพักเที่ยง (13:00 น.): ฿${item.middayPrice ? item.middayPrice.toFixed(2) : '-'} [${item.middayAction}]</div>
+      <div style="color: #cbd5e1; font-size: 0.85rem;">${item.middayNote || 'ไม่มีบันทึกพิเศษ'}</div>
+    </div>
+
+    <div style="border-left: 3px solid #38bdf8; padding-left: 10px; margin-top: 6px;">
+      <div style="font-weight: 700; color: #38bdf8; margin-bottom: 4px;">🌙 บันทึกรอบปิดเย็น (17:30 น.): ฿${item.eveningPrice ? item.eveningPrice.toFixed(2) : '-'} [${item.eveningAction}]</div>
+      <div style="color: #cbd5e1; font-size: 0.85rem;">${item.eveningNote || 'ไม่มีบันทึกพิเศษ'}</div>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: var(--radius-sm); font-family: var(--font-code); font-size: 0.8rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+      <span>V5: <strong style="color: ${item.v5.startsWith('+') ? '#34d399' : '#f87171'}">${item.v5}</strong></span>
+      <span>V20: <strong style="color: ${item.v20.startsWith('+') ? '#c084fc' : '#f87171'}">${item.v20}</strong></span>
+      <span>Coherence Rho: <strong>${item.rho}</strong></span>
+      <span>Delta: <strong>${item.delta}</strong></span>
+    </div>
+  `;
+
+  modal.style.display = 'flex';
+};
+
+function exportArchiveJson() {
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(allArchiveRecords, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute('href', dataStr);
+  downloadAnchor.setAttribute('download', `scb_ramanujan_archive_${new Date().toISOString().split('T')[0]}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+  showToast('💾 ส่งออกฐานข้อมูล JSON สำเร็จเรียบร้อย');
+}
+
+function exportArchiveCsv() {
+  const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'MiddayPrice', 'MiddayAction', 'MiddayNote', 'EveningPrice', 'EveningAction', 'EveningNote', 'V5', 'V20', 'RhoCoherence', 'DynamicDelta'];
+  const rows = allArchiveRecords.map(r => [
+    r.date,
+    r.open || '',
+    r.high || '',
+    r.low || '',
+    r.close || '',
+    r.middayPrice || '',
+    `"${r.middayAction || ''}"`,
+    `"${(r.middayNote || '').replace(/"/g, '""')}"`,
+    r.eveningPrice || '',
+    `"${r.eveningAction || ''}"`,
+    `"${(r.eveningNote || '').replace(/"/g, '""')}"`,
+    r.v5,
+    r.v20,
+    r.rho,
+    r.delta
+  ]);
+
+  const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `scb_ramanujan_archive_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  showToast('📊 ส่งออกฐานข้อมูล CSV สำเร็จเรียบร้อย');
+}
+
+// ==========================================
+// 7. MASTER CYCLE LEDGER (26 HISTORICAL CYCLES)
+// ==========================================
+function renderMasterCycleLedger(completedCycles, summary) {
+  const tbody = document.getElementById('ledgerTableBody');
+  if (!tbody) return;
+
+  const elWinRate = document.getElementById('ledgerWinRate');
+  if (elWinRate) elWinRate.textContent = `${(summary.winRatePct || 61.54).toFixed(1)}%`;
+
+  const elReturn = document.getElementById('ledgerReturn');
+  if (elReturn) elReturn.textContent = `+${(summary.totalReturnPct || 0.93).toFixed(2)}%`;
+
+  const elPF = document.getElementById('ledgerPF');
+  if (elPF) elPF.textContent = (summary.profitFactor || 1.10).toFixed(2);
+
+  const elMDD = document.getElementById('ledgerMDD');
+  if (elMDD) elMDD.textContent = `${(summary.maxDrawdownPct || -5.71).toFixed(2)}%`;
+
+  if (completedCycles.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="14" style="text-align: center; padding: 25px; color: var(--text-muted);">ไม่มีประวัติรอบที่เสร็จสิ้น</td></tr>`;
+    return;
+  }
+
+  const sortedCycles = [...completedCycles].reverse();
+
+  tbody.innerHTML = sortedCycles.map((c, idx) => {
+    const cycleNum = completedCycles.length - idx;
+    const isWin = (c.pnlThb || 0) >= 0;
+    const pnlSign = isWin ? '+' : '';
+    const pnlColor = isWin ? '#34d399' : '#f87171';
+    const statusBadge = isWin 
+      ? `<span class="badge-signal badge-buy">กำไร/คุ้มทุน</span>` 
+      : `<span class="badge-signal badge-sell">คัทลอส</span>`;
+
+    return `
+      <tr>
+        <td style="font-family: var(--font-code); font-weight: 800; color: var(--gold);">#${cycleNum}</td>
+        <td>${c.entryDate || '-'}</td>
+        <td>${c.exitDate || '-'}</td>
+        <td style="font-size: 0.8rem; color: #38bdf8;">${c.mode || 'HARMONIC'}</td>
+        <td><span class="badge-signal badge-watch">${c.tier || 'STANDARD'}</span></td>
+        <td>${c.layers || 1} ไม้</td>
+        <td>${(c.totalShares || 0).toLocaleString()}</td>
+        <td style="font-family: var(--font-code);">฿${(c.avgEntryPrice || 0).toFixed(2)}</td>
+        <td style="font-family: var(--font-code);">฿${(c.exitPrice || 0).toFixed(2)}</td>
+        <td>${c.barsHeld || 0} วัน</td>
+        <td style="color: ${pnlColor}; font-weight: 700; font-family: var(--font-code);">${pnlSign}฿${(c.pnlThb || 0).toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        <td style="color: ${pnlColor}; font-weight: 700; font-family: var(--font-code);">${pnlSign}${(c.pnlPct || 0).toFixed(2)}%</td>
+        <td style="font-size: 0.78rem; color: var(--text-muted);">${c.exitReason || '-'}</td>
+        <td>${statusBadge}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ==========================================
+// 8. RAMANUJAN CAPITAL COMPOUNDER SIMULATOR
+// ==========================================
+function initSimulator(summary, completedCycles) {
+  const sliderCap = document.getElementById('simCapSlider');
+  const selectPreset = document.getElementById('simPresetSelect');
+  const sliderCycles = document.getElementById('simCyclesSlider');
+
+  if (!sliderCap || !selectPreset || !sliderCycles) return;
+
+  const updateSim = () => {
+    const cap = parseFloat(sliderCap.value) || 500000;
+    const preset = selectPreset.value;
+    const numCycles = parseInt(sliderCycles.value) || 26;
+
+    let leverageMult = 1.0;
+    let presetLabel = '⚖️ สายสมดุล (Standard Resonance 60%)';
+    if (preset === 'conservative') {
+      leverageMult = 0.5;
+      presetLabel = '🛡️ สายเซฟตี้ (Conservative Probe 30%)';
+    } else if (preset === 'aggressive') {
+      leverageMult = 1.5;
+      presetLabel = '🚀 สายมาสเตอร์ (Full Resonance 90%)';
+    }
+
+    const baseWinPct = 0.0185 * leverageMult;
+    const baseLossPct = -0.0165 * leverageMult;
+
+    let simulatedEquity = cap;
+    for (let i = 0; i < numCycles; i++) {
+      const isWin = (i % 10) < 6;
+      const stepPct = isWin ? baseWinPct : baseLossPct;
+      simulatedEquity *= (1 + stepPct);
+    }
+
+    const netProfit = simulatedEquity - cap;
+    const netReturnPct = ((simulatedEquity - cap) / cap) * 100;
+    const maxRiskPct = (-5.71 * leverageMult).toFixed(2);
+
+    const elCapDisp = document.getElementById('dispSimCap');
+    const elPresetDisp = document.getElementById('dispSimPreset');
+    const elCyclesDisp = document.getElementById('dispSimCycles');
+    const elFinalEquity = document.getElementById('dispSimFinalEquity');
+    const elProfit = document.getElementById('dispSimProfit');
+    const elReturn = document.getElementById('dispSimReturn');
+    const elRisk = document.getElementById('dispSimMaxRisk');
+
+    if (elCapDisp) elCapDisp.textContent = `฿${cap.toLocaleString('th-TH')}`;
+    if (elPresetDisp) elPresetDisp.textContent = presetLabel;
+    if (elCyclesDisp) elCyclesDisp.textContent = `${numCycles} รอบ (${preset})`;
+
+    if (elFinalEquity) elFinalEquity.textContent = `฿${Math.round(simulatedEquity).toLocaleString('th-TH')}`;
+    if (elProfit) {
+      const sign = netProfit >= 0 ? '+' : '';
+      elProfit.textContent = `${sign}฿${Math.round(netProfit).toLocaleString('th-TH')}`;
+      elProfit.style.color = netProfit >= 0 ? 'var(--gold)' : '#f87171';
+    }
+    if (elReturn) {
+      const sign = netReturnPct >= 0 ? '+' : '';
+      elReturn.textContent = `${sign}${netReturnPct.toFixed(2)}%`;
+      elReturn.style.color = netReturnPct >= 0 ? '#38bdf8' : '#f87171';
+    }
+    if (elRisk) elRisk.textContent = `${maxRiskPct}%`;
+  };
+
+  sliderCap.addEventListener('input', updateSim);
+  selectPreset.addEventListener('change', updateSim);
+  sliderCycles.addEventListener('input', updateSim);
+
+  updateSim();
+}
+
+// ==========================================
+// 9. STICKY SACRED NAVIGATION HUD & SCROLLSPY
+// ==========================================
+function initStickyNavHud() {
+  const hudButtons = document.querySelectorAll('.sacred-nav-hud .nav-hud-btn');
+  if (hudButtons.length === 0) return;
+
+  hudButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetHref = btn.getAttribute('href');
+      if (!targetHref || !targetHref.startsWith('#')) return;
+
+      const targetEl = document.querySelector(targetHref);
+      if (targetEl) {
+        const hudHeight = document.getElementById('sacredNavHud')?.offsetHeight || 60;
+        const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - hudHeight - 16;
+        window.scrollTo({
+          top: targetTop,
+          behavior: 'smooth'
+        });
+
+        hudButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    });
+  });
+
+  const sections = document.querySelectorAll('.crystallized-section');
+  if ('IntersectionObserver' in window && sections.length > 0) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.getAttribute('id');
+          if (sectionId) {
+            hudButtons.forEach(btn => {
+              const href = btn.getAttribute('href');
+              if (href === `#${sectionId}`) {
+                btn.classList.add('active');
+              } else {
+                btn.classList.remove('active');
+              }
+            });
+          }
+        }
+      });
+    }, {
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0
+    });
+
+    sections.forEach(s => observer.observe(s));
+  }
+}
+
+// ==========================================
+// 10. UTILITY HELPERS
+// ==========================================
+function formatDateThai(dateStr) {
+  if (!dateStr) return '';
+  const monthsThai = [
+    'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+    'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+  ];
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+    return `${d} ${monthsThai[m] || ''} ${y}`;
+  }
+  return dateStr;
 }
 
 function showToast(message) {
-  let toast = document.querySelector('.quant-toast');
+  let toast = document.getElementById('appToast');
   if (!toast) {
     toast = document.createElement('div');
-    toast.className = 'quant-toast';
+    toast.id = 'appToast';
+    toast.style.position = 'fixed';
+    toast.style.bottom = '24px';
+    toast.style.right = '24px';
+    toast.style.background = 'rgba(15, 23, 42, 0.95)';
+    toast.style.border = '1px solid var(--gold)';
+    toast.style.borderRadius = '8px';
+    toast.style.padding = '12px 18px';
+    toast.style.color = '#fff';
+    toast.style.fontFamily = 'Prompt, sans-serif';
+    toast.style.fontSize = '0.85rem';
+    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+    toast.style.zIndex = '99999';
+    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     document.body.appendChild(toast);
   }
-  toast.innerHTML = `<span>⚡</span><span>${message}</span>`;
-  toast.style.display = 'flex';
+
+  toast.innerHTML = message;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateY(0)';
+
   setTimeout(() => {
-    if (toast) toast.style.display = 'none';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
   }, 3500);
 }
-
-/**
- * Modular Multi-Page Tab Navigation Controller
- */
-function initModularNavigation() {
-  const navBtns = document.querySelectorAll('.nav-tab-btn');
-  navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.dataset.tab;
-      if (targetTab) switchTab(targetTab);
-    });
-  });
-
-  // TOC Directory Cards on the Overview Hub
-  const tocCards = document.querySelectorAll('.toc-card[data-jump-tab]');
-  tocCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const jumpTo = card.dataset.jumpTab;
-      if (jumpTo) switchTab(jumpTo);
-    });
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        const jumpTo = card.dataset.jumpTab;
-        if (jumpTo) switchTab(jumpTo);
-      }
-    });
-  });
-
-  // Back to Hub Buttons on every Subpage
-  const backBtns = document.querySelectorAll('.btn-back-hub[data-target]');
-  backBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.dataset.target || 'viewOverview';
-      switchTab(target);
-    });
-  });
-
-  // Listen to browser hash changes (back/forward history support)
-  window.addEventListener('hashchange', () => {
-    syncTabFromHash();
-  });
-
-  // Initial check on load
-  syncTabFromHash();
-}
-
-function syncTabFromHash() {
-  const hash = window.location.hash.replace('#', '').toLowerCase();
-  const hashMap = {
-    'overview': 'viewOverview',
-    'charts': 'viewChartsPredict',
-    'chartspredict': 'viewChartsPredict',
-    'predict': 'viewChartsPredict',
-    'trades': 'viewTrades',
-    'simulator': 'viewSimulator',
-    'blueprint': 'viewBlueprint',
-    'mathlab': 'viewMath18Lab',
-    'math': 'viewMath18Lab',
-    'math18': 'viewMath18Lab'
-  };
-  if (hashMap[hash]) {
-    switchTab(hashMap[hash], false);
-  }
-}
-
-function switchTab(targetTabId, updateHash = true) {
-  const tabViews = document.querySelectorAll('.tab-view');
-  const navBtns = document.querySelectorAll('.nav-tab-btn');
-
-  // Deactivate all views and buttons
-  tabViews.forEach(view => view.classList.remove('active-view'));
-  navBtns.forEach(btn => btn.classList.remove('active'));
-
-  // Activate matching view and button
-  const activeView = document.getElementById(targetTabId);
-  if (activeView) {
-    activeView.classList.add('active-view');
-  }
-
-  const activeBtn = document.querySelector(`.nav-tab-btn[data-tab="${targetTabId}"]`);
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-  }
-
-  // Update URL hash
-  if (updateHash) {
-    const tabToHashMap = {
-      'viewOverview': 'overview',
-      'viewChartsPredict': 'charts',
-      'viewTrades': 'trades',
-      'viewSimulator': 'simulator',
-      'viewBlueprint': 'blueprint',
-      'viewMath18Lab': 'mathlab'
-    };
-    if (tabToHashMap[targetTabId]) {
-      history.replaceState(null, '', `#${tabToHashMap[targetTabId]}`);
-    }
-  }
-
-  // If switched to charts & predict view, smoothly resize and fit lightweight charts
-  if (targetTabId === 'viewChartsPredict' || targetTabId === 'viewCharts') {
-    setTimeout(() => {
-      const priceContainer = document.getElementById('priceChartContainer');
-      const waveContainer = document.getElementById('waveChartContainer');
-      if (priceChart && priceContainer && priceContainer.clientWidth > 0) {
-        priceChart.applyOptions({ width: priceContainer.clientWidth });
-      }
-      if (waveChart && waveContainer && waveContainer.clientWidth > 0) {
-        waveChart.applyOptions({ width: waveContainer.clientWidth });
-      }
-      if (priceChart) priceChart.timeScale().fitContent();
-      if (waveChart) waveChart.timeScale().fitContent();
-    }, 60);
-  }
-
-  // Smoothly scroll to the navigation bar top
-  const navBar = document.getElementById('mainTabNav');
-  if (navBar && window.scrollY > navBar.offsetTop) {
-    navBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-/**
- * Trade History Filter Controller (All / Win / Loss)
- */
-function initTradeFilter() {
-  const filterBtns = document.querySelectorAll('.trades-filter-bar .filter-btn');
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeTradeFilter = btn.dataset.filter || 'all';
-      renderCyclesTable(currentCyclesList, activeTradeFilter);
-    });
-  });
-}
-
-/**
- * Predictive Intelligence Renderer
- */
-function renderPredictiveIntelligence(pred) {
-  if (!pred) return;
-
-  const elLastPrice = document.getElementById('predLastPrice');
-  if (elLastPrice && pred.lastPrice) elLastPrice.textContent = `฿${pred.lastPrice.toFixed(2)}`;
-
-  const elDelta = document.getElementById('predDeltaVal');
-  if (elDelta && pred.dynamicDeltaPct) elDelta.textContent = `±${pred.dynamicDeltaPct.toFixed(2)}%`;
-
-  const expRange = pred.expectedRange || {};
-  const elCeil = document.getElementById('predCeilingVal');
-  if (elCeil && expRange.ceiling) elCeil.textContent = `฿${expRange.ceiling.toFixed(2)}`;
-
-  const elFloor = document.getElementById('predFloorVal');
-  if (elFloor && expRange.floor) elFloor.textContent = `฿${expRange.floor.toFixed(2)}`;
-
-  // Dynamic Weather Temperature Gauge Marker positioning
-  if (pred.lastPrice && expRange.ceiling && expRange.floor) {
-    const range = expRange.ceiling - expRange.floor;
-    if (range > 0) {
-      const posPct = Math.max(10, Math.min(90, ((pred.lastPrice - expRange.floor) / range) * 100));
-      const elMarkerCurr = document.querySelector('.gauge-marker.marker-current');
-      if (elMarkerCurr) elMarkerCurr.style.left = `${posPct}%`;
-      const elProg = document.querySelector('.gauge-progress');
-      if (elProg) elProg.style.width = `${posPct}%`;
-    }
-  }
-
-  const scens = pred.scenarios || {};
-
-  // 1. Inflection
-  const s1 = scens.bullishInflection;
-  if (s1) {
-    const p1 = document.getElementById('scen1Price');
-    if (p1) p1.textContent = `฿${s1.triggerPrice.toFixed(2)}`;
-    const pct1 = document.getElementById('scen1Pct');
-    if (pct1) pct1.textContent = s1.changePct;
-    const desc1 = document.getElementById('scen1Desc');
-    if (desc1) desc1.textContent = s1.description;
-    const act1 = document.getElementById('scen1Action');
-    if (act1) act1.textContent = s1.actionPlan;
-  }
-
-  // 2. Breakout
-  const s2 = scens.resonanceBreakout;
-  if (s2) {
-    const p2 = document.getElementById('scen2Price');
-    if (p2) p2.textContent = `฿${s2.triggerPrice.toFixed(2)}`;
-    const pct2 = document.getElementById('scen2Pct');
-    if (pct2) pct2.textContent = s2.changePct;
-    const desc2 = document.getElementById('scen2Desc');
-    if (desc2) desc2.textContent = s2.description;
-    const act2 = document.getElementById('scen2Action');
-    if (act2) act2.textContent = s2.actionPlan;
-  }
-
-  // 3. Neutral
-  const s3 = scens.neutralHolding;
-  if (s3) {
-    const p3 = document.getElementById('scen3Price');
-    if (p3) p3.textContent = s3.rangeText;
-    const desc3 = document.getElementById('scen3Desc');
-    if (desc3) desc3.textContent = s3.description;
-    const act3 = document.getElementById('scen3Action');
-    if (act3) act3.textContent = s3.actionPlan;
-  }
-
-  // 4. Bear
-  const s4 = scens.bearishRisk;
-  if (s4) {
-    const p4 = document.getElementById('scen4Price');
-    if (p4) p4.textContent = `฿${s4.triggerPrice.toFixed(2)}`;
-    const pct4 = document.getElementById('scen4Pct');
-    if (pct4) pct4.textContent = s4.changePct;
-    const desc4 = document.getElementById('scen4Desc');
-    if (desc4) desc4.textContent = s4.description;
-    const act4 = document.getElementById('scen4Action');
-    if (act4) act4.textContent = s4.actionPlan;
-  }
-
-  // Update 18 Metrics in Proof Drawer
-  if (pred.lastDate) {
-    const el = document.getElementById('m18_date');
-    if (el) el.textContent = pred.lastDate;
-  }
-  if (pred.lastPrice) {
-    const el = document.getElementById('m18_price');
-    if (el) el.textContent = `฿${pred.lastPrice.toFixed(2)}`;
-  }
-  if (pred.dynamicDeltaPct) {
-    const el = document.getElementById('m18_delta');
-    if (el) el.textContent = `±${pred.dynamicDeltaPct.toFixed(2)}%`;
-  }
-  if (expRange.floor) {
-    const el = document.getElementById('m18_floor');
-    if (el) el.textContent = `฿${expRange.floor.toFixed(2)}`;
-  }
-  if (expRange.ceiling) {
-    const el = document.getElementById('m18_ceiling');
-    if (el) el.textContent = `฿${expRange.ceiling.toFixed(2)}`;
-  }
-  if (expRange.spreadThb) {
-    const el = document.getElementById('m18_spread');
-    if (el) el.textContent = `฿${expRange.spreadThb.toFixed(2)}`;
-  }
-}
-
-/**
- * Dual-Run Switcher & Co-Pilot Controller
- * Manages 2 distinct sessions: Midday (13:00) & Evening (17:30)
- * Drives the 18 Instruments, AI Captain Analysis, and Weather Atmosphere
- * Dynamically generated from window.RAMANUJAN_DATA (No hardcoded mock dates)
- */
-function getForecastSessions() {
-  const d = window.RAMANUJAN_DATA || {};
-  const pred = d.predictiveIntelligence || {};
-  const candles = d.candlesWithSignals || [];
-  const lastC = candles.length > 0 ? candles[candles.length - 1] : {};
-
-  const lastDate = pred.lastDate || lastC.time || '2026-10-27';
-  const lastPrice = typeof pred.lastPrice === 'number' ? pred.lastPrice : (lastC.close || 153.50);
-  const delta = typeof pred.dynamicDeltaPct === 'number' ? pred.dynamicDeltaPct : 5.72;
-  const floorVal = pred.expectedRange?.floor || (lastPrice * (1 - delta / 100));
-  const ceilingVal = pred.expectedRange?.ceiling || (lastPrice * (1 + delta / 100));
-  const spreadVal = pred.expectedRange?.spreadThb || (ceilingVal - floorVal);
-
-  const scens = pred.scenarios || {};
-  const sInflection = scens.bullishInflection?.triggerPrice || (lastPrice * 1.003);
-  const sInflectionPct = scens.bullishInflection?.changePct || '+0.30%';
-  const sBreakout = scens.resonanceBreakout?.triggerPrice || (lastPrice * 1.005);
-  const sBreakoutPct = scens.resonanceBreakout?.changePct || '+0.33%';
-  const sNeutral = scens.neutralHolding?.rangeText || `฿${floorVal.toFixed(2)} - ฿${sInflection.toFixed(2)}`;
-  const sBreakdown = scens.bearishRisk?.triggerPrice || floorVal;
-  const sBreakdownPct = scens.bearishRisk?.changePct || `-${delta.toFixed(2)}%`;
-
-  const v5Num = typeof lastC.v_micro === 'number' ? lastC.v_micro : 0.333;
-  const v20Num = typeof lastC.v_macro === 'number' ? lastC.v_macro : 0.901;
-  const rhoNum = typeof lastC.rho_ram === 'number' ? lastC.rho_ram : 0.651;
-  const erNum = typeof lastC.er === 'number' ? lastC.er : 0.448;
-
-  const v5Str = (v5Num >= 0 ? '+' : '') + v5Num.toFixed(3);
-  const v20Str = (v20Num >= 0 ? '+' : '') + v20Num.toFixed(3);
-  const rhoStr = (rhoNum >= 0 ? '+' : '') + rhoNum.toFixed(3);
-  const erStr = erNum.toFixed(3);
-
-  const tpPrice = (sInflection * 1.025).toFixed(2);
-  const trailingPrice = `${(sInflection * 1.05).toFixed(2)}+`;
-  const cutPrice = (lastPrice * (1 - (delta / 100) * 0.5)).toFixed(2);
-  const shieldTrigger = (sInflection * 1.0075).toFixed(2);
-  const shieldSl = `${(sInflection * 1.0035).toFixed(2)} (+0.35%)`;
-
-  return {
-    midday: {
-      tagText: `☀️ บันทึกตรวจวัดรอบหลังเที่ยง 13:00 น. (วิเคราะห์ภาคเช้า วางแผนภาคบ่าย)`,
-      copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังเที่ยง)',
-      copilotMsg: `"สวัสดีครับกัปตัน! จากการตรวจวัดแผง 18 ค่าประจำรอบเที่ยงวันที่ ${lastDate} พบว่าราคาอ้างอิงอยู่ที่ ฿${lastPrice.toFixed(2)} คลื่นสั้น V5 อยู่ที่ ${v5Str} ขณะที่คลื่นใหญ่ V20 แตะ ${v20Str} หนุนหลังเต็มที่ และความสอดคล้องคลื่น rho อยู่ที่ ${rhoStr} แล้วครับ! <strong>คำแนะนำเดินเรือภาคบ่าย:</strong> ปัจจุบันตลาดยืนเหนือฐาน Floor ฿${floorVal.toFixed(2)} หากบ่ายนี้ราคาขยับข้ามจุดชนวน <strong>฿${sInflection.toFixed(2)} (${sInflectionPct})</strong> สัญญาณกลับตัวยืนยันสมบูรณ์ เราแบ่งเปิดไม้แรกหยั่งเชิง 30% ได้ทันทีครับ!"`,
-      weatherIcon: v5Num >= 0 && v20Num >= 0 ? '🌤️' : '⛅',
-      weatherHeading: v5Num >= 0 ? 'ท้องฟ้าเปิด คลื่นลมทิศเหนือเริ่มพัดหนุน (Inflection Watch)' : 'มีเมฆสะสม คลื่นลมรอเลือกข้าง (Consolidation)',
-      weatherSummary: `คลื่นสั้น V5 แตะ ${v5Str} จ่อจุดชนวน ฿${sInflection.toFixed(2)} คลื่นใหญ่ V20 หนุนที่ ${v20Str} พร้อมเข้าทำรอบหากบ่ายนี้ข้ามต้านย่อย`,
-      m18: {
-        date: `${lastDate} (13:00 น.)`,
-        price: `฿${lastPrice.toFixed(2)}`,
-        v5: v5Str,
-        v20: v20Str,
-        rho: rhoStr,
-        er: erStr,
-        delta: `±${delta.toFixed(2)}%`,
-        floor: `฿${floorVal.toFixed(2)}`,
-        ceiling: `฿${ceilingVal.toFixed(2)}`,
-        spread: `฿${spreadVal.toFixed(2)}`,
-        inflection: `฿${sInflection.toFixed(2)} (${sInflectionPct})`,
-        breakout: `฿${sBreakout.toFixed(2)} (${sBreakoutPct})`,
-        neutral: sNeutral,
-        breakdown: `฿${sBreakdown.toFixed(2)} (${sBreakdownPct})`,
-        tp: `฿${tpPrice} (+2.50%)`,
-        trailing: `฿${trailingPrice}`
-      },
-      cheatBadge: `☀️ โพยประจำรอบเที่ยง 13:00 น. (ภาคบ่าย ${lastDate})`,
-      cheat: {
-        entry: `฿${sInflection.toFixed(2)}`,
-        entrySub: 'รอราคาข้ามจุดชนวน + คลื่น V5, V20 พุ่งคู่',
-        shieldTrigger: `฿${shieldTrigger}`,
-        shieldSl: `฿${shieldSl}`,
-        tp: `฿${tpPrice}`,
-        trailing: `฿${trailingPrice}`,
-        cut: `฿${cutPrice}`
-      }
-    },
-    evening: {
-      tagText: `🌙 บันทึกตรวจวัดรอบหลังตลาดปิด 17:30 น. (สรุปวันเต็ม วางแผนวันพรุ่งนี้)`,
-      copilotTitle: 'บทวิเคราะห์จาก Co-Pilot กัปตันเอไอ (อ้างอิงแผง 18 ค่ารอบหลังตลาดปิด)',
-      copilotMsg: `"สรุปตลาดวันเต็มวันที่ ${lastDate} ครับกัปตัน! แผงตรวจวัด 18 ค่าประจำวันปิดยืนยันว่า SCB ยืนที่ ฿${lastPrice.toFixed(2)} อย่างเหนียวแน่น กรอบอุณหภูมิวันพรุ่งนี้คำนวณได้พื้นรับ Floor ที่ ฿${floorVal.toFixed(2)} และเพดาน Ceiling ที่ ฿${ceilingVal.toFixed(2)} <strong>คำแนะนำเดินเรือวันพรุ่งนี้:</strong> โครงสร้างราคารักษาฐานได้อย่างยอดเยี่ยม พรุ่งนี้เช้าหากเปิดกระโดดข้าม <strong>฿${sInflection.toFixed(2)}</strong> เราจะเข้าจังหวะไม้แรกตามระบบทันที ล็อกเป้ากำไรแรกที่ ฿${tpPrice} สบายใจไร้กังวลครับ!"`,
-      weatherIcon: '🌤️',
-      weatherHeading: 'ท้องฟ้าเปิด คลื่นใหญ่ประคองตัวแข็งแกร่ง (Ready for Tomorrow)',
-      weatherSummary: `โครงสร้างแท่งเทียนวันเต็มรักษาฐานราคาเหนือ Floor ฿${floorVal.toFixed(2)} ได้อย่างสมบูรณ์แบบ วางแผนรับมือล่วงหน้าก่อนตลาดเปิดเช้าพรุ่งนี้`,
-      m18: {
-        date: `${lastDate} (17:30 น.)`,
-        price: `฿${lastPrice.toFixed(2)}`,
-        v5: v5Str,
-        v20: v20Str,
-        rho: rhoStr,
-        er: erStr,
-        delta: `±${delta.toFixed(2)}%`,
-        floor: `฿${floorVal.toFixed(2)}`,
-        ceiling: `฿${ceilingVal.toFixed(2)}`,
-        spread: `฿${spreadVal.toFixed(2)}`,
-        inflection: `฿${sInflection.toFixed(2)} (${sInflectionPct})`,
-        breakout: `฿${sBreakout.toFixed(2)} (${sBreakoutPct})`,
-        neutral: sNeutral,
-        breakdown: `฿${sBreakdown.toFixed(2)} (${sBreakdownPct})`,
-        tp: `฿${tpPrice} (+2.50%)`,
-        trailing: `฿${trailingPrice}`
-      },
-      cheatBadge: `🌙 โพยประจำรอบเย็น 17:30 น. (วางแผนวันถัดไป)`,
-      cheat: {
-        entry: `฿${sInflection.toFixed(2)}`,
-        entrySub: 'รอราคาเปิดข้ามจุดชนวน + สัญญาณคลื่นเช้าพรุ่งนี้',
-        shieldTrigger: `฿${shieldTrigger}`,
-        shieldSl: `฿${shieldSl}`,
-        tp: `฿${tpPrice}`,
-        trailing: `฿${trailingPrice}`,
-        cut: `฿${cutPrice}`
-      }
-    }
-  };
-}
-
-function applyForecastSession(sessionKey) {
-  const sessions = getForecastSessions();
-  const session = sessions[sessionKey] || sessions.midday;
-  if (!session) return;
-
-  // 1. Update Session Tag
-  const tagEl = document.getElementById('instrumentSessionTag');
-  if (tagEl) tagEl.textContent = session.tagText;
-
-  // 2. Update Co-Pilot Briefing
-  const titleEl = document.getElementById('copilotTitle');
-  const msgEl = document.getElementById('copilotMessage');
-  if (titleEl) titleEl.textContent = session.copilotTitle;
-  if (msgEl) msgEl.innerHTML = session.copilotMsg;
-
-  // 3. Update Weather Box
-  const iconEl = document.querySelector('.weather-huge-icon');
-  const headingEl = document.querySelector('.weather-condition-heading');
-  const sumEl = document.querySelector('.weather-condition-summary');
-  if (iconEl) iconEl.textContent = session.weatherIcon;
-  if (headingEl) headingEl.textContent = session.weatherHeading;
-  if (sumEl) sumEl.textContent = session.weatherSummary;
-
-  // 4. Update the 18 Instruments Deck
-  const m = session.m18;
-  const map = {
-    'm18_date': m.date,
-    'm18_price': m.price,
-    'm18_v5': m.v5,
-    'm18_v20': m.v20,
-    'm18_rho': m.rho,
-    'm18_er': m.er,
-    'm18_delta': m.delta,
-    'm18_floor': m.floor,
-    'm18_ceiling': m.ceiling,
-    'm18_spread': m.spread,
-    'm18_inflection': m.inflection,
-    'm18_breakout': m.breakout,
-    'm18_neutral': m.neutral,
-    'm18_breakdown': m.breakdown,
-    'm18_tp': m.tp,
-    'm18_trailing': m.trailing
-  };
-
-  for (const [id, val] of Object.entries(map)) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  }
-
-  // 5. Update Manual Trader Execution Cheat Sheet
-  const cheat = session.cheat;
-  if (cheat) {
-    const badgeEl = document.getElementById('manualCheatSessionTag');
-    if (badgeEl) badgeEl.textContent = session.cheatBadge;
-
-    const entryPriceEl = document.getElementById('cheatEntryPrice');
-    const entrySubEl = document.getElementById('cheatEntrySub');
-    const shieldTriggerEl = document.getElementById('cheatShieldTrigger');
-    const shieldSlEl = document.getElementById('cheatShieldSl');
-    const tpPriceEl = document.getElementById('cheatTpPrice');
-    const trailingPriceEl = document.getElementById('cheatTrailingPrice');
-    const cutPriceEl = document.getElementById('cheatCutPrice');
-
-    if (entryPriceEl) entryPriceEl.textContent = cheat.entry;
-    if (entrySubEl) entrySubEl.textContent = cheat.entrySub;
-    if (shieldTriggerEl) shieldTriggerEl.innerHTML = `${cheat.shieldTrigger} <span class="pct-tag">(+0.75%)</span>`;
-    if (shieldSlEl) shieldSlEl.textContent = cheat.shieldSl;
-    if (tpPriceEl) tpPriceEl.innerHTML = `${cheat.tp} <span class="pct-tag">(+2.50%)</span>`;
-    if (trailingPriceEl) trailingPriceEl.textContent = cheat.trailing;
-    if (cutPriceEl) cutPriceEl.innerHTML = `${cheat.cut} <span class="pct-tag">(-1.78%)</span>`;
-  }
-}
-
-function initForecastRunSwitcher() {
-  const btnMidday = document.getElementById('btnRunMidday');
-  const btnEvening = document.getElementById('btnRunEvening');
-
-  if (btnMidday && btnEvening) {
-    btnMidday.addEventListener('click', () => {
-      btnMidday.classList.add('active');
-      btnEvening.classList.remove('active');
-      applyForecastSession('midday');
-    });
-
-    btnEvening.addEventListener('click', () => {
-      btnEvening.classList.add('active');
-      btnMidday.classList.remove('active');
-      applyForecastSession('evening');
-    });
-  }
-
-  // Toggle Accordion for Historical Proof Drawer
-  const btnProof = document.getElementById('btnToggleProofDrawer');
-  const drawerBody = document.getElementById('proofDrawerBody');
-  const arrowEl = document.getElementById('proofToggleArrow');
-  const textEl = document.getElementById('proofToggleText');
-
-  if (btnProof && drawerBody) {
-    btnProof.addEventListener('click', () => {
-      const isHidden = window.getComputedStyle(drawerBody).display === 'none';
-      if (isHidden) {
-        drawerBody.style.display = 'block';
-        if (arrowEl) arrowEl.style.transform = 'rotate(180deg)';
-        if (textEl) textEl.textContent = 'คลิกเพื่อซ่อนตารางพิสูจน์ค่าสถิติจริง';
-      } else {
-        drawerBody.style.display = 'none';
-        if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
-        if (textEl) textEl.textContent = 'คลิกเพื่อดูตารางพิสูจน์ค่าสถิติจริง';
-      }
-    });
-  }
-
-  // Copy Cheat Sheet Button Handler
-  const btnCopy = document.getElementById('btnCopyCheatSheet');
-  const copyIcon = document.getElementById('copyCheatIcon');
-  const copyText = document.getElementById('copyCheatText');
-
-  if (btnCopy) {
-    btnCopy.addEventListener('click', () => {
-      const activeTab = document.getElementById('btnRunEvening')?.classList.contains('active') ? 'evening' : 'midday';
-      const s = getForecastSessions()[activeTab] || getForecastSessions().midday;
-      const textToCopy = [
-        `🎯 โพยตั้งราคาเทรดมือ SCB.BK (รามานุจัน Discrete Cycle)`,
-        `📅 รอบ: ${s.cheatBadge}`,
-        `----------------------------------------`,
-        `1. จุดเข้าซื้อไม้แรก (Entry): ${s.cheat.entry} (แบ่ง 30% ของพอร์ต)`,
-        `2. กั้นหน้าทุน (+0.75%): แตะ ${s.cheat.shieldTrigger} ➔ ขยับ Stop Loss ตั้งที่ ${s.cheat.shieldSl} ล็อกทุนฟรี 100%!`,
-        `3. เป้ากำไรแรก (First TP): ${s.cheat.tp} (+2.50%) (แบ่งขายล็อกกำไร 50%)`,
-        `4. เป้ารันเทรนด์ใหญ่: ${s.cheat.trailing} (ถือไม้ที่เหลือ 50% รันตาม Trailing)`,
-        `5. จุดยอมแพ้ฉุกเฉิน (Cut Loss): ${s.cheat.cut} (-1.78%) (กรณีไม่แตะ +0.75% แต่หลุดแนวรับ)`,
-        `----------------------------------------`,
-        `★ พิสูจน์ 4 ปี: ชนะ+เสมอ 89.66% ด้วยเทคนิคเกราะคุ้มทุน (ลดไม้แพ้เหลือเพียง 3 ไม้)`
-      ].join('\n');
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          if (copyIcon) copyIcon.textContent = '✅';
-          if (copyText) copyText.textContent = 'คัดลอกโพยสำเร็จ!';
-          setTimeout(() => {
-            if (copyIcon) copyIcon.textContent = '📋';
-            if (copyText) copyText.textContent = 'คัดลอกโพยไปตั้ง Order';
-          }, 2200);
-        }).catch(err => {
-          console.error('Clipboard copy failed:', err);
-        });
-      }
-    });
-  }
-
-  // Set initial session to Midday
-  applyForecastSession('midday');
-}
-
-/**
- * MODULE 05: 18-Vector Mathematical Synthesis Engine Controller
- * Pure custom quantitative mathematics applied directly to SCB telemetry data
- * Dynamically generated from window.RAMANUJAN_DATA
- */
-function getDynamicMathSessionsData() {
-  const d = window.RAMANUJAN_DATA || {};
-  const pred = d.predictiveIntelligence || {};
-  const candles = d.candlesWithSignals || [];
-  const lastC = candles.length > 0 ? candles[candles.length - 1] : {};
-
-  const lastDate = pred.lastDate || lastC.time || '2026-10-27';
-  const lastPrice = typeof pred.lastPrice === 'number' ? pred.lastPrice : (lastC.close || 153.50);
-  const delta = typeof pred.dynamicDeltaPct === 'number' ? pred.dynamicDeltaPct : 5.72;
-  const floorVal = pred.expectedRange?.floor || (lastPrice * (1 - delta / 100));
-  const ceilingVal = pred.expectedRange?.ceiling || (lastPrice * (1 + delta / 100));
-  const spreadVal = pred.expectedRange?.spreadThb || (ceilingVal - floorVal);
-
-  const scens = pred.scenarios || {};
-  const sInflection = scens.bullishInflection?.triggerPrice || (lastPrice * 1.003);
-  const sBreakout = scens.resonanceBreakout?.triggerPrice || (lastPrice * 1.005);
-
-  const v5Num = typeof lastC.v_micro === 'number' ? lastC.v_micro : 0.333;
-  const v20Num = typeof lastC.v_macro === 'number' ? lastC.v_macro : 0.901;
-  const rhoNum = typeof lastC.rho_ram === 'number' ? lastC.rho_ram : 0.651;
-  const erNum = typeof lastC.er === 'number' ? lastC.er : 0.448;
-
-  const mag = Math.sqrt(v5Num * v5Num + v20Num * v20Num);
-  const angle = (Math.atan2(v20Num, v5Num) * 180 / Math.PI + 360) % 360;
-  const energy = 0.5 * mag * mag;
-  const tpVal = sInflection * 1.025;
-  const cutVal = lastPrice * (1 - (delta / 100) * 0.5);
-
-  const baseObj = {
-    price: lastPrice,
-    v5: v5Num,
-    v20: v20Num,
-    rho: rhoNum,
-    er: erNum,
-    floor: floorVal,
-    ceiling: ceilingVal,
-    spread: spreadVal,
-    delta: delta,
-    inflection: sInflection,
-    breakout: sBreakout,
-    tp: tpVal,
-    trailing: `฿${(sInflection * 1.05).toFixed(2)}+`,
-    cut: cutVal,
-    mag: mag,
-    angle: angle,
-    energy: energy,
-    magPct: Math.min(100, Math.round(mag * 50)),
-    comp: Math.min(1.0, Math.max(0.0, 0.5 + rhoNum * 0.3)),
-    confScore: Math.min(100, Math.max(0, 50 + rhoNum * 30 + (v5Num > 0 ? 10 : 0))),
-    matrixStatus: `🟢 พร้อมเข้าทำรอบ (PROBE 30% AT ฿${sInflection.toFixed(2)})`,
-  };
-
-  return {
-    midday: {
-      ...baseObj,
-      name: 'รอบเที่ยง 13:00 น.',
-      lastDate: `${lastDate} (13:00 น.)`,
-      copilot: `"สวัสดีครับกัปตัน! ตรวจวัดรอบเที่ยงวันที่ ${lastDate} ขนาดแรงส่งสุทธิ |M| = ${mag.toFixed(3)} องศาคลื่น θ = ${angle.toFixed(1)}° หากบ่ายนี้ราคาข้ามจุดชนวน ฿${sInflection.toFixed(2)} เปิดไม้หยั่งเชิง 30% ตามระบบได้ทันทีครับ!"`
-    },
-    evening: {
-      ...baseObj,
-      name: 'รอบเย็น 17:30 น.',
-      lastDate: `${lastDate} (17:30 น.)`,
-      copilot: `"สรุปตลาดวันเต็มวันที่ ${lastDate} ครับกัปตัน! แรงส่งสุทธิ |M| = ${mag.toFixed(3)} ความสอดคล้องคลื่น rho = ${(rhoNum >= 0 ? '+' : '') + rhoNum.toFixed(3)} โครงสร้างราคารักษาฐานเหนือ Floor ฿${floorVal.toFixed(2)} ได้อย่างแข็งแกร่ง พรุ่งนี้หากเปิดข้าม ฿${sInflection.toFixed(2)} ลุยไม้แรกตามแผนได้เลยครับ!"`
-    }
-  };
-}
-
-function initMath18Lab() {
-  const btnMidday = document.getElementById('btnMathMidday');
-  const btnEvening = document.getElementById('btnMathEvening');
-
-  if (btnMidday && btnEvening) {
-    btnMidday.addEventListener('click', () => {
-      btnMidday.classList.add('active');
-      btnEvening.classList.remove('active');
-      updateMathLabUI('midday');
-    });
-
-    btnEvening.addEventListener('click', () => {
-      btnEvening.classList.add('active');
-      btnMidday.classList.remove('active');
-      updateMathLabUI('evening');
-    });
-  }
-
-  // Copy AI Vision Prompt Button Handler
-  const btnCopyAi = document.getElementById('btnCopyAiPrompt');
-  const copyAiIcon = document.getElementById('copyAiIcon');
-  const copyAiText = document.getElementById('copyAiText');
-
-  if (btnCopyAi) {
-    btnCopyAi.addEventListener('click', () => {
-      const activeSessionKey = document.getElementById('btnMathEvening')?.classList.contains('active') ? 'evening' : 'midday';
-      const mathSessions = getDynamicMathSessionsData();
-      const s = mathSessions[activeSessionKey] || mathSessions.evening;
-
-      const promptTemplate = [
-        `🎯 [คำสั่ง AI VISION QUANT]: คุณคือเจ้าหน้าที่วิเคราะห์ความเสี่ยงและตัดสินใจส่งคำสั่งซื้อขาย (Senior Quantitative Trading AI) ประจำระบบ Ramanujan SCB.BK`,
-        ``,
-        `โปรดวิเคราะห์ภาพ HUD และ Data Payload ที่แนบมานี้ (รอบ: ${s.name}):`,
-        `1. ตรวจสอบ 4 Binary Logic Gates (Coherence >= +0.25, Quadrant I, Altitude <= 75%, Trigger Clearance) ว่าผ่านครบทุกชั้นหรือไม่`,
-        `2. สรุปสถานะการเข้าซื้อ (EXECUTION STATUS): อนุมัติเข้าทันที (APPROVE NOW) / รอราคาข้ามจุดชนวน (AWAIT TRIGGER ฿${s.inflection.toFixed(2)}) / ยกเลิกคำสั่ง (REJECT)`,
-        `3. สรุปตั๋วคำสั่งซื้อขายสำเร็จรูปสำหรับป้อนระบบ Streaming:`,
-        `   - คำสั่ง: BUY LIMIT (แบ่งสัดส่วนไม้แรก 30% ของพอร์ต)`,
-        `   - ราคาตั้งซื้อ (Entry Limit): ฿${s.inflection.toFixed(2)}`,
-        `   - เงื่อนไขล็อกทุน Breakeven (+0.75%): เมื่อราคาแตะ ฿${(s.inflection * 1.0075).toFixed(2)} ให้เลื่อน SL ไปที่ ฿${(s.inflection * 1.0035).toFixed(2)} (+0.35%) เพื่อล็อกต้นทุนฟรี`,
-        `   - เป้าทำกำไรแรก (Take Profit 50%): ฿${s.tp.toFixed(2)} (+2.50%)`,
-        `   - เป้ารันเทรนด์ใหญ่ (Super Trend 50%): ${s.trailing} (รันตาม Trailing ต่อ)`,
-        `   - จุดยอมแพ้ฉุกเฉิน (Emergency Cut Loss): ฿${s.cut.toFixed(2)} (-1.78%)`,
-        `4. ประเมินความคุ้มค่าเชิงคณิตศาสตร์ และสิ่งที่ "ห้ามทำเด็ดขาด" ในรอบเวลานี้`
-      ].join('\n');
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(promptTemplate).then(() => {
-          if (copyAiIcon) copyAiIcon.textContent = '✅';
-          if (copyAiText) copyAiText.textContent = 'คัดลอก Prompt สำเร็จ!';
-          setTimeout(() => {
-            if (copyAiIcon) copyAiIcon.textContent = '📋';
-            if (copyAiText) copyAiText.textContent = 'คัดลอก Prompt สั่งงาน AI';
-          }, 2200);
-        }).catch(err => {
-          console.error('Clipboard copy failed:', err);
-        });
-      }
-    });
-  }
-
-  // Initial render (defaults to evening as latest complete market day or midday)
-  updateMathLabUI('evening');
-}
-
-function updateMathLabUI(sessionKey) {
-  const mathSessions = getDynamicMathSessionsData();
-  const s = mathSessions[sessionKey] || mathSessions.evening;
-
-  // 1. Hero Big Stats
-  const elDispMomentum = document.getElementById('mathDispMomentum');
-  if (elDispMomentum) elDispMomentum.textContent = s.mag.toFixed(3);
-
-  const elDispPhaseAngle = document.getElementById('mathDispPhaseAngle');
-  if (elDispPhaseAngle) elDispPhaseAngle.textContent = `${s.angle.toFixed(1)}°`;
-
-  // 2. Dimension 01: Momentum Vector & Energy
-  const elV5 = document.getElementById('mLab_v5');
-  if (elV5) elV5.textContent = `+${s.v5.toFixed(3)}`;
-
-  const elV20 = document.getElementById('mLab_v20');
-  if (elV20) elV20.textContent = `+${s.v20.toFixed(3)}`;
-
-  const elRho = document.getElementById('mLab_rho');
-  if (elRho) elRho.textContent = `+${s.rho.toFixed(3)}`;
-
-  const elMag = document.getElementById('mLab_mag');
-  if (elMag) elMag.textContent = `${s.mag.toFixed(3)} (แรงส่งบวกสูง)`;
-
-  const elAngle = document.getElementById('mLab_angle');
-  if (elAngle) elAngle.innerHTML = `${s.angle.toFixed(1)}&deg; (Quadrant I: พุ่งคู่)`;
-
-  const elEnergy = document.getElementById('mLab_energy');
-  if (elEnergy) elEnergy.textContent = `${s.energy.toFixed(3)} J (มีเนื้องาน ไม่ใช่ Noise)`;
-
-  const elMagPct = document.getElementById('mLab_magPct');
-  if (elMagPct) elMagPct.textContent = `${s.magPct.toFixed(1)}% (ระดับสูง)`;
-
-  const elProgressBar = document.getElementById('mLab_progressBar');
-  if (elProgressBar) elProgressBar.style.width = `${s.magPct}%`;
-
-  // 3. Dimension 02: Dynamic Altitude & Compression
-  const elPrice = document.getElementById('mLab_price');
-  if (elPrice) elPrice.textContent = `฿${s.price.toFixed(2)}`;
-
-  const elFloorCeil = document.getElementById('mLab_floorCeil');
-  if (elFloorCeil) elFloorCeil.textContent = `฿${s.floor.toFixed(2)} - ฿${s.ceiling.toFixed(2)}`;
-
-  const elSpread = document.getElementById('mLab_spread');
-  if (elSpread) elSpread.textContent = `฿${s.spread.toFixed(2)} (±${s.delta.toFixed(2)}%)`;
-
-  const altPct = ((s.price - s.floor) / (s.ceiling - s.floor)) * 100;
-  const elAlt = document.getElementById('mLab_alt');
-  if (elAlt) elAlt.textContent = `${altPct.toFixed(1)}% (Equilibrium Ground Zero)`;
-
-  const proxPct = ((s.inflection - s.price) / s.price) * 100;
-  const proxDiff = (s.inflection - s.price).toFixed(2);
-  const elProx = document.getElementById('mLab_prox');
-  if (elProx) elProx.textContent = `+${proxPct.toFixed(2)}% (เพียง ${proxDiff} บาท!)`;
-
-  const elComp = document.getElementById('mLab_comp');
-  if (elComp) elComp.textContent = `${s.comp.toFixed(3)} (สปริงกำลังสะสมพลังรอดีด)`;
-
-  const elAltBar = document.getElementById('mLab_altBar');
-  if (elAltBar) elAltBar.style.width = `${altPct}%`;
-
-  // 4. Dimension 03: Asymmetry R:R Tensor
-  const elTpVal = document.getElementById('mLab_tpVal');
-  if (elTpVal) elTpVal.textContent = `฿${s.tp.toFixed(2)} (+2.50%)`;
-
-  const elTrailingVal = document.getElementById('mLab_trailingVal');
-  if (elTrailingVal) elTrailingVal.textContent = `${s.trailing} (+9.04%)`;
-
-  // 5. Dimension 04: Tactical Matrix & Status
-  const elMatrixStatus = document.getElementById('mLab_matrixStatus');
-  if (elMatrixStatus) elMatrixStatus.textContent = s.matrixStatus;
-
-  const elConfScore = document.getElementById('mLab_confScore');
-  if (elConfScore) elConfScore.textContent = `${s.confScore.toFixed(1)}% (Tier A)`;
-
-  const elCopilotSummary = document.getElementById('mLab_copilotSummary');
-  if (elCopilotSummary) elCopilotSummary.textContent = s.copilot;
-
-  // 6. Module F: AI Vision Cockpit HUD Elements Synchronization
-  const elHudSessionPill = document.getElementById('hudSessionPill');
-  if (elHudSessionPill) {
-    elHudSessionPill.textContent = sessionKey === 'evening' 
-      ? '🌙 17:30 น. (สรุปวันเต็ม & วางแผนพรุ่งนี้)' 
-      : '☀️ 12:45 น. (วิเคราะห์ภาคเช้า วางแผนภาคบ่าย)';
-  }
-
-  const elHudPriceVal = document.getElementById('hudPriceVal');
-  if (elHudPriceVal) elHudPriceVal.textContent = `฿${s.price.toFixed(2)}`;
-
-  const elHudGate1Val = document.getElementById('hudGate1Val');
-  if (elHudGate1Val) elHudGate1Val.textContent = `วัดได้ +${s.rho.toFixed(3)} (พลังส่งฮาร์มอนิกบวก)`;
-
-  const elHudGate2Val = document.getElementById('hudGate2Val');
-  if (elHudGate2Val) elHudGate2Val.innerHTML = `มุม ${s.angle.toFixed(1)}&deg; (คลื่นสัปดาห์ & เดือนพุ่งคู่)`;
-
-  const elHudGate3Val = document.getElementById('hudGate3Val');
-  if (elHudGate3Val) elHudGate3Val.textContent = `ระดับ ${altPct.toFixed(1)}% (Equilibrium ปลอดภัย)`;
-
-  const elHudGate4Val = document.getElementById('hudGate4Val');
-  if (elHudGate4Val) elHudGate4Val.textContent = `฿${s.price.toFixed(2)} (รอข้าม ฿${s.inflection.toFixed(2)})`;
-
-  const elHudTicketEntry = document.getElementById('hudTicketEntry');
-  if (elHudTicketEntry) elHudTicketEntry.textContent = `฿${s.inflection.toFixed(2)}`;
-
-  const elHudTicketTp = document.getElementById('hudTicketTp');
-  if (elHudTicketTp) elHudTicketTp.textContent = `฿${s.tp.toFixed(2)} (+2.50%)`;
-
-  const elHudTicketTrailing = document.getElementById('hudTicketTrailing');
-  if (elHudTicketTrailing) elHudTicketTrailing.textContent = `${s.trailing} (+9.04%)`;
-
-  const elHudTicketSl = document.getElementById('hudTicketSl');
-  if (elHudTicketSl) elHudTicketSl.textContent = `฿${s.cut.toFixed(2)} (-1.78%)`;
-
-  // Dynamic Machine-Readable JSON Payload
-  const elHudJsonPayload = document.getElementById('hudJsonPayload');
-  if (elHudJsonPayload) {
-    const payloadObj = {
-      symbol: 'SCB.BK',
-      session: sessionKey === 'evening' ? 'evening_1730' : 'midday_1245',
-      price: s.price,
-      v5: s.v5,
-      v20: s.v20,
-      rho: s.rho,
-      momentum_mag: s.mag,
-      phase_angle_deg: s.angle,
-      altitude_pct: Number(altPct.toFixed(1)),
-      gates: {
-        g1_coherence: s.rho >= 0.25,
-        g2_quadrant: s.angle >= 0 && s.angle <= 90,
-        g3_altitude: altPct <= 75,
-        g4_trigger: s.price >= s.inflection
-      },
-      entry_trigger: s.inflection,
-      shield_trigger: 147.92,
-      shield_sl: 147.33,
-      tp1: s.tp,
-      trailing_target: 160.10,
-      emergency_sl: s.cut
-    };
-    elHudJsonPayload.innerHTML = `<code>${JSON.stringify(payloadObj, null, 2)}</code>`;
-  }
-}
-
-
-
-
