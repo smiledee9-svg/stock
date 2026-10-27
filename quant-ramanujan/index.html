@@ -128,6 +128,47 @@
       color: #64748b;
       margin-top: 2px;
     }
+    /* Widescreen Full-Width Chart + Horizontal 4-Scenario Fact Matrix (Under Chart) */
+    .chart-decision-split {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chart-panel-wrap {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .decision-matrix-wrap {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .decision-scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 1024px) {
+      .decision-scenarios-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .decision-scenarios-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -212,11 +253,11 @@
       <a href="#pillarsSection" class="nav-hud-btn"><span>📐</span> <span>4 เสาหลัก & จำลองทุน</span></a>
     </nav>
 
-    <!-- ================= 3. CORE ROW: CHART + 4 DECISION SCENARIOS ================= -->
+    <!-- ================= 3. CORE ROW: CHART (FULL WIDTH) + 4 DECISION SCENARIOS (UNDER CHART) ================= -->
     <section class="crystallized-section" id="chartDecisionSection" style="padding-top: 6px;">
       <div class="chart-decision-split">
         
-        <!-- Left Column: Sacred TradingView Candlestick Canvas -->
+        <!-- Sacred TradingView Candlestick Canvas (Expansive 100% Full Width) -->
         <div class="chart-panel-wrap">
           <div class="chart-header-compact">
             <div class="chart-controls-left">
@@ -233,55 +274,62 @@
             </div>
           </div>
 
-          <div class="chart-container-box" id="priceChartContainer" style="height: 380px;"></div>
+          <div class="chart-container-box" id="priceChartContainer" style="height: 440px;"></div>
           <div class="wave-subchart-box" id="waveChartContainer" style="height: 140px;"></div>
         </div>
 
-        <!-- Right Column: 4 Pure Decision Scenarios -->
+        <!-- 4 Pure Decision Scenarios (Placed Directly Under the Chart Canvas) -->
         <div class="decision-matrix-wrap">
           <div class="matrix-head">
-            <span class="matrix-title">⚡ เมทริกซ์ 4 สภาวะราคาจุดชนวน</span>
-            <span class="badge-mini">Fact Matrix</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="matrix-title">⚡ เมทริกซ์ 4 สภาวะราคาจุดชนวน</span>
+              <span class="badge-mini">Fact Matrix</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">
+              ราคาสัจธรรมปัจจุบัน: <strong style="color: #fff;">฿153.50</strong> • กรอบปลอดภัย Delta: <strong style="color: var(--gold-glow);">±6.16% (±฿9.45)</strong>
+            </div>
           </div>
 
-          <!-- Scenario 1: Inflection -->
-          <div class="scenario-compact sc-inflection">
-            <div class="sc-top">
-              <span class="sc-tag sc-tag-green">🟢 HARMONIC INFLECTION</span>
-              <span class="sc-target" id="scInflectPrice">฿154.93</span>
+          <div class="decision-scenarios-grid">
+            <!-- Scenario 1: Inflection -->
+            <div class="scenario-compact sc-inflection">
+              <div class="sc-top">
+                <span class="sc-tag sc-tag-green">🟢 HARMONIC INFLECTION</span>
+                <span class="sc-target" id="scInflectPrice">฿154.93</span>
+              </div>
+              <div class="sc-info">ราคาปิดยืนเหนือแนวต้านระยะสั้น คลื่นสัปดาห์ V5 พลิกตัดบวก</div>
+              <div class="sc-exec">🎯 แผน: <strong>TRIGGER WATCH</strong> (เตรียมตั้งรับไม้แรก)</div>
             </div>
-            <div class="sc-info">ราคาปิดยืนเหนือแนวต้านระยะสั้น คลื่นสัปดาห์ V5 พลิกตัดบวก</div>
-            <div class="sc-exec">🎯 แผน: <strong>TRIGGER WATCH</strong> (เตรียมตั้งรับไม้แรก)</div>
-          </div>
 
-          <!-- Scenario 2: Breakout -->
-          <div class="scenario-compact sc-breakout">
-            <div class="sc-top">
-              <span class="sc-tag sc-tag-gold">⚡ RESONANCE BREAKOUT</span>
-              <span class="sc-target" id="scBreakPrice">฿155.00</span>
+            <!-- Scenario 2: Breakout -->
+            <div class="scenario-compact sc-breakout">
+              <div class="sc-top">
+                <span class="sc-tag sc-tag-gold">⚡ RESONANCE BREAKOUT</span>
+                <span class="sc-target" id="scBreakPrice">฿155.00</span>
+              </div>
+              <div class="sc-info">ราคาปิดทะลุกรอบไซด์เวย์ ER ≥ 0.26 คลื่นสอดคล้องเต็มกำลัง</div>
+              <div class="sc-exec">🚀 แผน: <strong>BUY ENTRY #1</strong> (เปิดรอบซื้อไม้แรกทันที)</div>
             </div>
-            <div class="sc-info">ราคาปิดทะลุกรอบไซด์เวย์ ER ≥ 0.26 คลื่นสอดคล้องเต็มกำลัง</div>
-            <div class="sc-exec">🚀 แผน: <strong>BUY ENTRY #1</strong> (เปิดรอบซื้อไม้แรกทันที)</div>
-          </div>
 
-          <!-- Scenario 3: Neutral Sanctuary -->
-          <div class="scenario-compact sc-neutral">
-            <div class="sc-top">
-              <span class="sc-tag sc-tag-neutral">⚪ CASH SANCTUARY</span>
-              <span class="sc-target" id="scNeutralRange">฿144.05 - ฿154.93</span>
+            <!-- Scenario 3: Neutral Sanctuary -->
+            <div class="scenario-compact sc-neutral">
+              <div class="sc-top">
+                <span class="sc-tag sc-tag-neutral">⚪ CASH SANCTUARY</span>
+                <span class="sc-target" id="scNeutralRange">฿144.05 - ฿154.93</span>
+              </div>
+              <div class="sc-info">ราคาสะสมพลังในกรอบ คลื่นยังไม่ครบเกณฑ์คู่ ปลอดภัย 100%</div>
+              <div class="sc-exec">🛡️ แผน: <strong>HOLD 100% CASH</strong> (ถือเงินสด ไม่ติดดอย)</div>
             </div>
-            <div class="sc-info">ราคาสะสมพลังในกรอบ คลื่นยังไม่ครบเกณฑ์คู่ ปลอดภัย 100%</div>
-            <div class="sc-exec">🛡️ แผน: <strong>HOLD 100% CASH</strong> (ถือเงินสด ไม่ติดดอย)</div>
-          </div>
 
-          <!-- Scenario 4: Abyssal Drop -->
-          <div class="scenario-compact sc-danger">
-            <div class="sc-top">
-              <span class="sc-tag sc-tag-red">🔴 ABYSSAL FLOOR</span>
-              <span class="sc-target" id="scDangerPrice">฿144.05</span>
+            <!-- Scenario 4: Abyssal Drop -->
+            <div class="scenario-compact sc-danger">
+              <div class="sc-top">
+                <span class="sc-tag sc-tag-red">🔴 ABYSSAL FLOOR</span>
+                <span class="sc-target" id="scDangerPrice">฿144.05</span>
+              </div>
+              <div class="sc-info">ราคาหลุดต่ำกว่า Floor (หลุดกรอบล่าง Delta ของรามานุจัน)</div>
+              <div class="sc-exec">⚠️ แผน: <strong>AVOID DROP</strong> (ห้ามรับมีดเด็ดขาด นั่งทับมือ)</div>
             </div>
-            <div class="sc-info">ราคาหลุดต่ำกว่า Floor (หลุดกรอบล่าง Delta ของรามานุจัน)</div>
-            <div class="sc-exec">⚠️ แผน: <strong>AVOID DROP</strong> (ห้ามรับมีดเด็ดขาด นั่งทับมือ)</div>
           </div>
         </div>
 

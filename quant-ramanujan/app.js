@@ -196,11 +196,11 @@ function initLightweightCharts(candles) {
     }
   };
 
-  // Main Price Chart
+  // Main Price Chart (Widescreen 100% full width)
   priceChart = LightweightCharts.createChart(priceContainer, {
     ...chartTheme,
     width: priceContainer.clientWidth,
-    height: 380
+    height: 440
   });
 
   candleSeries = priceChart.addCandlestickSeries({

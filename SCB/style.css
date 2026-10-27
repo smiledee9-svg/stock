@@ -1169,18 +1169,19 @@ body {
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-/* Side-by-Side Chart & Decision Split */
+/* Widescreen Full-Width Chart + Horizontal 4-Scenario Fact Matrix (Under Chart) */
 .chart-decision-split {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
 .chart-panel-wrap {
+  width: 100%;
   background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1195,13 +1196,14 @@ body {
 }
 
 .decision-matrix-wrap {
+  width: 100%;
   background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .matrix-head {
@@ -1211,6 +1213,24 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: 8px;
   margin-bottom: 2px;
+}
+
+.decision-scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 1024px) {
+  .decision-scenarios-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .decision-scenarios-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .matrix-title {
