@@ -24,7 +24,7 @@ let allArchiveRecords = [];
 let currentArchiveFilter = 'all';
 let archiveSearchQuery = '';
 let currentArchivePage = 1;
-const ARCHIVE_ITEMS_PER_PAGE = 30;
+const ARCHIVE_ITEMS_PER_PAGE = 10;
 
 // Active 18-wave selection
 let selectedWaveIdx = 5; // Default to V5 (Weekly Momentum)
@@ -1004,6 +1004,8 @@ function exportArchiveCsv() {
 // ==========================================
 // 7. MASTER CYCLE LEDGER (26 HISTORICAL CYCLES)
 // ==========================================
+let showAllLedger = false;
+
 function renderMasterCycleLedger(completedCycles, summary) {
   const tbody = document.getElementById('ledgerTableBody');
   if (!tbody) return;
@@ -1020,14 +1022,37 @@ function renderMasterCycleLedger(completedCycles, summary) {
   const elMDD = document.getElementById('ledgerMDD');
   if (elMDD) elMDD.textContent = `${(summary.maxDrawdownPct || -5.71).toFixed(2)}%`;
 
+  const btnToggle = document.getElementById('btnToggleLedger');
+  const titleText = document.getElementById('ledgerTitleText');
+  const scrollWrap = document.getElementById('ledgerScrollWrap');
+
+  if (btnToggle) {
+    btnToggle.textContent = showAllLedger ? 'ย่อเหลือ 10 รอบล่าสุด' : `ดูทั้งหมด ${completedCycles.length} รอบ`;
+    btnToggle.onclick = () => {
+      showAllLedger = !showAllLedger;
+      renderMasterCycleLedger(completedCycles, summary);
+    };
+  }
+
+  if (titleText) {
+    titleText.textContent = showAllLedger 
+      ? `สัจธรรมประวัติครบทั้ง ${completedCycles.length} รอบวัฏจักร (Master Cycle Ledger)` 
+      : `สัจธรรมประวัติ 10 รอบล่าสุด (Master Cycle Ledger)`;
+  }
+
+  if (scrollWrap) {
+    scrollWrap.style.maxHeight = showAllLedger ? '500px' : 'none';
+  }
+
   if (completedCycles.length === 0) {
     tbody.innerHTML = `<tr><td colspan="14" style="text-align: center; padding: 25px; color: var(--text-muted);">ไม่มีประวัติรอบที่เสร็จสิ้น</td></tr>`;
     return;
   }
 
   const sortedCycles = [...completedCycles].reverse();
+  const displayCycles = showAllLedger ? sortedCycles : sortedCycles.slice(0, 10);
 
-  tbody.innerHTML = sortedCycles.map((c, idx) => {
+  tbody.innerHTML = displayCycles.map((c, idx) => {
     const cycleNum = completedCycles.length - idx;
     const isWin = (c.pnlThb || 0) >= 0;
     const pnlSign = isWin ? '+' : '';

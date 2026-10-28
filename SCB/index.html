@@ -378,7 +378,7 @@
     <nav class="compact-nav-hud" id="sacredNavHud">
       <a href="#chartDecisionSection" class="nav-hud-btn active"><span>📈</span> <span>กราฟ & 4 สภาวะจุดชนวน</span></a>
       <a href="#waveSpectrumSection" class="nav-hud-btn"><span>🌊</span> <span>สเปกตรัม 18 คลื่น</span></a>
-      <a href="#ledgerSection" class="nav-hud-btn"><span>📜</span> <span>สถิติ 26 รอบจริง</span></a>
+      <a href="#ledgerSection" class="nav-hud-btn"><span>📜</span> <span>สถิติ 10 รอบล่าสุด</span></a>
       <a href="#archiveSection" class="nav-hud-btn"><span>🗄️</span> <span>คลังรายวัน 2-in-1 (เที่ยง/เย็น)</span></a>
     </nav>
 
@@ -515,7 +515,8 @@
       <div class="section-head-mini">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span>📜</span>
-          <strong style="font-size: 0.95rem; color: #fff;">สัจธรรมประวัติ 26 รอบวัฏจักรย้อนหลัง (Master Cycle Ledger)</strong>
+          <strong style="font-size: 0.95rem; color: #fff;" id="ledgerTitleText">สัจธรรมประวัติ 10 รอบล่าสุด (Master Cycle Ledger)</strong>
+          <button type="button" class="interval-pill" id="btnToggleLedger">ดูทั้งหมด 26 รอบ</button>
         </div>
         <div class="ledger-stats-inline">
           <span>ความแม่นยำ: <strong class="text-green" id="ledgerWinRate">61.54%</strong> (16 ชนะ / 10 แพ้)</span>
@@ -525,7 +526,7 @@
         </div>
       </div>
 
-      <div class="master-table-scroll" style="max-height: 280px;">
+      <div class="master-table-scroll" id="ledgerScrollWrap">
         <table class="master-db-table compact-table">
           <thead>
             <tr>
@@ -648,7 +649,7 @@
       </div>
 
       <!-- Master Table -->
-      <div class="master-table-scroll" style="max-height: 280px;">
+      <div class="master-table-scroll">
         <table class="master-db-table compact-table">
           <thead>
             <tr>
@@ -706,8 +707,8 @@
   </div>
 
   <!-- Data Bundle Script -->
-  <script src="ramanujan_data.js?v=20261028_2"></script>
+  <script src="ramanujan_data.js?v=20261028_3"></script>
   <!-- Unified Controller -->
-  <script src="app.js?v=20261028_2"></script>
+  <script src="app.js?v=20261028_3"></script>
 </body>
 </html>
