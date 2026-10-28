@@ -77,10 +77,7 @@ function initDashboard(data) {
   // 6. Render Master Cycle Ledger (26 historical cycles)
   renderMasterCycleLedger(completedCycles, summary);
 
-  // 7. Initialize Capital Compounder Simulator
-  initSimulator(summary, completedCycles);
-
-  // 8. Initialize Sticky Navigation HUD (Smooth Scrolling + ScrollSpy)
+  // 7. Initialize Sticky Navigation HUD (Smooth Scrolling + ScrollSpy)
   initStickyNavHud();
 }
 
@@ -1060,77 +1057,6 @@ function renderMasterCycleLedger(completedCycles, summary) {
   }).join('');
 }
 
-// ==========================================
-// 8. RAMANUJAN CAPITAL COMPOUNDER SIMULATOR
-// ==========================================
-function initSimulator(summary, completedCycles) {
-  const sliderCap = document.getElementById('simCapSlider');
-  const selectPreset = document.getElementById('simPresetSelect');
-  const sliderCycles = document.getElementById('simCyclesSlider');
-
-  if (!sliderCap || !selectPreset || !sliderCycles) return;
-
-  const updateSim = () => {
-    const cap = parseFloat(sliderCap.value) || 500000;
-    const preset = selectPreset.value;
-    const numCycles = parseInt(sliderCycles.value) || 26;
-
-    let leverageMult = 1.0;
-    let presetLabel = '⚖️ สายสมดุล (Standard Resonance 60%)';
-    if (preset === 'conservative') {
-      leverageMult = 0.5;
-      presetLabel = '🛡️ สายเซฟตี้ (Conservative Probe 30%)';
-    } else if (preset === 'aggressive') {
-      leverageMult = 1.5;
-      presetLabel = '🚀 สายมาสเตอร์ (Full Resonance 90%)';
-    }
-
-    const baseWinPct = 0.0185 * leverageMult;
-    const baseLossPct = -0.0165 * leverageMult;
-
-    let simulatedEquity = cap;
-    for (let i = 0; i < numCycles; i++) {
-      const isWin = (i % 10) < 6;
-      const stepPct = isWin ? baseWinPct : baseLossPct;
-      simulatedEquity *= (1 + stepPct);
-    }
-
-    const netProfit = simulatedEquity - cap;
-    const netReturnPct = ((simulatedEquity - cap) / cap) * 100;
-    const maxRiskPct = (-5.71 * leverageMult).toFixed(2);
-
-    const elCapDisp = document.getElementById('dispSimCap');
-    const elPresetDisp = document.getElementById('dispSimPreset');
-    const elCyclesDisp = document.getElementById('dispSimCycles');
-    const elFinalEquity = document.getElementById('dispSimFinalEquity');
-    const elProfit = document.getElementById('dispSimProfit');
-    const elReturn = document.getElementById('dispSimReturn');
-    const elRisk = document.getElementById('dispSimMaxRisk');
-
-    if (elCapDisp) elCapDisp.textContent = `฿${cap.toLocaleString('th-TH')}`;
-    if (elPresetDisp) elPresetDisp.textContent = presetLabel;
-    if (elCyclesDisp) elCyclesDisp.textContent = `${numCycles} รอบ (${preset})`;
-
-    if (elFinalEquity) elFinalEquity.textContent = `฿${Math.round(simulatedEquity).toLocaleString('th-TH')}`;
-    if (elProfit) {
-      const sign = netProfit >= 0 ? '+' : '';
-      elProfit.textContent = `${sign}฿${Math.round(netProfit).toLocaleString('th-TH')}`;
-      elProfit.style.color = netProfit >= 0 ? 'var(--gold)' : '#f87171';
-    }
-    if (elReturn) {
-      const sign = netReturnPct >= 0 ? '+' : '';
-      elReturn.textContent = `${sign}${netReturnPct.toFixed(2)}%`;
-      elReturn.style.color = netReturnPct >= 0 ? '#38bdf8' : '#f87171';
-    }
-    if (elRisk) elRisk.textContent = `${maxRiskPct}%`;
-  };
-
-  sliderCap.addEventListener('input', updateSim);
-  selectPreset.addEventListener('change', updateSim);
-  sliderCycles.addEventListener('input', updateSim);
-
-  updateSim();
-}
 
 // ==========================================
 // 9. STICKY SACRED NAVIGATION HUD & SCROLLSPY

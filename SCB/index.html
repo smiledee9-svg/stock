@@ -380,7 +380,6 @@
       <a href="#waveSpectrumSection" class="nav-hud-btn"><span>🌊</span> <span>สเปกตรัม 18 คลื่น</span></a>
       <a href="#ledgerSection" class="nav-hud-btn"><span>📜</span> <span>สถิติ 26 รอบจริง</span></a>
       <a href="#archiveSection" class="nav-hud-btn"><span>🗄️</span> <span>คลังรายวัน 2-in-1 (เที่ยง/เย็น)</span></a>
-      <a href="#pillarsSection" class="nav-hud-btn"><span>📐</span> <span>4 เสาหลัก & จำลองทุน</span></a>
     </nav>
 
     <!-- ================= 3. CORE ROW: CHART (FULL WIDTH) + 4 DECISION SCENARIOS (UNDER CHART) ================= -->
@@ -682,67 +681,6 @@
       </div>
     </section>
 
-    <!-- ================= 7. COMPACT PILLARS & RISK SIMULATOR ================= -->
-    <section class="crystallized-section" id="pillarsSection">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px;">
-        <div class="pillar-box-mini">
-          <div class="pillar-label">PILLAR I • RPT HARMONICS</div>
-          <div class="pillar-formula">c_q(n) = \sum_{(a,q)=1} e^{2\pi i a n / q}</div>
-          <div class="pillar-sub">แยกสัญญาณแท้ V5 (สัปดาห์) และ V20 (เดือน) จากคลื่นรบกวน</div>
-        </div>
-
-        <div class="pillar-box-mini">
-          <div class="pillar-label">PILLAR II • ROGERS-RAMANUJAN</div>
-          <div class="pillar-formula">R(q) = \frac{q^{1/5}}{1 + \frac{q}{1 + \dots}} \to \pm\delta_t = 6.16\%</div>
-          <div class="pillar-sub">คำนวณก้าวผันผวนไดนามิกสร้าง Floor ฿144.05 / Ceiling ฿162.95</div>
-        </div>
-
-        <div class="pillar-box-mini">
-          <div class="pillar-label">PILLAR III • HARDY-RAMANUJAN</div>
-          <div class="pillar-formula">p(n) \sim \frac{1}{4n\sqrt{3}} \exp(\pi\sqrt{2n/3})</div>
-          <div class="pillar-sub">สเกลการบีบอัดตัว (Squeeze) ตรวจจุดชนวนก่อนวอลุ่มสถาบันปรากฏ</div>
-        </div>
-
-        <div class="pillar-box-mini">
-          <div class="pillar-label">PILLAR IV • RISK-FREE PYRAMID</div>
-          <div class="pillar-formula">\text{SL}_{\text{new}} \ge \text{AvgCost}(1 + \tau_{\text{fee}} + 0.002)</div>
-          <div class="pillar-sub">เปิดไม้งอกได้เฉพาะเมื่อมีกำไรคุ้มทุนแล้ว กำจัดความเสี่ยงเงินต้นเป็นศูนย์</div>
-        </div>
-      </div>
-
-      <!-- Compact Simulator Strip -->
-      <div class="sim-strip-compact">
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-          <span style="font-weight: 700; color: var(--gold); font-size: 0.85rem;">🚀 เครื่องจำลองผลึกทุน:</span>
-          <div style="display: flex; gap: 6px; align-items: center; font-size: 0.8rem;">
-            <span>เงินทุน:</span>
-            <input type="range" id="simCapSlider" min="100000" max="5000000" step="50000" value="500000" style="width: 110px;">
-            <strong id="dispSimCap" style="color: var(--gold);">฿500,000</strong>
-          </div>
-          <div style="display: flex; gap: 6px; align-items: center; font-size: 0.8rem;">
-            <span>โหมด:</span>
-            <select id="simPresetSelect" class="search-input-sm" style="padding: 2px 6px;">
-              <option value="conservative">🛡️ เซฟตี้ 30%</option>
-              <option value="balanced" selected>⚖️ สมดุล 60%</option>
-              <option value="aggressive">🚀 มาสเตอร์ 90%</option>
-            </select>
-            <span id="dispSimPreset" style="display: none;">⚖️ สมดุล</span>
-          </div>
-          <div style="display: flex; gap: 6px; align-items: center; font-size: 0.8rem;">
-            <span>รอบ:</span>
-            <input type="range" id="simCyclesSlider" min="10" max="50" step="1" value="26" style="width: 80px;">
-            <strong id="dispSimCycles" style="color: #c084fc;">26 รอบ</strong>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 14px; font-size: 0.82rem; font-family: var(--font-code);">
-          <span>พอร์ตสิ้นสุด: <strong class="text-green" id="dispSimFinalEquity">฿504,650</strong></span>
-          <span>กำไรสุทธิ: <strong class="text-gold" id="dispSimProfit">+฿4,650</strong></span>
-          <span>ผลตอบแทน: <strong style="color: #38bdf8;" id="dispSimReturn">+0.93%</strong></span>
-          <span>ความเสี่ยงสูงสุด: <strong style="color: #f87171;" id="dispSimMaxRisk">-5.71%</strong></span>
-        </div>
-      </div>
-    </section>
 
     <!-- ================= FOOTER ================= -->
     <footer style="text-align: center; padding: 18px 10px; color: var(--text-dim); font-size: 0.78rem;">
