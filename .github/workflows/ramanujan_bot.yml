@@ -2,10 +2,14 @@ name: Ramanujan SET Cycle Auto Pipeline
 
 on:
   schedule:
-    # รอบพักเที่ยง: 13:00 น. เวลาไทย (06:00 UTC) ทุกวันจันทร์ - ศุกร์ (หลบช่วงดีเลย์ 15 นาที ให้ Yahoo สรุปยอดเช้านิ่ง 100%)
+    # Midday Primary: 13:10 BKK (06:10 UTC)
     - cron: '10 6 * * 1-5'
-    # รอบตลาดปิดเย็น: 17:30 น. เวลาไทย (10:30 UTC) ทุกวันจันทร์ - ศุกร์
-    - cron: '30 10 * * 1-5'
+    # Midday Fail-safe Backup: 13:30 BKK (06:30 UTC)
+    - cron: '30 6 * * 1-5'
+    # Evening Primary: 17:40 BKK (10:40 UTC)
+    - cron: '40 10 * * 1-5'
+    # Evening Fail-safe Backup: 18:00 BKK (11:00 UTC)
+    - cron: '0 11 * * 1-5'
   workflow_dispatch: # เปิดให้กดปุ่มสั่งรันเองได้จากหน้าเว็บ GitHub ตลอดเวลา
 
 permissions:

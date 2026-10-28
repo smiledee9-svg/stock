@@ -92,10 +92,12 @@ function renderTelemetryCockpit(summary, activePos, pred, candles) {
   const currPrice = pred.lastPrice || lastBar.close || 153.50;
   const lastDate = pred.lastDate || lastBar.time || '2026-10-27';
 
-  // Live status pill in Hero
+  // Live status pill in Hero (Dynamic Midday vs Evening)
   const elStatus = document.getElementById('liveStatusText');
   if (elStatus) {
-    elStatus.textContent = `ตลาดปิดเย็น ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
+    const isMidday = new Date().getHours() < 16;
+    const sessionLabel = isMidday ? 'ตลาดปิดเที่ยง' : 'ตลาดปิดเย็น';
+    elStatus.textContent = `${sessionLabel} ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
   }
 
   // Header Collapse Toggle (Maximized Screen Focus)
@@ -159,6 +161,29 @@ function renderTelemetryCockpit(summary, activePos, pred, candles) {
       elTitle.textContent = `สัจธรรมแห่งสภาวะปัจจุบัน: คลื่นอยู่ในช่วงปรับสมดุลกาลเวลา`;
       elText.innerHTML = `"คลื่นความเร็วกำลังจัดระเบียบใหม่ ราคาแกว่งตัวอยู่ในกรอบ Floor <strong>฿${floorPrice.toFixed(2)}</strong> ถึง Ceiling <strong>฿${ceilPrice.toFixed(2)}</strong> ยึดมั่นวินัยเงินสดเป็นเอก"`;
     }
+  }
+
+  // 3-Minute Auto-Poll Heartbeat: Auto-refreshes data when market closes midday or evening
+  if (!window._ramanujanPollStarted) {
+    window._ramanujanPollStarted = true;
+    setInterval(() => {
+      const now = new Date();
+      const hr = now.getHours();
+      // Only poll during active SET update windows (12:30 - 14:30 and 16:30 - 18:30)
+      if ((hr >= 12 && hr <= 14) || (hr >= 16 && hr <= 18)) {
+        fetch(`ramanujan_results.json?t=${Date.now()}`)
+          .then(res => res.json())
+          .then(freshData => {
+            const freshPrice = freshData?.predictiveIntelligence?.lastPrice;
+            const freshDate = freshData?.predictiveIntelligence?.lastDate;
+            if (freshDate && (freshDate !== pred.lastDate || (freshPrice && Math.abs(freshPrice - currPrice) > 0.01))) {
+              console.log(`[Auto-Update] Detected fresh data (${freshDate} ฿${freshPrice}). Reloading...`);
+              window.location.reload();
+            }
+          })
+          .catch(() => {});
+      }
+    }, 180000); // Check every 3 minutes
   }
 }
 
