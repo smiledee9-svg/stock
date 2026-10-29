@@ -89,12 +89,26 @@ function renderTelemetryCockpit(summary, activePos, pred, candles) {
   const currPrice = pred.lastPrice || lastBar.close || 153.50;
   const lastDate = pred.lastDate || lastBar.time || '2026-10-27';
 
-  // Live status pill in Hero (Dynamic Midday vs Evening)
+  // Live status pill in Hero (Dynamic Midday vs Evening vs Previous Close)
   const elStatus = document.getElementById('liveStatusText');
   if (elStatus) {
-    const isMidday = new Date().getHours() < 16;
-    const sessionLabel = isMidday ? 'ตลาดปิดเที่ยง' : 'ตลาดปิดเย็น';
-    elStatus.textContent = `${sessionLabel} ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
+    const now = new Date();
+    const todayYMD = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    let sessionLabel = 'ตลาดปิดเย็น';
+
+    if (lastDate === todayYMD) {
+      const currentHour = now.getHours();
+      const currentMin = now.getMinutes();
+      if (currentHour < 16 || (currentHour === 16 && currentMin < 35)) {
+        sessionLabel = 'ตลาดปิดเที่ยง';
+      } else {
+        sessionLabel = 'ตลาดปิดเย็น';
+      }
+      elStatus.textContent = `${sessionLabel} ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
+    } else {
+      // Data is from previous settled trading day (settled close)
+      elStatus.textContent = `ราคาปิดสิ้นวัน ${formatDateThai(lastDate)}: ฿${currPrice.toFixed(2)}`;
+    }
   }
 
   // Header Collapse Toggle (Maximized Screen Focus)
@@ -615,11 +629,13 @@ function initDailyArchive(candles, pred, summary) {
 
     const midPrice = userJ.middayPrice !== undefined ? userJ.middayPrice : (isToday && pred.lastPrice ? pred.lastPrice : c.open);
     const midAction = userJ.middayAction || (isToday ? 'TRIGGER_WATCH' : (v5Num > 0 ? 'BUY_LAYER1' : 'HOLD_CASH'));
-    const midNote = userJ.middayNote || (isToday ? 'รอบเช้าพักตัวทดสอบแนวรับ จ่อจุดชนวน ฿154.93' : '');
+    const inflectionP = pred.scenarios?.bullishInflection?.triggerPrice ? `฿${pred.scenarios.bullishInflection.triggerPrice.toFixed(2)}` : 'จุดชนวน';
+    const floorP = pred.expectedRange?.floor ? `฿${pred.expectedRange.floor.toFixed(2)}` : 'Sacred Floor';
+    const midNote = userJ.middayNote || (isToday ? `รอบเช้าแกว่งตัวทดสอบแนวรับ จ่อจุดชนวน ${inflectionP}` : '');
 
     const evePrice = userJ.eveningPrice !== undefined ? userJ.eveningPrice : c.close;
     const eveAction = userJ.eveningAction || c.signal || 'HOLD_CASH';
-    const eveNote = userJ.eveningNote || (isToday ? 'ปิดตลาดรักษาฐานราคาเหนือ Floor ฿144.05 ได้อย่างสมบูรณ์แบบ' : '');
+    const eveNote = userJ.eveningNote || (isToday ? `ปิดตลาดรักษาฐานราคาเหนือ Floor ${floorP} ได้อย่างมั่นคง` : '');
 
     records.push({
       date: c.time,
