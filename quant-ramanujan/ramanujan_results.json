@@ -2,63 +2,63 @@
   "summary": {
     "symbol": "SCB.BK",
     "period": "4 Years (Daily SET)",
-    "totalCandles": 970,
+    "totalCandles": 969,
     "initialCapital": 500000.0,
-    "finalEquity": 504629.46,
-    "totalReturnPct": 0.93,
+    "finalEquity": 504929.46,
+    "totalReturnPct": 0.99,
     "maxDrawdownPct": -5.71,
     "annVolPct": 2.18,
     "sharpe": -1.02,
-    "sortino": -1.41,
-    "calmar": 0.16,
+    "sortino": -1.4,
+    "calmar": 0.17,
     "totalCycles": 26,
     "winCycles": 16,
     "lossCycles": 10,
     "winRatePct": 61.54,
     "profitFactor": 1.1,
     "totalFeesPaid": 12228.65,
-    "bnhReturnPct": 45.5,
+    "bnhReturnPct": 45.97,
     "bnhMaxDrawdownPct": -18.99,
-    "currentPrice": 153.5
+    "currentPrice": 154.0
   },
   "predictiveIntelligence": {
-    "lastDate": "2026-11-18",
-    "lastPrice": 153.5,
-    "dynamicDeltaPct": 1.96,
+    "lastDate": "2026-11-17",
+    "lastPrice": 154.0,
+    "dynamicDeltaPct": 4.33,
     "expectedRange": {
-      "floor": 150.49,
-      "ceiling": 156.51,
-      "spreadThb": 6.02
+      "floor": 147.34,
+      "ceiling": 160.66,
+      "spreadThb": 13.32
     },
     "scenarios": {
       "bullishInflection": {
         "name": "จุดกลับตัวคลื่นสอดคล้อง (Harmonic Inflection Trigger)",
-        "triggerPrice": 154.68,
-        "changePct": "+0.77%",
-        "description": "ราคาปิดยืนเหนือ ฿154.68 คลื่นสัปดาห์ V5 และเดือน V20 ตัดขึ้นบวกพร้อมกัน (Phase Coherence >= 0.25)",
+        "triggerPrice": 154.92,
+        "changePct": "+0.6%",
+        "description": "ราคาปิดยืนเหนือ ฿154.92 คลื่นสัปดาห์ V5 และเดือน V20 ตัดขึ้นบวกพร้อมกัน (Phase Coherence >= 0.25)",
         "actionPlan": "จับตาใกล้ชิด เตรียมตั้งรับไม้แรกหยั่งเชิง (Watchlist / Ready to Probe)",
         "statusBadge": "🟢 TRIGGER WATCH"
       },
       "resonanceBreakout": {
         "name": "จุดระเบิดเบรกเอาท์เต็มสูบ (Full Resonance Breakout)",
-        "triggerPrice": 155.75,
-        "changePct": "+1.47%",
-        "description": "ราคาปิดทะลุ ฿155.75 ทะลุกรอบไซด์เวย์ ER >= 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด",
+        "triggerPrice": 155.0,
+        "changePct": "+0.65%",
+        "description": "ราคาปิดทะลุ ฿155.00 ทะลุกรอบไซด์เวย์ ER >= 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด",
         "actionPlan": "เปิดรอบซื้อไม้แรกตามระบบทันที (BUY Entry Stage 1)",
         "statusBadge": "⚡ FULL BUY"
       },
       "neutralHolding": {
         "name": "โซนถือเงินสดปลอดภัย (Neutral Cash Zone)",
-        "rangeText": "฿150.49 - ฿154.68",
+        "rangeText": "฿147.34 - ฿154.92",
         "description": "คลื่นความเร็วยังไม่เข้าเกณฑ์คู่ ตลาดยังแกว่งตัวรอเลือกข้าง",
         "actionPlan": "ถือเงินสด 100% สบายใจ ปล่อยคนอื่นติดดอย ไม่มีความเสี่ยง (HOLD 100% CASH)",
         "statusBadge": "⚪ HOLD CASH"
       },
       "bearishRisk": {
         "name": "จุดเตือนระวังพักฐานลึก (Dynamic Floor Breakdown)",
-        "triggerPrice": 150.49,
-        "changePct": "-1.96%",
-        "description": "ราคาหลุดต่ำกว่า ฿150.49 (หลุดกรอบล่าง Delta_t ของรามานุจัน)",
+        "triggerPrice": 147.34,
+        "changePct": "-4.33%",
+        "description": "ราคาหลุดต่ำกว่า ฿147.34 (หลุดกรอบล่าง Delta_t ของรามานุจัน)",
         "actionPlan": "ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือรอคลื่นสงบ (AVOID DROP)",
         "statusBadge": "🔴 DANGER AVOID"
       }
@@ -71,10 +71,10 @@
     "layers": 1,
     "totalShares": 600,
     "avgEntryPrice": 152.5,
-    "currentPrice": 153.5,
+    "currentPrice": 154.0,
     "trailingStopPrice": 144.88,
-    "unrealizedPnLPct": 0.66,
-    "barsHeld": 17,
+    "unrealizedPnLPct": 0.98,
+    "barsHeld": 16,
     "openDate": "2026-10-26"
   },
   "completedCycles": [
@@ -21839,28 +21839,6 @@
       "signal_detail": "",
       "trailing_stop": 144.88,
       "equity": 504929.46
-    },
-    {
-      "time": "2026-11-18",
-      "timestamp": 1794970800,
-      "open": 154.0,
-      "high": 154.5,
-      "low": 152.5,
-      "close": 153.5,
-      "volume": 11941471.0,
-      "v_micro": -0.6559,
-      "v_macro": 0.0901,
-      "rho_ram": -0.27,
-      "er": 0.167,
-      "dynamic_delta": 0.0196,
-      "r_q": 0.4054,
-      "z_t": -0.224,
-      "ema_trend": 151.19,
-      "confidence_pct": 22.9,
-      "signal": "HOLD",
-      "signal_detail": "",
-      "trailing_stop": 144.88,
-      "equity": 504629.46
     }
   ],
   "presets": {
