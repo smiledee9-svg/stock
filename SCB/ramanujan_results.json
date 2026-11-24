@@ -2,7 +2,7 @@
   "summary": {
     "symbol": "SCB.BK",
     "period": "4 Years (Daily SET)",
-    "totalCandles": 970,
+    "totalCandles": 969,
     "initialCapital": 500000.0,
     "finalEquity": 503875.74,
     "totalReturnPct": 0.78,
@@ -17,48 +17,48 @@
     "winRatePct": 59.26,
     "profitFactor": 1.1,
     "totalFeesPaid": 12382.37,
-    "bnhReturnPct": 45.97,
+    "bnhReturnPct": 45.5,
     "bnhMaxDrawdownPct": -18.99,
-    "currentPrice": 154.0
+    "currentPrice": 153.5
   },
   "predictiveIntelligence": {
-    "lastDate": "2026-11-24",
-    "lastPrice": 154.0,
-    "dynamicDeltaPct": 4.11,
+    "lastDate": "2026-11-23",
+    "lastPrice": 153.5,
+    "dynamicDeltaPct": 4.1,
     "expectedRange": {
-      "floor": 147.68,
-      "ceiling": 160.32,
-      "spreadThb": 12.64
+      "floor": 147.21,
+      "ceiling": 159.79,
+      "spreadThb": 12.58
     },
     "scenarios": {
       "bullishInflection": {
         "name": "จุดกลับตัวคลื่นสอดคล้อง (Harmonic Inflection Trigger)",
-        "triggerPrice": 156.17,
-        "changePct": "+1.41%",
-        "description": "ราคาปิดยืนเหนือ ฿156.17 คลื่นสัปดาห์ V5 และเดือน V20 ตัดขึ้นบวกพร้อมกัน (Phase Coherence >= 0.25)",
+        "triggerPrice": 153.43,
+        "changePct": "-0.05%",
+        "description": "ราคาปิดยืนเหนือ ฿153.43 คลื่นสัปดาห์ V5 และเดือน V20 ตัดขึ้นบวกพร้อมกัน (Phase Coherence >= 0.25)",
         "actionPlan": "จับตาใกล้ชิด เตรียมตั้งรับไม้แรกหยั่งเชิง (Watchlist / Ready to Probe)",
         "statusBadge": "🟢 TRIGGER WATCH"
       },
       "resonanceBreakout": {
         "name": "จุดระเบิดเบรกเอาท์เต็มสูบ (Full Resonance Breakout)",
-        "triggerPrice": 156.0,
-        "changePct": "+1.3%",
-        "description": "ราคาปิดทะลุ ฿156.00 ทะลุกรอบไซด์เวย์ ER >= 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด",
+        "triggerPrice": 153.5,
+        "changePct": "0.0%",
+        "description": "ราคาปิดทะลุ ฿153.50 ทะลุกรอบไซด์เวย์ ER >= 0.26 วอลุ่มพร้อมคลื่นสอดคล้องสูงสุด",
         "actionPlan": "เปิดรอบซื้อไม้แรกตามระบบทันที (BUY Entry Stage 1)",
         "statusBadge": "⚡ FULL BUY"
       },
       "neutralHolding": {
         "name": "โซนถือเงินสดปลอดภัย (Neutral Cash Zone)",
-        "rangeText": "฿147.68 - ฿156.17",
+        "rangeText": "฿147.21 - ฿153.43",
         "description": "คลื่นความเร็วยังไม่เข้าเกณฑ์คู่ ตลาดยังแกว่งตัวรอเลือกข้าง",
         "actionPlan": "ถือเงินสด 100% สบายใจ ปล่อยคนอื่นติดดอย ไม่มีความเสี่ยง (HOLD 100% CASH)",
         "statusBadge": "⚪ HOLD CASH"
       },
       "bearishRisk": {
         "name": "จุดเตือนระวังพักฐานลึก (Dynamic Floor Breakdown)",
-        "triggerPrice": 147.68,
-        "changePct": "-4.11%",
-        "description": "ราคาหลุดต่ำกว่า ฿147.68 (หลุดกรอบล่าง Delta_t ของรามานุจัน)",
+        "triggerPrice": 147.21,
+        "changePct": "-4.1%",
+        "description": "ราคาหลุดต่ำกว่า ฿147.21 (หลุดกรอบล่าง Delta_t ของรามานุจัน)",
         "actionPlan": "ห้ามเข้ารับมีดเด็ดขาด นั่งทับมือรอคลื่นสงบ (AVOID DROP)",
         "statusBadge": "🔴 DANGER AVOID"
       }
@@ -21845,28 +21845,6 @@
       "z_t": 0.495,
       "ema_trend": 151.38,
       "confidence_pct": 67.7,
-      "signal": "HOLD",
-      "signal_detail": "",
-      "trailing_stop": null,
-      "equity": 503875.74
-    },
-    {
-      "time": "2026-11-24",
-      "timestamp": 1795489200,
-      "open": 154.0,
-      "high": 155.5,
-      "low": 153.5,
-      "close": 154.0,
-      "volume": 12962067.0,
-      "v_micro": 0.5802,
-      "v_macro": 0.4046,
-      "rho_ram": 0.938,
-      "er": 0.333,
-      "dynamic_delta": 0.0411,
-      "r_q": 0.4378,
-      "z_t": 0.247,
-      "ema_trend": 151.48,
-      "confidence_pct": 59.1,
       "signal": "HOLD",
       "signal_detail": "",
       "trailing_stop": null,
